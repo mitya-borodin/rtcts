@@ -1,0 +1,63 @@
+{
+  "name": "@borodindmitriy/base-code",
+  "description": "Common classes's library.",
+  "version": "4.0.0",
+  "engines": {
+    "node": ">=8",
+    "npm": ">=5"
+  },
+  "files": [
+    "lib"
+  ],
+  "homepage": "https://gitlab.com/mitya-borodin/base-code",
+  "bugs": {
+    "url": "https://gitlab.com/mitya-borodin/base-code"
+  },
+  "repository": {
+    "type": "git+ssh",
+    "url": "git@gitlab.com:mitya-borodin/base-code.git"
+  },
+  "author": {
+    "name": "Dmitriy Borodin",
+    "email": "dmitriy@borodin.site",
+    "url": "http://borodin.site"
+  },
+  "scripts": {
+    "build": " npm run lint && tsc",
+    "build:relink": "del lib && npm run build && npm link",
+    "build:watch": "npm run build && tsc --watch",
+    "lint": "tslint -c tslint.json src/**/*.ts --fix",
+    "test": "mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
+    "test:coverage": "nyc --extension .ts --reporter=html mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
+    "test:watch": "mocha -R progress --require ./tests/setup.js --watch-extensions ts --watch tests/unit/**/*.spec.ts",
+    "prepublishOnly": "sh ./prepublish.sh",
+    "prepush": "sh ./prepublish.sh"
+  },
+  "devDependencies": {
+    "@types/chai": "4.1.2",
+    "@types/mocha": "5.2.0",
+    "@types/node": "9.6.6",
+    "@types/twix": "0.6.37",
+    "bson": "2.0.5",
+    "chai": "4.1.2",
+    "del-cli": "1.1.0",
+    "husky": "0.14.3",
+    "mocha": "5.1.1",
+    "moment": "2.22.1",
+    "nyc": "11.7.1",
+    "prettier": "1.12.1",
+    "ts-node": "6.0.0",
+    "tslib": "1.9.0",
+    "tslint": "5.9.1",
+    "tslint-no-circular-imports": "0.3.0",
+    "twix": "1.2.1",
+    "typescript": "2.8.3"
+  },
+  "peerDependencies": {
+    "moment": ">=2.20.1",
+    "tslib": ">=1.9.0",
+    "twix": ">=1.2.1",
+    "bson": ">=1.0.0"
+  },
+  "license": "unlicensed"
+}
