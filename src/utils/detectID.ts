@@ -1,6 +1,6 @@
 import { isString } from "../utils/isType";
 
-export const detectID = ( data?: any ): string => {
+export function detectID( data?: any ): string {
   if ( data ) {
     if ( isString( data.id ) && data.id.length > 0 ) {
       return data.id;
@@ -14,4 +14,4 @@ export const detectID = ( data?: any ): string => {
   }
 
   return "";
-};
+}

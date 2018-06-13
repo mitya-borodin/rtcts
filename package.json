@@ -9,12 +9,16 @@
   "files": [
     "lib"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
   "repository": {
-    "type": "git+ssh",
+    "type": "git",
     "url": "git@gitlab.com:mitya-borodin/base-code.git"
   },
   "author": {
@@ -29,7 +33,9 @@
     "lint": "tslint -c tslint.json src/**/*.ts --fix",
     "test": "mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
     "test:coverage": "nyc --extension .ts --reporter=html mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
-    "test:watch": "mocha -R progress --require ./tests/setup.js --watch-extensions ts --watch tests/unit/**/*.spec.ts"
+    "test:watch": "mocha -R progress --require ./tests/setup.js --watch-extensions ts --watch tests/unit/**/*.spec.ts",
+    "prepublishOnly": "sh ./prepublish.sh",
+    "prepush": "sh ./prepublish.sh"
   },
   "devDependencies": {
     "@types/chai": "4.1.2",
@@ -57,5 +63,6 @@
     "twix": ">=1.2.1",
     "bson": ">=1.0.0"
   },
-  "license": "unlicensed"
+  "license": "MIT",
+  "dependencies": {}
 }
