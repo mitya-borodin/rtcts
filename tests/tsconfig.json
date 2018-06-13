@@ -33,9 +33,7 @@
     "baseUrl": "./",
     "paths": {},
     "rootDirs": [
-      "../src",
-      "./unit",
-      "./support"
+      "./unit"
     ],
     "typeRoots": [
       "node_modules/@types"
@@ -48,10 +46,7 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "support/**/*.ts",
-    "unit/**/*.ts",
-    "../src",
-    "../node_modules/.cache/nyc/ac14064e9368b996bb1e50be41ed8cd6_11.7.1.ts"
+    "unit/**/*.ts"
   ],
   "exclude": [
     "node_modules"

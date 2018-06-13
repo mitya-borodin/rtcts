@@ -1,7 +1,7 @@
 {
   "name": "@borodindmitriy/base-code",
   "description": "Common classes's library.",
-  "version": "4.0.0",
+  "version": "1.0.0",
   "engines": {
     "node": ">=8",
     "npm": ">=5"
@@ -29,9 +29,7 @@
     "lint": "tslint -c tslint.json src/**/*.ts --fix",
     "test": "mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
     "test:coverage": "nyc --extension .ts --reporter=html mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
-    "test:watch": "mocha -R progress --require ./tests/setup.js --watch-extensions ts --watch tests/unit/**/*.spec.ts",
-    "prepublishOnly": "sh ./prepublish.sh",
-    "prepush": "sh ./prepublish.sh"
+    "test:watch": "mocha -R progress --require ./tests/setup.js --watch-extensions ts --watch tests/unit/**/*.spec.ts"
   },
   "devDependencies": {
     "@types/chai": "4.1.2",
