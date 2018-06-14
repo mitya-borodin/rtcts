@@ -9,5 +9,5 @@ export function toMongo<T extends IInsert>( instance: T ): { [ key: string ]: an
     throw new Error( "[toMongo] - expected that id is defined, but right now id is undefined;" );
   }
 
-  return Object.assign( {}, { _id: ObjectId( id ) }, data );
+  return Object.assign( {}, { _id: new ObjectId( id ) }, data );
 }
