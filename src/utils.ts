@@ -16,3 +16,4 @@ export { authenticate } from "./utils/authenticate";
 export { getSalt } from "./utils/getSalt";
 export { encryptPassword } from "./utils/encryptPassword";
 export { uploadHTML } from "./utils/uploadHTML";
+export { overlaps } from "./utils/overlaps";

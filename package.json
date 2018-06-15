@@ -1,11 +1,13 @@
 {
   "name": "@borodindmitriy/base-code",
   "description": "Common classes's library.",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "engines": {
     "node": ">=8",
     "npm": ">=5"
   },
+  "main": "lib",
+  "types": "lib",
   "files": [
     "lib"
   ],
@@ -42,7 +44,6 @@
     "@types/chai": "4.1.2",
     "@types/mocha": "5.2.0",
     "@types/node": "9.6.6",
-    "@types/twix": "0.6.34",
     "bson": "2.0.5",
     "chai": "4.1.2",
     "del-cli": "1.1.0",
@@ -55,13 +56,11 @@
     "tslib": "1.9.0",
     "tslint": "5.9.1",
     "tslint-no-circular-imports": "0.3.0",
-    "twix": "1.2.1",
     "typescript": "2.8.3"
   },
   "peerDependencies": {
     "moment": ">=2.22.2",
     "tslib": ">=1.9.0",
-    "twix": ">=1.2.1",
     "bson": ">=2.0.5"
   },
   "license": "MIT"
