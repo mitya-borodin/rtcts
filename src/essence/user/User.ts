@@ -6,13 +6,13 @@ import { UserInsert } from "./UserInsert";
 export class User extends UserInsert implements IUser, IPersist {
   public readonly id: string;
 
-  constructor( data?: any ) {
-    super( data );
+  constructor(data?: any) {
+    super(data);
 
-    this.id = detectID( data );
+    this.id = detectID(data);
   }
 
-  public toJS(): { [ key: string ]: any } {
+  public toJS(): { [key: string]: any } {
     return {
       ...super.toJS(),
       id: this.id,

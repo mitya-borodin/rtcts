@@ -1,3 +1,3 @@
 export interface IInsert {
-  toJS(): { [ key: string ]: any };
+  toJS(): { [key: string]: any };
 }

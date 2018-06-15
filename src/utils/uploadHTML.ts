@@ -1,7 +1,12 @@
-export function uploadHTML( title: string, body: string, css: string[], fileName: string ): void {
+export function uploadHTML(
+  title: string,
+  body: string,
+  css: string[],
+  fileName: string,
+): void {
   const styles = css
-    .map( ( style ) => ( `<style type="text/css">${ style }</style>` ) )
-    .join( "\n\r" );
+    .map((style) => `<style type="text/css">${style}</style>`)
+    .join("\n\r");
 
   const html = `
       <!DOCTYPE html>
@@ -15,17 +20,17 @@ export function uploadHTML( title: string, body: string, css: string[], fileName
         </html>
       `;
 
-  const blob = new Blob( [ html ], { type: "text/html" } );
-  const a = document.createElement( "a" );
-  const url = URL.createObjectURL( blob );
+  const blob = new Blob([html], { type: "text/html" });
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(blob);
 
   a.href = url;
   a.download = `${fileName}.html`;
 
-  document.body.appendChild( a );
+  document.body.appendChild(a);
 
   a.click();
 
-  document.body.removeChild( a );
-  window.URL.revokeObjectURL( url );
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 }
