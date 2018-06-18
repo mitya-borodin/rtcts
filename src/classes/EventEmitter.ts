@@ -53,7 +53,7 @@ export class EventEmitter {
         console.warn(
           `[ ${
             this.constructor.name
-            } ][ ON ][ CALLBACK ][ ${name} ][ ALREADY_EXIST ]`,
+          } ][ ON ][ CALLBACK ][ ${name} ][ ALREADY_EXIST ]`,
         );
       }
     } else {
@@ -71,14 +71,14 @@ export class EventEmitter {
         console.warn(
           `[ ${
             this.constructor.name
-            } ][ OFF ][ CALLBACK ][ ${name} ][ NOT_EXIST ]`,
+          } ][ OFF ][ CALLBACK ][ ${name} ][ NOT_EXIST ]`,
         );
       }
     } else {
       console.error(
         `[ ${
           this.constructor.name
-          } ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`,
+        } ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`,
       );
     }
   }
