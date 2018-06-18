@@ -50,7 +50,11 @@ export class EventEmitter {
       if (!listeners.has(callBack)) {
         listeners.add(callBack);
       } else {
-        console.warn(`[ ${this.constructor.name} ][ ON ][ CALLBACK ][ ${name} ][ ALREADY_EXIST ]`);
+        console.warn(
+          `[ ${
+            this.constructor.name
+            } ][ ON ][ CALLBACK ][ ${name} ][ ALREADY_EXIST ]`,
+        );
       }
     } else {
       this.subscriptions.set(name, new Set([callBack]));
@@ -64,12 +68,19 @@ export class EventEmitter {
       if (listeners.has(callBack)) {
         listeners.delete(callBack);
       } else {
-        console.warn(`[ ${this.constructor.name} ][ OFF ][ CALLBACK ][ ${name} ][ NOT_EXIST ]`);
+        console.warn(
+          `[ ${
+            this.constructor.name
+            } ][ OFF ][ CALLBACK ][ ${name} ][ NOT_EXIST ]`,
+        );
       }
     } else {
-      console.error(`[ ${this.constructor.name} ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`);
+      console.error(
+        `[ ${
+          this.constructor.name
+          } ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`,
+      );
     }
-
   }
 
   public clear() {
