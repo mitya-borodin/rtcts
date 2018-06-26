@@ -1,16 +1,14 @@
 {
   "name": "@borodindmitriy/base-code",
   "description": "Common classes's library.",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "engines": {
     "node": ">=8",
     "npm": ">=5"
   },
   "main": "lib",
   "types": "lib",
-  "files": [
-    "lib"
-  ],
+  "files": ["lib"],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
