@@ -1,6 +1,6 @@
 import { Moment } from "moment";
 
-export function overlaps(x_0: Moment, x_1: Moment, y_0: Moment, y_1: Moment, includeBoundary = true): boolean {
+export function overlaps(x_0: Moment, x_1: Moment, y_0: Moment, y_1: Moment, includeBoundary = false): boolean {
   let hasOverlaps = false;
 
   if (Math.abs(x_0.diff(x_1, "ms")) > Math.abs(y_0.diff(y_1, "ms"))) {
