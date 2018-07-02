@@ -18,3 +18,4 @@ export { encryptPassword } from "./utils/encryptPassword";
 export { uploadHTML } from "./utils/uploadHTML";
 export { overlaps } from "./utils/overlaps";
 export { intersection } from "./utils/intersection";
+export { yearOnly } from "./utils/yearOnly";
