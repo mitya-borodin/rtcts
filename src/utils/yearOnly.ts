@@ -1,12 +1,6 @@
 import { Moment } from "moment";
+import * as moment from "moment";
 
 export function yearOnly(date: Moment): Moment {
-  return date
-    .clone()
-    .month(0)
-    .date(1)
-    .hour(0)
-    .minute(0)
-    .second(0)
-    .millisecond(0);
+  return moment(`${date.year()}-01-01`).utc();
 }
