@@ -1,1 +1,10 @@
 export { toMongo } from "./back/toMongo";
+export { DBConnection } from "./back/DBConnection";
+export { AuthStrategy } from "./back/AuthStrategy";
+export { APPServer } from "./back/APPServer";
+export { AppConfig } from "./back/AppConfig";
+export { Model } from "./back/Model";
+export { MongoDBRepository } from "./back/MongoDBRepository";
+export { UserModel } from "./back/UserModel";
+export { Service } from "./back/Service";
+export { UserService } from "./back/UserService";

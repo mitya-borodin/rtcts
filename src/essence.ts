@@ -1,2 +1,2 @@
-export { User } from "./essence/user/User";
-export { UserInsert } from "./essence/user/UserInsert";
+export { User } from "./essence/User";
+export { UserInsert } from "./essence/UserInsert";

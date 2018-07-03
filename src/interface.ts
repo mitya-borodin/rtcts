@@ -1,3 +1,12 @@
 export { IPersist } from "./interfaces/IPersist";
 export { IInsert } from "./interfaces/IInsert";
-export { IUser } from "./interfaces/essence/IUser";
+export { IUser } from "./interfaces/IUser";
+export { IUserModel } from "./interfaces/IUserModel";
+export { IAppConfig } from "./interfaces/IAppConfig";
+export { IAuthStrategy } from "./interfaces/IAuthStrategy";
+export { IChannels } from "./interfaces/IChannels";
+export { IConnection } from "./interfaces/IConnection";
+export { IDBConnection } from "./interfaces/IDBConnection";
+export { IModel } from "./interfaces/IModel";
+export { IRepository } from "./interfaces/IRepository";
+export { IUserGroup } from "./interfaces/IUserGroup";

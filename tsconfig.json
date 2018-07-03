@@ -4,11 +4,7 @@
     "preserveConstEnums": true,
     "target": "es6",
     "module": "commonjs",
-    "lib": [
-      "es6",
-      "es7",
-      "dom"
-    ],
+    "lib": ["es6", "es7", "dom"],
     "allowJs": false,
     "checkJs": false,
     "declaration": true,
@@ -35,20 +31,10 @@
     "baseUrl": "./src",
     "paths": {},
     "rootDirs": [],
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "types": [
-      "node"
-    ],
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node"],
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules",
-    "node_modules/.cache",
-    "lib"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
