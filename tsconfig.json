@@ -33,7 +33,8 @@
     "rootDirs": [],
     "typeRoots": ["node_modules/@types"],
     "types": ["node"],
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]

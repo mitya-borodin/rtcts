@@ -1,4 +1,6 @@
-export class EventEmitter {
+import { IEventEmitter } from "../interfaces/IEventEmitter";
+
+export class EventEmitter implements IEventEmitter {
   private subscriptions: Map<string, Set<(payload: any) => void>>;
 
   constructor() {
@@ -12,11 +14,11 @@ export class EventEmitter {
     this.clear = this.clear.bind(this);
   }
 
-  get listenersCount() {
+  get listenersCount(): number {
     return this.subscriptions.size;
   }
 
-  public emit(name, payload?: object) {
+  public emit(name, payload?: object): void {
     const listeners = this.subscriptions.get(name);
 
     if (listeners) {
@@ -24,7 +26,7 @@ export class EventEmitter {
     }
   }
 
-  public once(name, callBack) {
+  public once(name: string, callBack: any): void {
     const cb = (...args) => {
       callBack(...args);
       this.off(name, cb);
@@ -33,7 +35,7 @@ export class EventEmitter {
     this.on(name, cb);
   }
 
-  public has(name, callBack) {
+  public has(name: string, callBack: any): boolean {
     const listeners = this.subscriptions.get(name);
 
     if (listeners) {
@@ -43,47 +45,35 @@ export class EventEmitter {
     return false;
   }
 
-  public on(name, callBack) {
+  public on(name: string, callBack: any): void {
     const listeners = this.subscriptions.get(name);
 
     if (listeners) {
       if (!listeners.has(callBack)) {
         listeners.add(callBack);
       } else {
-        console.warn(
-          `[ ${
-            this.constructor.name
-          } ][ ON ][ CALLBACK ][ ${name} ][ ALREADY_EXIST ]`,
-        );
+        console.warn(`[ ${this.constructor.name} ][ ON ][ CALLBACK ][ ${name} ][ ALREADY_EXIST ]`);
       }
     } else {
       this.subscriptions.set(name, new Set([callBack]));
     }
   }
 
-  public off(name, callBack) {
+  public off(name: string, callBack: any): void {
     const listeners = this.subscriptions.get(name);
 
     if (listeners) {
       if (listeners.has(callBack)) {
         listeners.delete(callBack);
       } else {
-        console.warn(
-          `[ ${
-            this.constructor.name
-          } ][ OFF ][ CALLBACK ][ ${name} ][ NOT_EXIST ]`,
-        );
+        console.warn(`[ ${this.constructor.name} ][ OFF ][ CALLBACK ][ ${name} ][ NOT_EXIST ]`);
       }
     } else {
-      console.error(
-        `[ ${
-          this.constructor.name
-        } ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`,
-      );
+      console.error(`[ ${this.constructor.name} ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`);
     }
   }
 
-  public clear() {
+  public clear(): void {
     this.subscriptions.forEach((list) => list.clear());
     this.subscriptions.clear();
   }

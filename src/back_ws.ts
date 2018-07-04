@@ -2,6 +2,8 @@ export {
   cancel_assigment_to_user_of_the_connection_channel,
   assigment_to_user_of_the_connection_channel,
   ErrorChannel,
+  PingChannel,
+  PongChannel,
 } from "./webSocket/const";
 export { recognizeMessage, makeMessage, makeErrorMessage } from "./webSocket/helpers";
 export { WSServer } from "./webSocket/WSServer";
