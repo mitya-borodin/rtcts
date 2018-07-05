@@ -20,12 +20,6 @@ export interface IWSClient extends IEventEmitter {
     },
   ): void;
 
-  handleOpen(): void;
-
-  handleClose(event: any): void;
-
-  handleError(error: Error): void;
-
   assigmentToUserOfTheConnection(): Promise<void>;
 
   cancelAssigmentToUserOfTheConnection(): Promise<void>;

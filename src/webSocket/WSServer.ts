@@ -120,7 +120,9 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
       if (isArray(recieveData)) {
         const [channelName, payload] = recieveData;
 
-        if (isString(payload.uid)) {
+        if (channelName === PingChannel) {
+          connection.send(this.makeMessage(PongChannel, {}));
+        } else if (isString(payload.uid)) {
           if (
             channelName === assigment_to_user_of_the_connection_channel ||
             channelName === cancel_assigment_to_user_of_the_connection_channel
@@ -165,8 +167,6 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
               .catch((error) => {
                 connection.send(this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${error.message}`, { error, payload }));
               });
-          } else if (channelName === PingChannel) {
-            connection.send(this.makeMessage(PongChannel, {}));
           } else {
             connection.send(
               this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
