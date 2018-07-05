@@ -10,31 +10,30 @@ import { Store } from "./Store";
 
 export class RepositoryStore<
   T extends { id: string | void },
-  Service extends IClientService<T>,
+  S extends IClientService<T>,
   US extends IUserStore<U, G>,
   U extends IUser<G>,
   G extends IUserGroup
-> extends Store<US, U, G> implements IRepositoryStore<T> {
+> extends Store<T, S, US, U, G> implements IRepositoryStore<T> {
   @observable protected collection = observable.map<string, T>();
 
   protected repoName: string;
   protected chName: string;
   protected Constructor: { new (data?: any): T };
-  protected readonly service: Service;
 
   constructor(
-    service: Service,
+    service: S,
     name: string,
     chName: string,
     Constructor: { new (data?: any): T },
     wsClient: IWSClient,
     userStore: US,
   ) {
-    super(wsClient, userStore);
+    super(service, wsClient, userStore);
 
     // DEPS
     this.repoName = name.toUpperCase();
-    this.service = service;
+
     this.chName = chName;
     this.Constructor = Constructor;
 
@@ -90,7 +89,6 @@ export class RepositoryStore<
             }, observable.map());
 
             this.wasInit = true;
-            this.service.onChannel();
           });
         }
       } catch (error) {

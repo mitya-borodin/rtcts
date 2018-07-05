@@ -98,9 +98,9 @@ export class WSClient extends EventEmitter implements IWSClient {
         }
 
         if (chName === assigment_to_user_of_the_connection_channel) {
-          this.emit(wsEventEnum.ASSIGMENT, data);
+          this.handleAssigment({ uid: data.uid, wsid: data.wsid });
         } else if (chName === cancel_assigment_to_user_of_the_connection_channel) {
-          this.emit(wsEventEnum.CANCEL_ASSIGMENT, data);
+          this.handleCancelAssigment();
         } else if (chName === PongChannel) {
           this.pong();
         } else if (chName === ErrorChannel) {
@@ -145,25 +145,15 @@ export class WSClient extends EventEmitter implements IWSClient {
           this.dropConnectionData();
           this.uid = "";
 
-          console.log(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ][ CODE: ${event.code} ]`, event);
-
-          setTimeout(() => {
-            // Удаляю все обработчики событий.
-            this.clear();
-
-            console.log(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${this.listenersCount} ]`);
-            resolve();
-          }, 100);
+          resolve();
         });
 
         this.connection.close(1000, reason);
-      } else {
-        this.clear();
-
-        console.log(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ][ CODE: ${null} ]`);
-        console.log(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${this.listenersCount} ]`);
       }
     });
+
+    console.warn(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ]`);
+    console.warn(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${this.listenersCount} ]`);
   }
 
   public send(
@@ -192,7 +182,6 @@ export class WSClient extends EventEmitter implements IWSClient {
               this.connection.send(makeMessage(assigment_to_user_of_the_connection_channel, { uid: this.uid }));
 
               this.once(wsEventEnum.ASSIGMENT, (data) => {
-                this.handleAssigment(data);
                 resolve();
               });
             } else {
@@ -275,6 +264,8 @@ export class WSClient extends EventEmitter implements IWSClient {
     this.isAssigment = true;
     this.wsid = wsid;
     this.uid = uid;
+
+    this.emit(wsEventEnum.ASSIGMENT, {});
   }
 
   @action("[ WSClient ][ CANCEL_ASSIGMENT ]")
@@ -282,6 +273,8 @@ export class WSClient extends EventEmitter implements IWSClient {
     this.readyState = WebSocket.CLOSED;
     this.isAssigment = false;
     this.wsid = "";
+
+    this.emit(wsEventEnum.CANCEL_ASSIGMENT, {});
   }
 
   private ping(): void {

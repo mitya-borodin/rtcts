@@ -1,21 +1,30 @@
 import { action, observable } from "mobx";
 import { userStoreEventEnum } from "../enums/userStoreEventEnum";
 import { wsEventEnum } from "../enums/wsEventEnum";
+import { IClientService } from "../interfaces/IClientService";
 import { IStore } from "../interfaces/IStore";
 import { IUser } from "../interfaces/IUser";
 import { IUserGroup } from "../interfaces/IUserGroup";
 import { IUserStore } from "../interfaces/IUserStore";
 import { IWSClient } from "../interfaces/IWSClient";
 
-export class Store<US extends IUserStore<U, G>, U extends IUser<G>, G extends IUserGroup> implements IStore {
+export class Store<
+  T,
+  S extends IClientService<T>,
+  US extends IUserStore<U, G>,
+  U extends IUser<G>,
+  G extends IUserGroup
+> implements IStore {
   @observable public loading: boolean = false;
   @observable public wasInit: boolean = false;
 
   protected wsClient: IWSClient;
   protected userStore: US;
+  protected readonly service: S;
 
-  constructor(wsClient: IWSClient, userStore: US) {
+  constructor(service: S, wsClient: IWSClient, userStore: US) {
     // DEPS
+    this.service = service;
     this.wsClient = wsClient;
     this.userStore = userStore;
 
@@ -26,6 +35,7 @@ export class Store<US extends IUserStore<U, G>, U extends IUser<G>, G extends IU
     // SUBSCRIPTION
     this.userStore.on(userStoreEventEnum.LOGIN, this.onLogin);
     this.userStore.on(userStoreEventEnum.LOGOUT, this.onLogout);
+    this.wsClient.on(wsEventEnum.ASSIGMENT, this.service.onChannel);
   }
 
   public receiveMessage(message) {
