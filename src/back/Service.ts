@@ -1,10 +1,10 @@
 import * as express from "express";
+import { IPersist } from "interfaces/IPersist";
+import { IUserGroup } from "interfaces/IUserGroup";
 import * as passport from "passport";
-import { IChannels } from "../interfaces/IChannels";
 import { IInsert } from "../interfaces/IInsert";
-import { IModel } from "../interfaces/IModel";
-import { IPersist } from "../interfaces/IPersist";
-import { IUserGroup } from "../interfaces/IUserGroup";
+import { IChannels } from "./interfaces/IChannels";
+import { IModel } from "./interfaces/IModel";
 
 export class Service<P extends IPersist, I extends IInsert, C extends IChannels, G extends IUserGroup> {
   protected readonly name: string;

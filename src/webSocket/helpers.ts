@@ -1,4 +1,4 @@
-import { isObject, isString } from "../utils/isType";
+import { isObject, isString } from "utils/isType";
 import { ErrorChannel } from "./const";
 
 export const recognizeMessage = (message: string): [string, { [key: string]: any }] => {

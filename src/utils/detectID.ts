@@ -1,4 +1,4 @@
-import { isString } from "../utils/isType";
+import { isString } from "./isType";
 
 export function detectID(data?: any): string {
   if (data) {

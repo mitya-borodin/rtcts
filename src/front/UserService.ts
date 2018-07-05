@@ -1,11 +1,11 @@
-import { IClientUserService } from "../interfaces/IClientUserService";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
 import { IUserGroup } from "../interfaces/IUserGroup";
+import { IUserService } from "./interfaces/IUserService";
 import { Service } from "./Service";
 
 export class UserService<U extends IUser<G>, G extends IUserGroup> extends Service<U & IPersist>
-  implements IClientUserService<U & IPersist, G> {
+  implements IUserService<U & IPersist, G> {
   public async signIn(login: string, password: string): Promise<string | void> {
     const output: string | null = await this.post(`/${this.name}/signIn`, { login, password });
 

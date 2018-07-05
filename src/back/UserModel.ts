@@ -1,16 +1,16 @@
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
-import { IAppConfig } from "../interfaces/IAppConfig";
+import { checkPassword } from "utils/checkPassword";
+import { encryptPassword } from "utils/encryptPassword";
+import { getSalt } from "utils/getSalt";
+import { userGroupEnum } from "../enums/userGroupEnum";
 import { IPersist } from "../interfaces/IPersist";
-import { IRepository } from "../interfaces/IRepository";
+import { IUser } from "../interfaces/IUser";
 import { IUserGroup } from "../interfaces/IUserGroup";
-import { IUserModel } from "../interfaces/IUserModel";
 import { authenticate } from "../utils/authenticate";
-import { checkPassword } from "../utils/checkPassword";
-import { encryptPassword } from "../utils/encryptPassword";
-import { getSalt } from "../utils/getSalt";
-import { userGroupEnum } from "./../enums/userGroupEnum";
-import { IUser } from "./../interfaces/IUser";
+import { IAppConfig } from "./interfaces/IAppConfig";
+import { IRepository } from "./interfaces/IRepository";
+import { IUserModel } from "./interfaces/IUserModel";
 import { Model } from "./Model";
 
 export class UserModel<P extends IUser<G> & IPersist, I extends IUser<G>, G extends IUserGroup> extends Model<P, I>

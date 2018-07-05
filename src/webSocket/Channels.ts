@@ -1,8 +1,8 @@
 import chalk from "chalk";
-import { IChannels } from "../interfaces/IChannels";
-import { IConnection } from "../interfaces/IConnection";
-import { makeMessage } from "../WebSocket/helpers";
+import { IChannels } from "../back/interfaces/IChannels";
+import { IConnection } from "../back/interfaces/IConnection";
 import { Connection } from "./Connection";
+import { makeMessage } from "./helpers";
 
 export class Channels implements IChannels {
   // Map<connectionID: string, Connection>

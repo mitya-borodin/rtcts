@@ -1,9 +1,9 @@
-import { IClientService } from "./IClientService";
-import { IPersist } from "./IPersist";
-import { IUser } from "./IUser";
-import { IUserGroup } from "./IUserGroup";
+import { IUserGroup } from "interfaces/IUserGroup";
+import { IPersist } from "../../interfaces/IPersist";
+import { IUser } from "../../interfaces/IUser";
+import { IService } from "./IService";
 
-export interface IClientUserService<U extends IUser<G> & IPersist, G extends IUserGroup> extends IClientService<U> {
+export interface IUserService<U extends IUser<G> & IPersist, G extends IUserGroup> extends IService<U> {
   signIn(login: string, password: string): Promise<string | void>;
 
   signUp(login: string, password: string, password_confirm: string, group: G): Promise<string | void>;

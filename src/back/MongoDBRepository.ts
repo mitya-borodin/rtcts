@@ -15,9 +15,9 @@ import {
   InsertWriteOpResult,
   ReplaceOneOptions,
 } from "mongodb";
-import { IDBConnection } from "../interfaces/IDBConnection";
-import { IRepository } from "../interfaces/IRepository";
 import { isString } from "../utils/isType";
+import { IDBConnection } from "./interfaces/IDBConnection";
+import { IRepository } from "./interfaces/IRepository";
 
 export class MongoDBRepository<D> implements IRepository<D> {
   private readonly name: string;

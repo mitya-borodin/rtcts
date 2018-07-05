@@ -1,16 +1,16 @@
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
-import { IClientService } from "../interfaces/IClientService";
-import { IRepositoryStore } from "../interfaces/IRepositoryStore";
-import { IUser } from "../interfaces/IUser";
-import { IUserGroup } from "../interfaces/IUserGroup";
-import { IUserStore } from "../interfaces/IUserStore";
-import { IWSClient } from "../interfaces/IWSClient";
-import { isString } from "../utils/isType";
-import { Store } from "./Store";
+import { IUser } from "../../interfaces/IUser";
+import { IUserGroup } from "../../interfaces/IUserGroup";
+import { isString } from "../../utils/isType";
+import { Store } from "../Store";
+import { IRepositoryStore } from "./IRepositoryStore";
+import { IService } from "./IService";
+import { IUserStore } from "./IUserStore";
+import { IWSClient } from "./IWSClient";
 
 export class RepositoryStore<
   T extends { id: string | void },
-  S extends IClientService<T>,
+  S extends IService<T>,
   US extends IUserStore<U, G>,
   U extends IUser<G>,
   G extends IUserGroup

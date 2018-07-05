@@ -1,4 +1,4 @@
-export interface IClientService<T> {
+export interface IService<T> {
   collection: () => Promise<T[] | void>;
   model: (id: string) => Promise<T | void>;
   create: (data: object) => Promise<T | void>;

@@ -1,6 +1,6 @@
-import { IUser } from "../../interfaces/IUser";
-import { IUserGroup } from "../../interfaces/IUserGroup";
-import { isString } from "../../utils/isType";
+import { IUser } from "interfaces/IUser";
+import { IUserGroup } from "interfaces/IUserGroup";
+import { isString } from "utils/isType";
 
 export class UserInsert<G extends IUserGroup> implements IUser<G> {
   public readonly login: string;

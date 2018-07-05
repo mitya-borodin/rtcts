@@ -3,8 +3,8 @@ import chalk from "chalk";
 import * as express from "express";
 import * as http from "http";
 import * as passport from "passport";
-import { IAuthStrategy } from "../interfaces/IAuthStrategy";
-import { IAppConfig } from "./../interfaces/IAppConfig";
+import { IAppConfig } from "./interfaces/IAppConfig";
+import { IAuthStrategy } from "./interfaces/IAuthStrategy";
 
 export class APPServer {
   private wasRun: boolean;

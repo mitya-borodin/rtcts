@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { Db, MongoClient } from "mongodb";
-import { IAppConfig } from "../interfaces/IAppConfig";
-import { IDBConnection } from "../interfaces/IDBConnection";
+import { IAppConfig } from "./interfaces/IAppConfig";
+import { IDBConnection } from "./interfaces/IDBConnection";
 
 export class DBConnection implements IDBConnection {
   protected client: MongoClient | undefined;

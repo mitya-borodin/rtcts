@@ -1,20 +1,15 @@
+import { IUserGroup } from "interfaces/IUserGroup";
 import { action, observable } from "mobx";
 import { userStoreEventEnum } from "../enums/userStoreEventEnum";
 import { wsEventEnum } from "../enums/wsEventEnum";
-import { IClientService } from "../interfaces/IClientService";
-import { IStore } from "../interfaces/IStore";
 import { IUser } from "../interfaces/IUser";
-import { IUserGroup } from "../interfaces/IUserGroup";
-import { IUserStore } from "../interfaces/IUserStore";
-import { IWSClient } from "../interfaces/IWSClient";
+import { IService } from "./interfaces/IService";
+import { IStore } from "./interfaces/IStore";
+import { IUserStore } from "./interfaces/IUserStore";
+import { IWSClient } from "./interfaces/IWSClient";
 
-export class Store<
-  T,
-  S extends IClientService<T>,
-  US extends IUserStore<U, G>,
-  U extends IUser<G>,
-  G extends IUserGroup
-> implements IStore {
+export class Store<T, S extends IService<T>, US extends IUserStore<U, G>, U extends IUser<G>, G extends IUserGroup>
+  implements IStore {
   @observable public loading: boolean = false;
   @observable public wasInit: boolean = false;
 

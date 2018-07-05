@@ -1,6 +1,6 @@
 import { ObjectId } from "bson";
-import { IInsert } from "../interfaces/IInsert";
-import { isUndefined } from "../utils/isType";
+import { IInsert } from "interfaces/IInsert";
+import { isUndefined } from "utils/isType";
 
 export function toMongo<T extends IInsert>(
   instance: T,

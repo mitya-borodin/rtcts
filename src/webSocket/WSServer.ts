@@ -1,13 +1,13 @@
 import chalk from "chalk";
 import * as express from "express";
 import * as WebSocket from "ws";
-import { IAppConfig } from "../interfaces/IAppConfig";
-import { IChannels } from "../interfaces/IChannels";
-import { IConnection } from "../interfaces/IConnection";
+import { IAppConfig } from "../back/interfaces/IAppConfig";
+import { IChannels } from "../back/interfaces/IChannels";
+import { IConnection } from "../back/interfaces/IConnection";
+import { IUserModel } from "../back/interfaces/IUserModel";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
 import { IUserGroup } from "../interfaces/IUserGroup";
-import { IUserModel } from "../interfaces/IUserModel";
 import { isArray, isString } from "../utils/isType";
 import {
   assigment_to_user_of_the_connection_channel,

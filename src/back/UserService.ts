@@ -1,10 +1,10 @@
 import * as express from "express";
+import { IUser } from "interfaces/IUser";
+import { IUserGroup } from "interfaces/IUserGroup";
 import * as passport from "passport";
-import { IChannels } from "../interfaces/IChannels";
 import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
-import { IUserGroup } from "../interfaces/IUserGroup";
-import { IUserModel } from "../interfaces/IUserModel";
+import { IChannels } from "./interfaces/IChannels";
+import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";
 
 export class UserService<

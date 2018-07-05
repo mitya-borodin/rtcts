@@ -1,7 +1,7 @@
-import { IClientService } from "../interfaces/IClientService";
-import { IWSClient } from "../interfaces/IWSClient";
+import { IService } from "./interfaces/IService";
+import { IWSClient } from "./interfaces/IWSClient";
 
-export class Service<T> implements IClientService<T> {
+export class Service<T> implements IService<T> {
   protected name: string;
   protected Class: { new (data?: any): T };
   protected ws: IWSClient;

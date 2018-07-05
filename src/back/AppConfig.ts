@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { ExtractJwt, JwtFromRequestFunction } from "passport-jwt";
-import { IAppConfig } from "../interfaces/IAppConfig";
 import { isNumber } from "../utils/isType";
+import { IAppConfig } from "./interfaces/IAppConfig";
 
 export class AppConfig implements IAppConfig {
   public readonly jwt: {

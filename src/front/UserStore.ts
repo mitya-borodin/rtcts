@@ -1,14 +1,14 @@
+import { IUser } from "interfaces/IUser";
+import { IUserGroup } from "interfaces/IUserGroup";
 import { action, computed, observable, runInAction } from "mobx";
+import { isString } from "utils/isType";
 import { userGroupEnum } from "../enums/userGroupEnum";
 import { userStoreEventEnum } from "../enums/userStoreEventEnum";
-import { IClientUserService } from "../interfaces/IClientUserService";
 import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
-import { IUserGroup } from "../interfaces/IUserGroup";
-import { IUserStore } from "../interfaces/IUserStore";
-import { IWSClient } from "../interfaces/IWSClient";
 import { EventEmitter } from "../isomorphic/EventEmitter";
-import { isString } from "../utils/isType";
+import { IUserService } from "./interfaces/IUserService";
+import { IUserStore } from "./interfaces/IUserStore";
+import { IWSClient } from "./interfaces/IWSClient";
 
 export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> extends EventEmitter
   implements IUserStore<U, G> {
@@ -18,10 +18,10 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
   @observable public userList: Array<U & IPersist>;
 
   protected User: { new (data: any): U };
-  protected service: IClientUserService<U, G>;
+  protected service: IUserService<U, G>;
   protected WSClient: IWSClient;
 
-  constructor(service: IClientUserService<U, G>, WSClient: IWSClient, User: { new (data: any): U }) {
+  constructor(service: IUserService<U, G>, WSClient: IWSClient, User: { new (data: any): U }) {
     super();
 
     // DEPS
