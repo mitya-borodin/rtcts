@@ -1,7 +1,6 @@
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
 import { IClientService } from "../interfaces/IClientService";
 import { IRepositoryStore } from "../interfaces/IRepositoryStore";
-import { IStore } from "../interfaces/IStore";
 import { IUser } from "../interfaces/IUser";
 import { IUserGroup } from "../interfaces/IUserGroup";
 import { IUserStore } from "../interfaces/IUserStore";
@@ -15,13 +14,12 @@ export class RepositoryStore<
   US extends IUserStore<U, G>,
   U extends IUser<G>,
   G extends IUserGroup
-> extends Store<US, U, G> implements IRepositoryStore<T>, IStore {
+> extends Store<US, U, G> implements IRepositoryStore<T> {
   @observable protected collection = observable.map<string, T>();
 
   protected repoName: string;
   protected chName: string;
   protected Constructor: { new (data?: any): T };
-
   protected readonly service: Service;
 
   constructor(
@@ -34,17 +32,19 @@ export class RepositoryStore<
   ) {
     super(wsClient, userStore);
 
+    // DEPS
     this.repoName = name.toUpperCase();
-
     this.service = service;
     this.chName = chName;
     this.Constructor = Constructor;
 
+    // BINDINGS
     this.init = this.init.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
     this.receiveMessage = this.receiveMessage.bind(this);
+    this.destroy = this.destroy.bind(this);
   }
 
   @computed
@@ -72,17 +72,15 @@ export class RepositoryStore<
     return list;
   }
 
-  @action(`[ REPOSITORY_BASE ][ INIT ]`)
   public async init(): Promise<void> {
     if (!this.wasInit) {
-      super.init();
-      this.loading = true;
+      this.startLoad();
 
       try {
         const collection: T[] | void = await this.service.collection();
 
         if (collection) {
-          runInAction(`[ SUCCESS ]`, () => {
+          runInAction(`[ REPOSITORY_BASE ][ INIT ][ SUCCESS ]`, () => {
             this.collection = collection.reduce<ObservableMap<string, T>>((preValue, item: T) => {
               if (isString(item.id)) {
                 preValue.set(item.id, item);
@@ -90,6 +88,7 @@ export class RepositoryStore<
 
               return preValue;
             }, observable.map());
+
             this.wasInit = true;
             this.service.onChannel();
           });
@@ -97,25 +96,24 @@ export class RepositoryStore<
       } catch (error) {
         console.error(error);
       } finally {
-        runInAction(`[ FINALLY ]`, () => (this.loading = false));
+        this.endLoad();
       }
     }
   }
 
-  @action(`[ REPOSITORY_BASE ][ CREATE ]`)
   public async create(data: object): Promise<T | void> {
     if (!this.loading) {
-      this.loading = true;
+      this.startLoad();
 
       try {
         const item: T | void = await this.service.create(data);
 
         if (item) {
-          runInAction(`[ SUCCESS ]`, () => {
+          runInAction(`[ REPOSITORY_BASE ][ CREATE ][ SUCCESS ]`, () => {
             if (isString(item.id)) {
               this.collection.set(item.id, item);
             } else {
-              console.error(`[ CREATE ] - must have id as string;`, item);
+              console.error(`[ REPOSITORY_BASE ][ CREATE ] - must have id as string;`, item);
             }
           });
         }
@@ -124,25 +122,25 @@ export class RepositoryStore<
       } catch (error) {
         console.error(error);
       } finally {
-        runInAction(`[ FINALLY ]`, () => (this.loading = false));
+        this.endLoad();
       }
     }
   }
 
-  @action(`[ REPOSITORY_BASE ][UPDATE]`)
+  @action(`[ REPOSITORY_BASE ][ UPDATE ]`)
   public async update(data: object): Promise<T | void> {
     if (!this.loading) {
-      this.loading = true;
+      this.startLoad();
 
       try {
         const item: T | void = await this.service.update(data);
 
         if (item) {
-          runInAction(`[ SUCCESS ]`, () => {
+          runInAction(`[ REPOSITORY_BASE ][ UPDATE ][ SUCCESS ]`, () => {
             if (isString(item.id)) {
               this.collection.set(item.id, item);
             } else {
-              console.error(`[ ERROR ] - must have id as string;`, item);
+              console.error(`[ REPOSITORY_BASE ][ UPDATE ][ ERROR ] - must have id as string;`, item);
             }
           });
         }
@@ -151,24 +149,24 @@ export class RepositoryStore<
       } catch (error) {
         return Promise.reject(error);
       } finally {
-        runInAction(`[ FINALLY ]`, () => (this.loading = false));
+        this.endLoad();
       }
     }
   }
 
-  @action(`[ REPOSITORY_BASE ][ REMOVE ]`)
   public async remove(id: string): Promise<T | void> {
     if (!this.loading) {
-      this.loading = true;
+      this.startLoad();
+
       try {
         const item: T | void = await this.service.remove(id);
 
         if (item) {
-          runInAction(`[ SUCCESS ]`, () => {
+          runInAction(`[ REPOSITORY_BASE ][ REMOVE ][ SUCCESS ]`, () => {
             if (isString(item.id)) {
               this.collection.delete(item.id);
             } else {
-              console.error(`[ ERROR ] - must have id as string;`, item);
+              console.error(`[ REPOSITORY_BASE ][ REMOVE ][ ERROR ] - must have id as string;`, item);
             }
           });
         }
@@ -178,7 +176,7 @@ export class RepositoryStore<
         console.error(error);
         return Promise.reject(error);
       } finally {
-        runInAction(`[ FINALLY ]`, () => (this.loading = false));
+        this.endLoad();
       }
     }
   }
@@ -218,5 +216,11 @@ export class RepositoryStore<
         return item;
       }
     }
+  }
+
+  protected destroy(): void {
+    super.destroy();
+
+    this.collection.clear();
   }
 }

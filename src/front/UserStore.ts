@@ -24,10 +24,12 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
   constructor(service: IClientUserService<U, G>, WSClient: IWSClient, User: { new (data: any): U }) {
     super();
 
+    // DEPS
     this.service = service;
     this.WSClient = WSClient;
     this.User = User;
 
+    // BINDINGS
     this.init = this.init.bind(this);
     this.load = this.load.bind(this);
     this.login = this.login.bind(this);
@@ -165,7 +167,9 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
               this.user = null;
               this.userList = [];
               this.loading = false;
-              super.clear();
+              // При logout не смысла удалять подписчиков
+              // Так как при login другого пользователя нам всего лишь нужно будет
+              // загрузить новые данные.
             });
           }, 100);
         });

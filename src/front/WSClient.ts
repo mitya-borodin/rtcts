@@ -91,21 +91,22 @@ export class WSClient extends EventEmitter implements IWSClient {
       };
 
       this.connection.onmessage = (event) => {
-        const message = recognizeMessage(event.data);
-        console.info("[ WSClient ][ ON_MESSAGE ]", message);
+        const [chName, data] = recognizeMessage(event.data);
 
-        const [chName, { uid, wsid }] = recognizeMessage(event.data);
+        if (chName !== PongChannel) {
+          console.info("[ WSClient ][ ON_MESSAGE ]", [chName, data]);
+        }
 
         if (chName === assigment_to_user_of_the_connection_channel) {
-          this.emit(wsEventEnum.ASSIGMENT, { wsid, uid });
+          this.emit(wsEventEnum.ASSIGMENT, data);
         } else if (chName === cancel_assigment_to_user_of_the_connection_channel) {
-          this.emit(wsEventEnum.CANCEL_ASSIGMENT, { wsid, uid });
+          this.emit(wsEventEnum.CANCEL_ASSIGMENT, data);
         } else if (chName === PongChannel) {
           this.pong();
         } else if (chName === ErrorChannel) {
-          this.emit(wsEventEnum.ERROR, message);
+          this.emit(wsEventEnum.ERROR, [chName, data]);
         } else {
-          this.emit(wsEventEnum.MESSAGE_RECEIVE, message);
+          this.emit(wsEventEnum.MESSAGE_RECEIVE, [chName, data]);
         }
       };
     });
@@ -242,18 +243,18 @@ export class WSClient extends EventEmitter implements IWSClient {
   }
 
   private handleOpen() {
-    console.info("CONNECTION_OPEN");
+    // console.info("CONNECTION_OPEN");
 
     this.headrBeatInterval = window.setInterval(async () => {
       if (this.isAlive) {
-        console.info("HEARD_BEAT", this.isAlive);
+        // console.info("HEARD_BEAT", this.isAlive);
         this.isAlive = false;
 
         this.ping();
       } else {
         clearInterval(this.headrBeatInterval);
 
-        console.info("HEARD_BEAT_WRONG", this.isAlive);
+        // console.info("HEARD_BEAT_WRONG", this.isAlive);
 
         if (this.connection instanceof WebSocket) {
           this.once(wsEventEnum.CLOSE, () => setTimeout(this.reconnect, 100));
@@ -285,13 +286,13 @@ export class WSClient extends EventEmitter implements IWSClient {
 
   private ping(): void {
     if (this.connection instanceof WebSocket) {
-      console.info("PING");
+      // console.info("PING");
       this.connection.send(makeMessage(PingChannel, {}));
     }
   }
 
   private pong() {
-    console.info("PONG");
+    // console.info("PONG");
     this.isAlive = true;
   }
 
