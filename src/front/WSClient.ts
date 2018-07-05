@@ -1,11 +1,8 @@
 import { action, observable } from "mobx";
 import { wsEventEnum } from "../enums/wsEventEnum";
-import { IUser } from "../interfaces/IUser";
-import { IUserGroup } from "../interfaces/IUserGroup";
-import { IUserStore } from "../interfaces/IUserStore";
 import { IWSClient } from "../interfaces/IWSClient";
 import { EventEmitter } from "../isomorphic/EventEmitter";
-import { isNumber, isString } from "../utils/isType";
+import { isNumber } from "../utils/isType";
 import {
   assigment_to_user_of_the_connection_channel,
   cancel_assigment_to_user_of_the_connection_channel,
@@ -15,38 +12,36 @@ import {
 } from "../WebSocket/const";
 import { makeMessage, recognizeMessage } from "../WebSocket/helpers";
 
-export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends IUserGroup> extends EventEmitter
-  implements IWSClient {
+export class WSClient extends EventEmitter implements IWSClient {
   @observable public readyState = WebSocket.CLOSED;
   @observable public isAssigment = false;
   public wsid: string;
-  public uid: string;
 
+  private uid: string;
   private readonly path: string;
   private readonly reconnectionDelay: number;
   private readonly pingPongDelay: number;
-  private readonly userStore: US;
   private connection: WebSocket | null;
   private isAlive: boolean;
   private timeout: number;
 
-  constructor(userStore: US, path = "ws", TLS = true) {
+  constructor(path = "ws", TLS = true, pingPongDelay = 1000, reconnectionDelay = 5000) {
     super();
+
+    this.uid = "";
 
     this.path = `${TLS ? "wss" : "ws"}://${window.location.host}/${path}`;
 
-    // DEPS
-    this.userStore = userStore;
-
     // IS_ALIVE
-    this.pingPongDelay = 1000;
+    this.pingPongDelay = pingPongDelay;
 
     // RECONNECTION
-    this.reconnectionDelay = 5000;
+    this.reconnectionDelay = reconnectionDelay;
     this.timeout = 0;
 
     // BINDINGS
     this.connect = this.connect.bind(this);
+    this.reconnect = this.reconnect.bind(this);
     this.disconnect = this.disconnect.bind(this);
     this.handleOpen = this.handleOpen.bind(this);
     this.handleClose = this.handleClose.bind(this);
@@ -55,6 +50,10 @@ export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends
     this.handleAssigment = this.handleAssigment.bind(this);
     this.handleCancelAssigment = this.handleCancelAssigment.bind(this);
     this.handleError = this.handleError.bind(this);
+  }
+
+  public setUserID(uid: string): void {
+    this.uid = uid;
   }
 
   @action("[ WSClient ][ CONNECT ]")
@@ -101,6 +100,63 @@ export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends
     });
   }
 
+  @action("[ WSClient ][ RECONNECT ]")
+  public reconnect(): void {
+    console.log(`[ WSClient ][ INIT ][ RECONNECT ][ RECONNECT_WILL_THROUGHT: ${this.reconnectionDelay} ms; ]`);
+
+    this.dropConnectionData();
+
+    this.timeout = window.setTimeout(async () => {
+      console.log("[ WSClient ][ TRY ][ RECONNECT ]");
+
+      try {
+        await this.connect();
+        await this.assigmentToUserOfTheConnection();
+
+        window.clearTimeout(this.timeout);
+        console.log("[ WSClient ][ RECONNECT ][ SUCCESS ]");
+      } catch (error) {
+        console.log("[ WSClient ][ RECONNECT ][ ERROR ]");
+
+        window.clearTimeout(this.timeout);
+        this.handleError(error);
+      }
+    }, this.reconnectionDelay);
+  }
+
+  public async disconnect(reason = "[ DISCONNECT ]") {
+    // Нужен для того чтобы правильно проводить LOGOUT;
+    // Не используется если CLOSE или ERROR, так как но
+    // может быть закрыто или упать с ошибкой по разным
+    // причинам.
+
+    await new Promise((resolve) => {
+      if (this.connection instanceof WebSocket) {
+        super.once(wsEventEnum.CLOSE, (event) => {
+          this.uid = "";
+
+          console.log(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ][ CODE: ${event.code} ]`, event);
+
+          setTimeout(() => {
+            // Удаляю все обработчики событий.
+            super.clear();
+
+            console.log(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${super.listenersCount} ]`);
+            resolve();
+          }, 100);
+        });
+
+        this.connection.close(1000, reason);
+      } else {
+        super.clear();
+        this.uid = "";
+
+        console.log(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ][ CODE: ${null} ]`);
+        console.log(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${super.listenersCount} ]`);
+      }
+    });
+  }
+
   public send(
     channelName: string,
     payload: {
@@ -118,67 +174,6 @@ export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends
     }
   }
 
-  @action("[ WSClient ][ RECONNECT ]")
-  public reconnect() {
-    console.log("[ WSClient ][ INIT ][ TRY ][ RECONNECT ]");
-
-    window.clearTimeout(this.timeout);
-    this.clearTimer();
-    this.connection = null;
-    this.isAssigment = false;
-    this.readyState = WebSocket.CONNECTING;
-    this.wsid = "";
-    this.uid = "";
-
-    this.timeout = window.setTimeout(async () => {
-      console.log("[ WSClient ][ TRY ][ RECONNECT ]");
-
-      try {
-        await this.connect();
-
-        if (this.userStore.isAuthorized) {
-          await this.assigmentToUserOfTheConnection();
-
-          window.clearTimeout(this.timeout);
-          console.log("[ WSClient ][ RECONNECT ][ SUCCESS ]");
-        }
-      } catch (error) {
-        console.log("[ WSClient ][ RECONNECT ][ ERROR ]");
-
-        window.clearTimeout(this.timeout);
-        this.handleError(error);
-      }
-    }, this.reconnectionDelay);
-  }
-
-  @action("[ WSClient ][ DISCONNECT ]")
-  public async disconnect(reason = "Disconnect") {
-    await new Promise((resolve) => {
-      if (this.connection instanceof WebSocket) {
-        this.connection.close(1000, reason);
-        // Дублирую для того, чтобы не надеяться на WS события.
-        window.clearTimeout(this.timeout);
-        this.clearTimer();
-        this.connection = null;
-        this.isAssigment = false;
-        this.readyState = WebSocket.CONNECTING;
-        this.wsid = "";
-        this.uid = "";
-
-        super.once(wsEventEnum.CLOSE, (event) => {
-          console.warn(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ][ CODE: ${event.code} ]`, event);
-
-          setTimeout(() => {
-            super.clear();
-
-            console.warn(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${super.listenersCount} ]`);
-            resolve();
-          }, 0);
-        });
-      }
-    });
-  }
-
   public handleOpen() {
     this.setTimer(
       window.setInterval(async () => {
@@ -187,8 +182,15 @@ export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends
 
           this.ping();
         } else {
-          await this.disconnect("[ WSClient ][ IS_ALLIVE: FALSE ]");
-          this.reconnect();
+          this.clearTimer();
+
+          if (this.connection instanceof WebSocket) {
+            super.once(wsEventEnum.CLOSE, this.reconnect);
+
+            this.connection.close(1000, "The server does not respond on PONG_CHANNEL.");
+          } else {
+            this.reconnect();
+          }
         }
       }, this.pingPongDelay),
     );
@@ -196,96 +198,79 @@ export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends
     super.emit(wsEventEnum.OPEN);
   }
 
-  @action("[ WSClient ][ HANDLE_CLOSE ]")
   public handleClose(event) {
-    window.clearTimeout(this.timeout);
-    this.clearTimer();
-    this.connection = null;
-    this.isAssigment = false;
-    this.readyState = WebSocket.CLOSED;
-    this.wsid = "";
-    this.uid = "";
-
-    super.emit(wsEventEnum.CLOSE, event);
+    super.emit(wsEventEnum.CLOSE, {});
 
     if (event.code !== 1000) {
       this.reconnect();
     }
-
-    console.warn(event);
   }
 
   public handleError(error) {
-    window.clearTimeout(this.timeout);
-    this.clearTimer();
-    this.connection = null;
-    this.isAssigment = false;
-    this.readyState = WebSocket.CLOSED;
-    this.wsid = "";
-    this.uid = "";
+    console.error(error);
 
-    super.emit(wsEventEnum.CLOSE, event);
+    super.emit(wsEventEnum.CLOSE, {});
 
     this.reconnect();
-
-    console.error(error);
   }
 
   public async assigmentToUserOfTheConnection() {
-    await new Promise((resolve, reject) => {
-      const token = localStorage.getItem("token");
+    if (this.uid.length > 0) {
+      await new Promise((resolve, reject) => {
+        if (!this.isAssigment) {
+          if (this.connection instanceof WebSocket) {
+            if (this.connection.readyState === WebSocket.OPEN) {
+              this.connection.send(makeMessage(assigment_to_user_of_the_connection_channel, { uid: this.uid }));
 
-      if (isString(token) && token.length > 0 && !this.isAssigment && this.userStore.isUserData) {
-        if (this.connection instanceof WebSocket) {
-          if (this.connection.readyState === WebSocket.OPEN) {
-            this.connection.send(makeMessage(assigment_to_user_of_the_connection_channel, { token }));
+              super.once(wsEventEnum.ASSIGMENT, (data) => {
+                this.handleAssigment(data);
+                resolve();
+              });
+            } else {
+              console.info(`[ WSClient ][ REDY_STATE: ${this.connection.readyState} ]`);
 
-            super.once(wsEventEnum.ASSIGMENT, (data) => {
-              this.handleAssigment(data);
-              resolve();
-            });
+              setTimeout(this.assigmentToUserOfTheConnection, 1000);
+            }
           } else {
-            console.info(`[ WSClient ][ REDY_STATE: ${this.connection.readyState} ]`);
+            console.error("[ WSClient ][ HAS_NOT_CONNECTION ]");
 
-            setTimeout(this.assigmentToUserOfTheConnection, 1000);
+            reject();
           }
         } else {
-          console.error("[ WSClient ][ HAS_NOT_CONNECTION ]");
+          console.error("[ WSClient ][ ALREADY_ASSIGMENT ]");
 
           reject();
         }
-      } else {
-        console.error("[ WSClient ][ HAS_NOT_USER ]");
-
-        reject();
-      }
-    });
+      });
+    } else {
+      console.error(
+        "[ WSClient ][ USER_ID_FOUND ] you need use method setUserID(uid: string), so insert userID into WSClient;",
+      );
+    }
   }
 
   public async cancelAssigmentToUserOfTheConnection() {
-    await new Promise((resolve, reject) => {
-      const token = localStorage.getItem("token");
+    if (this.uid.length > 0) {
+      await new Promise((resolve, reject) => {
+        if (this.connection instanceof WebSocket && this.isAssigment) {
+          this.send(cancel_assigment_to_user_of_the_connection_channel, { uid: this.uid });
 
-      if (
-        this.connection instanceof WebSocket &&
-        isString(token) &&
-        token.length > 0 &&
-        this.isAssigment &&
-        this.userStore.isUserData
-      ) {
-        this.send(cancel_assigment_to_user_of_the_connection_channel, { token });
+          super.once(wsEventEnum.CANCEL_ASSIGMENT, () => {
+            this.handleCancelAssigment();
 
-        super.once(wsEventEnum.CANCEL_ASSIGMENT, () => {
-          this.handleCancelAssigment();
+            resolve();
+          });
+        } else {
+          console.error("[ WSClient ][ HAS_NOT CONNECTION | TOKEN | IS_NO_ASSIGMENT ]");
 
-          resolve();
-        });
-      } else {
-        console.error("[ WSClient ][ HAS_NOT CONNECTION | TOKEN | IS_NO_ASSIGMENT | USER_DATA ]");
-
-        reject();
-      }
-    });
+          reject();
+        }
+      });
+    } else {
+      console.error(
+        "[ WSClient ][ USER_ID_FOUND ] you need use method setUserID(uid: string), so insert userID into WSClient;",
+      );
+    }
   }
 
   @action("[ WSClient ][ ASSIGMENT ]")
@@ -301,7 +286,6 @@ export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends
     this.readyState = WebSocket.CLOSED;
     this.isAssigment = false;
     this.wsid = "";
-    this.uid = "";
   }
 
   private ping(): void {
@@ -327,5 +311,14 @@ export class WSClient<US extends IUserStore<U, G>, U extends IUser<G>, G extends
       window.clearInterval(timer);
       window.clearTimeout(timer);
     }
+  }
+
+  private dropConnectionData(): void {
+    window.clearTimeout(this.timeout);
+    this.clearTimer();
+    this.connection = null;
+    this.isAssigment = false;
+    this.readyState = WebSocket.CLOSED;
+    this.wsid = "";
   }
 }

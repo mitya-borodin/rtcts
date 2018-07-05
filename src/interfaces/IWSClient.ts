@@ -4,9 +4,14 @@ export interface IWSClient extends IEventEmitter {
   readyState: number;
   isAssigment: boolean;
   wsid: string;
-  uid: string;
+
+  setUserID(uid: string): void;
 
   connect(): Promise<void>;
+
+  reconnect(): void;
+
+  disconnect(reason?: string): void;
 
   send(
     channelName: string,
@@ -14,10 +19,6 @@ export interface IWSClient extends IEventEmitter {
       [key: string]: any;
     },
   ): void;
-
-  reconnect(): void;
-
-  disconnect(reason?: string): Promise<void>;
 
   handleOpen(): void;
 

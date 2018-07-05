@@ -74,7 +74,7 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
     }
   }
 
-  @action("[ STORE ][ USER ][ LOAD ]")
+  @action("[ USER_STORE ][ LOAD ]")
   public async load(token): Promise<void> {
     this.authorization = true;
 
@@ -82,10 +82,12 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
       const user: U | void = await this.service.load(token);
 
       if (user) {
+        localStorage.setItem("token", token);
+
         await runInAction("[SUCCESS]", async () => {
           this.user = user;
-          localStorage.setItem("token", token);
 
+          this.WSClient.setUserID(this.user.id);
           await this.WSClient.connect();
           await this.WSClient.assigmentToUserOfTheConnection();
 
@@ -96,9 +98,9 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
           this.emit(userStoreEventEnum.LOGIN);
         });
       } else {
-        await this.WSClient.disconnect();
+        await this.WSClient.disconnect("[ USER_STORE ][ ERROR ][ USER_NOT_FOUND ]");
 
-        runInAction("[FAIL]", () => {
+        runInAction("[ ERROR ][ USER_NOT_FOUND ]", () => {
           localStorage.removeItem("token");
           this.authorization = false;
           this.user = null;
@@ -107,8 +109,7 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
         });
       }
     } catch (error) {
-      console.error(error);
-      await this.WSClient.disconnect("[STORE][USER][ERROR][DATA_LOADED]");
+      await this.WSClient.disconnect(`[ USER_STORE ][ ERROR ][ DATA_LOADED ][ ${error.message} ]`);
 
       runInAction("[ERROR]", () => {
         localStorage.removeItem("token");
@@ -117,6 +118,8 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
         this.loading = false;
         this.userList = [];
       });
+
+      console.error(error);
     }
   }
 
@@ -152,21 +155,22 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
   public async logout(): Promise<void> {
     if (this.authorization) {
       try {
-        this.emit(userStoreEventEnum.LOGOUT);
+        this.once(userStoreEventEnum.LOGOUT, () => {
+          setTimeout(async () => {
+            await runInAction("[SUCCESS]", async () => {
+              await this.WSClient.disconnect("[ LOGOUT ]");
 
-        await this.WSClient.disconnect("[ LOGOUT ]");
-
-        runInAction("[SUCCESS]", () => {
-          localStorage.removeItem("token");
-          this.authorization = false;
-          this.user = null;
-          this.loading = false;
-          this.userList = [];
-
-          setTimeout(() => {
-            super.clear();
+              localStorage.removeItem("token");
+              this.authorization = false;
+              this.user = null;
+              this.userList = [];
+              this.loading = false;
+              super.clear();
+            });
           }, 100);
         });
+
+        this.emit(userStoreEventEnum.LOGOUT);
       } catch (error) {
         console.error(error);
       }

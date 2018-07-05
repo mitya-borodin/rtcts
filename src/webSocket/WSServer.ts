@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import * as express from "express";
-import * as jwt from "jsonwebtoken";
 import * as WebSocket from "ws";
 import { IAppConfig } from "../interfaces/IAppConfig";
 import { IChannels } from "../interfaces/IChannels";
@@ -13,6 +12,8 @@ import { isArray, isString } from "../utils/isType";
 import {
   assigment_to_user_of_the_connection_channel,
   cancel_assigment_to_user_of_the_connection_channel,
+  PingChannel,
+  PongChannel,
 } from "./const";
 import { makeErrorMessage, makeMessage, recognizeMessage } from "./helpers";
 
@@ -119,68 +120,61 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
       if (isArray(recieveData)) {
         const [channelName, payload] = recieveData;
 
-        if (isString(payload.token)) {
-          const decoded: any = jwt.verify(payload.token, this.config.jwt.secret_key);
+        if (isString(payload.uid)) {
+          if (
+            channelName === assigment_to_user_of_the_connection_channel ||
+            channelName === cancel_assigment_to_user_of_the_connection_channel
+          ) {
+            this.user
+              .readById(payload.uid)
+              .then((user: IUser<G> & IPersist | null) => {
+                if (user) {
+                  connection.setUserID(user.id);
 
-          if (isString(decoded.id)) {
-            if (
-              channelName === assigment_to_user_of_the_connection_channel ||
-              channelName === cancel_assigment_to_user_of_the_connection_channel
-            ) {
-              this.user
-                .readById(decoded.id)
-                .then((user: IUser<G> & IPersist | null) => {
-                  if (user) {
-                    connection.setUserID(user.id);
+                  if (channelName === assigment_to_user_of_the_connection_channel) {
+                    this.channels.addConnection(connection);
 
-                    if (channelName === assigment_to_user_of_the_connection_channel) {
-                      this.channels.addConnection(connection);
-
-                      connection.send(
-                        this.makeMessage(channelName, {
-                          message: "[ ASSIGMENT ][ DONE ]",
-                          uid: connection.uid,
-                          wsid: connection.wsid,
-                        }),
-                      );
-                    }
-                    if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
-                      this.channels.deleteConnection(connection);
-
-                      connection.send(
-                        this.makeMessage(channelName, {
-                          message: "[ CANCELING ][ ASSIGMENT ][ DONE ]",
-                          uid: connection.uid,
-                          wsid: connection.wsid,
-                        }),
-                      );
-                    }
-                  } else {
                     connection.send(
-                      this.makeErrorMessage(`[ ASSIGMENT_ERROR ] user by id: ${decoded.id} not found`, {
-                        channelName,
-                        payload,
+                      this.makeMessage(channelName, {
+                        message: "[ ASSIGMENT ][ DONE ]",
+                        uid: connection.uid,
+                        wsid: connection.wsid,
                       }),
                     );
                   }
-                })
-                .catch((error) => {
+                  if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
+                    this.channels.deleteConnection(connection);
+
+                    connection.send(
+                      this.makeMessage(channelName, {
+                        message: "[ CANCELING ][ ASSIGMENT ][ DONE ]",
+                        uid: connection.uid,
+                        wsid: connection.wsid,
+                      }),
+                    );
+                  }
+                } else {
                   connection.send(
-                    this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${error.message}`, { error, payload, decoded }),
+                    this.makeErrorMessage(`[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`, {
+                      channelName,
+                      payload,
+                    }),
                   );
-                });
-            } else {
-              connection.send(
-                this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
-              );
-            }
+                }
+              })
+              .catch((error) => {
+                connection.send(this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${error.message}`, { error, payload }));
+              });
+          } else if (channelName === PingChannel) {
+            connection.send(this.makeMessage(PongChannel, {}));
           } else {
-            console.log("");
-            console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] recieved toke must have user id;`));
+            connection.send(
+              this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
+            );
           }
         } else {
           console.log("");
-          console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_TOKEN ] payload must have JWT token;`));
+          console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`));
         }
       } else {
         console.log("");
