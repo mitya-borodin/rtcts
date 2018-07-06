@@ -1,4 +1,4 @@
-import { IEventEmitter } from "interfaces/IEventEmitter";
+import { IEventEmitter } from "../interfaces/IEventEmitter";
 
 export class EventEmitter implements IEventEmitter {
   private subscriptions: Map<string, Set<(payload: any) => void>>;

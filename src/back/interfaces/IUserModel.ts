@@ -1,4 +1,4 @@
-import { IInsert } from "interfaces/IInsert";
+import { IInsert } from "../../interfaces/IInsert";
 import { IPersist } from "../../interfaces/IPersist";
 import { IUserGroup } from "../../interfaces/IUserGroup";
 import { IModel } from "./IModel";

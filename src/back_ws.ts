@@ -4,9 +4,9 @@ export {
   ErrorChannel,
   PingChannel,
   PongChannel,
-} from "webSocket/const";
-export { recognizeMessage, makeMessage, makeErrorMessage } from "webSocket/helpers";
-export { WSServer } from "webSocket/WSServer";
-export { Connection } from "webSocket/Connection";
-export { Channels } from "webSocket/Channels";
-export { WSMiddelware } from "webSocket/WSMiddelware";
+} from "./webSocket/const";
+export { recognizeMessage, makeMessage, makeErrorMessage } from "./webSocket/helpers";
+export { WSServer } from "./webSocket/WSServer";
+export { Connection } from "./webSocket/Connection";
+export { Channels } from "./webSocket/Channels";
+export { WSMiddelware } from "./webSocket/WSMiddelware";

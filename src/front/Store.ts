@@ -1,8 +1,8 @@
-import { IUserGroup } from "interfaces/IUserGroup";
 import { action, observable } from "mobx";
 import { userStoreEventEnum } from "../enums/userStoreEventEnum";
 import { wsEventEnum } from "../enums/wsEventEnum";
 import { IUser } from "../interfaces/IUser";
+import { IUserGroup } from "../interfaces/IUserGroup";
 import { IService } from "./interfaces/IService";
 import { IStore } from "./interfaces/IStore";
 import { IUserStore } from "./interfaces/IUserStore";

@@ -1,7 +1,7 @@
-import { IEventEmitter } from "interfaces/IEventEmitter";
-import { IPersist } from "interfaces/IPersist";
-import { IUser } from "interfaces/IUser";
-import { IUserGroup } from "interfaces/IUserGroup";
+import { IEventEmitter } from "../../interfaces/IEventEmitter";
+import { IPersist } from "../../interfaces/IPersist";
+import { IUser } from "../../interfaces/IUser";
+import { IUserGroup } from "../../interfaces/IUserGroup";
 
 export interface IUserStore<U extends IUser<G>, G extends IUserGroup> extends IEventEmitter {
   loading: boolean;

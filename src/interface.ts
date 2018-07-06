@@ -1,4 +1,4 @@
-export { IPersist } from "interfaces/IPersist";
-export { IInsert } from "interfaces/IInsert";
-export { IUser } from "interfaces/IUser";
-export { IUserGroup } from "interfaces/IUserGroup";
+export { IPersist } from "./interfaces/IPersist";
+export { IInsert } from "./interfaces/IInsert";
+export { IUser } from "./interfaces/IUser";
+export { IUserGroup } from "./interfaces/IUserGroup";

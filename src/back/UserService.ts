@@ -1,8 +1,8 @@
 import * as express from "express";
-import { IUser } from "interfaces/IUser";
-import { IUserGroup } from "interfaces/IUserGroup";
 import * as passport from "passport";
 import { IPersist } from "../interfaces/IPersist";
+import { IUser } from "../interfaces/IUser";
+import { IUserGroup } from "../interfaces/IUserGroup";
 import { IChannels } from "./interfaces/IChannels";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";

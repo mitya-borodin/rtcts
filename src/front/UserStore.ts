@@ -1,11 +1,11 @@
-import { IUser } from "interfaces/IUser";
-import { IUserGroup } from "interfaces/IUserGroup";
 import { action, computed, observable, runInAction } from "mobx";
-import { isString } from "utils/isType";
 import { userGroupEnum } from "../enums/userGroupEnum";
 import { userStoreEventEnum } from "../enums/userStoreEventEnum";
 import { IPersist } from "../interfaces/IPersist";
+import { IUser } from "../interfaces/IUser";
+import { IUserGroup } from "../interfaces/IUserGroup";
 import { EventEmitter } from "../isomorphic/EventEmitter";
+import { isString } from "../utils/isType";
 import { IUserService } from "./interfaces/IUserService";
 import { IUserStore } from "./interfaces/IUserStore";
 import { IWSClient } from "./interfaces/IWSClient";

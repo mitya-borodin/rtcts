@@ -1,8 +1,8 @@
-import { IPersist } from "interfaces/IPersist";
-import { IUser } from "interfaces/IUser";
-import { IUserGroup } from "interfaces/IUserGroup";
 import { Strategy } from "passport-jwt";
 import { Strategy as PassportStrategy } from "passport-strategy";
+import { IPersist } from "../interfaces/IPersist";
+import { IUser } from "../interfaces/IUser";
+import { IUserGroup } from "../interfaces/IUserGroup";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
 import { IUserModel } from "./interfaces/IUserModel";

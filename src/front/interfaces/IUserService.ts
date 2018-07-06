@@ -1,6 +1,6 @@
-import { IUserGroup } from "interfaces/IUserGroup";
 import { IPersist } from "../../interfaces/IPersist";
 import { IUser } from "../../interfaces/IUser";
+import { IUserGroup } from "../../interfaces/IUserGroup";
 import { IService } from "./IService";
 
 export interface IUserService<U extends IUser<G> & IPersist, G extends IUserGroup> extends IService<U> {

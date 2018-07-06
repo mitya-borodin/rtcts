@@ -1,4 +1,4 @@
-import { IEventEmitter } from "interfaces/IEventEmitter";
+import { IEventEmitter } from "../../interfaces/IEventEmitter";
 
 export interface IWSClient extends IEventEmitter {
   readyState: number;
