@@ -4,7 +4,7 @@ import { IUserGroup } from "../../interfaces/IUserGroup";
 import { IModel } from "./IModel";
 
 export interface IUserModel<P extends IPersist, I extends IInsert, G extends IUserGroup> extends IModel<P, I> {
-  signUp(login: string, group: G, password: string, password_confirm: string): Promise<string>;
+  signUp(data: { [key: string]: any }): Promise<string>;
 
   signIn(login: string, password: string): Promise<string | null>;
 

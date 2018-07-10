@@ -103,7 +103,7 @@ export class Service<T> implements IService<T> {
               // tslint:disable-next-line:object-literal-key-quotes
               Accept: "application/json",
               // tslint:disable-next-line:object-literal-key-quotes
-              Authorization: `JWT ${localStorage.getItem("token")}`,
+              Authorization: `bearer ${localStorage.getItem("token")}`,
               "Content-Type": "application/json",
               ["x-ws-id"]: this.ws.wsid,
             },

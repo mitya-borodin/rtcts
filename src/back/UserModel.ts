@@ -8,6 +8,7 @@ import { authenticate } from "../utils/authenticate";
 import { checkPassword } from "../utils/checkPassword";
 import { encryptPassword } from "../utils/encryptPassword";
 import { getSalt } from "../utils/getSalt";
+import { isString } from "../utils/isType";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IRepository } from "./interfaces/IRepository";
 import { IUserModel } from "./interfaces/IUserModel";
@@ -33,33 +34,43 @@ export class UserModel<P extends IUser<G> & IPersist, I extends IUser<G>, G exte
     const result: any | null = await this.repository.findOne({});
 
     if (result === null) {
-      await this.signUp("admin@admin.com", userGroupEnum.admin, "admin", "admin");
+      await this.signUp({
+        group: userGroupEnum.admin,
+        login: "admin@admin.com",
+        password: "admin",
+        password_confirm: "admin",
+      });
     }
   }
 
-  public async signUp(login: string, groug: string, password: string, password_confirm: string): Promise<string> {
-    const existingUser: any | null = await this.repository.findOne({ login });
+  public async signUp(data: { [key: string]: any }): Promise<string> {
+    const { login, password, password_confirm, group, ...other } = data;
 
-    if (existingUser === null) {
-      const isValidPassword = checkPassword(password, password_confirm);
+    if (isString(login) && isString(password) && isString(password_confirm) && isString(group)) {
+      const existingUser: any | null = await this.repository.findOne({ login });
 
-      if (isValidPassword) {
-        const salt = getSalt();
-        const hashed_password = encryptPassword(password, salt);
-        const insert = new this.Insert({
-          groug,
-          hashed_password,
-          login,
-          salt,
-        });
-        const user: P = await this.repository.insertOne(insert.toJS());
+      if (existingUser === null) {
+        const isValidPassword = checkPassword(password, password_confirm);
 
-        return jwt.sign({ _id: user.id }, this.config.jwt.secret_key);
+        if (isValidPassword) {
+          const salt = getSalt();
+          const hashed_password = encryptPassword(password, salt);
+          const insert = new this.Insert({ login, group, salt, hashed_password, ...other });
+
+          const user: P = await this.repository.insertOne(insert.toJS());
+
+          return jwt.sign({ _id: user.id }, this.config.jwt.secret_key);
+        }
+
+        return Promise.reject(isValidPassword);
+      } else {
+        throw new Error(`Пользователь с таким: ${login} login уже зарегистрирован.`);
       }
-
-      return Promise.reject(isValidPassword);
     } else {
-      throw new Error(`Пользователь с таким: ${login} login уже зарегистрирован.`);
+      throw new Error(
+        `Аргументы не верные. login: ${login}, password: ${password}` +
+          `, password_confirm: ${password_confirm}, group: ${group}`,
+      );
     }
   }
 

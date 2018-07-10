@@ -38,7 +38,7 @@ export class AppConfig implements IAppConfig {
     }
 
     this.jwt = {
-      form_request: ExtractJwt.fromAuthHeader(),
+      form_request: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secret_key: process.env.JWT_SECRET_KEY || "JWT_SECRET_KEY",
     };
 
