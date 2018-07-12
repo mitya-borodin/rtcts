@@ -37,7 +37,7 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
     this.registration = this.registration.bind(this);
   }
 
-  get id() {
+  get id(): string {
     if (this.user instanceof this.User) {
       return this.user.id;
     }
