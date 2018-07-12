@@ -32,6 +32,6 @@
   "tslint.autoFixOnSave": true,
   "search.followSymlinks": true,
   "npm.autoDetect": "on",
-  "editor.fontSize": 14,
-  "editor.minimap.enabled": false
+  "editor.minimap.enabled": false,
+  "workbench.iconTheme": "vscode-icons"
 }
