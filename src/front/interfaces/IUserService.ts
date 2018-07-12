@@ -6,7 +6,7 @@ import { IService } from "./IService";
 export interface IUserService<U extends IUser<G> & IPersist, G extends IUserGroup> extends IService<U> {
   signIn(login: string, password: string): Promise<string | void>;
 
-  signUp(login: string, password: string, password_confirm: string, group: G): Promise<string | void>;
+  signUp(data: object): Promise<string | void>;
 
   load(token: string): Promise<U | void>;
 

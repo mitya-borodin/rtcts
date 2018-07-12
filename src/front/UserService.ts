@@ -14,13 +14,8 @@ export class UserService<U extends IUser<G>, G extends IUserGroup> extends Servi
     }
   }
 
-  public async signUp(
-    login: string,
-    group: string,
-    password: string,
-    password_confirm: string,
-  ): Promise<string | void> {
-    const output: string | void = await this.post(`/${this.name}/signIn`, { login, group, password, password_confirm });
+  public async signUp(data: object): Promise<string | void> {
+    const output: string | void = await this.post(`/${this.name}/signUp`, data);
 
     if (output) {
       return output;

@@ -18,7 +18,7 @@ export interface IUserStore<U extends IUser<G>, G extends IUserGroup> extends IE
 
   login(login: string, password: string): Promise<string>;
 
-  registration(login: string, password: string, password_confirm: string, group: string): Promise<string | void>;
+  registration(data: object): Promise<string | void>;
 
   logout(): Promise<void>;
 

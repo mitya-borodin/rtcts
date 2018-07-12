@@ -182,17 +182,12 @@ export class UserStore<U extends IUser<G> & IPersist, G extends IUserGroup> exte
   }
 
   @action("[STORE][USER][REGISTRATION]")
-  public async registration(
-    login: string,
-    password: string,
-    password_confirm: string,
-    userGroup: string,
-  ): Promise<string | void> {
+  public async registration(data: object): Promise<string | void> {
     if (!this.loading) {
       this.loading = true;
 
       try {
-        const token: string | void = await this.service.signUp(login, password, password_confirm, userGroup as G);
+        const token: string | void = await this.service.signUp(data);
 
         if (token) {
           await this.loadUserList();
