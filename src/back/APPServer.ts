@@ -2,7 +2,9 @@ import * as bodyParser from "body-parser";
 import chalk from "chalk";
 import * as express from "express";
 import * as http from "http";
+import { AddressInfo } from "net";
 import * as passport from "passport";
+import { isString } from "../utils/isType";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
 
@@ -35,6 +37,7 @@ export class APPServer {
 
   public run(): void {
     if (!this.wasRun) {
+      console.log(this.authStrategy.getStrategy());
       passport.use(this.authStrategy.getStrategy());
 
       this.app.use(bodyParser.json());
@@ -52,9 +55,11 @@ export class APPServer {
       });
 
       this.server.listen(this.config.server.port, this.config.server.host, () => {
-        console.log(
-          chalk.blueBright.bold(`[ APP ][ SERVER ][ RUN ][ http://localhost:${this.server.address().port} ]`),
-        );
+        const addressInfo: AddressInfo | string = this.server.address();
+
+        if (!isString(addressInfo)) {
+          console.log(chalk.blueBright.bold(`[ APP ][ SERVER ][ RUN ][ http://localhost:${addressInfo.port} ]`));
+        }
       });
     }
   }

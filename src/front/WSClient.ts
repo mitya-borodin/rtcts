@@ -1,4 +1,4 @@
-import { action, observable } from "mobx";
+import { action, computed, observable } from "mobx";
 import { wsEventEnum } from "../enums/wsEventEnum";
 import { EventEmitter } from "../isomorphic/EventEmitter";
 import {
@@ -55,6 +55,11 @@ export class WSClient extends EventEmitter implements IWSClient {
     this.pong = this.pong.bind(this);
   }
 
+  @computed
+  get isOpen(): boolean {
+    return this.readyState === WebSocket.OPEN;
+  }
+
   public setUserID(uid: string): void {
     this.uid = uid;
   }
@@ -62,7 +67,14 @@ export class WSClient extends EventEmitter implements IWSClient {
   @action("[ WSClient ][ CONNECT ]")
   public async connect() {
     if (this.connection instanceof WebSocket) {
-      throw new Error("[ WSClient ][ CONNECTION_ALLREADY_EXIST ]");
+      if (this.connection.readyState === WebSocket.OPEN) {
+        console.log("[ WSClient ][ CONNECTION_ALLREADY_EXIST ]");
+        return;
+      }
+
+      if (this.connection.readyState !== WebSocket.OPEN) {
+        return await this.reconnect();
+      }
     }
 
     this.readyState = WebSocket.CONNECTING;
@@ -82,12 +94,13 @@ export class WSClient extends EventEmitter implements IWSClient {
           this.reconnect();
         }
 
-        reject();
+        reject(event);
       };
 
       this.connection.onerror = (error) => {
         console.error(error);
-        reject();
+
+        reject(error);
       };
 
       this.connection.onmessage = (event) => {
@@ -113,47 +126,73 @@ export class WSClient extends EventEmitter implements IWSClient {
   }
 
   @action("[ WSClient ][ RECONNECT ]")
-  public reconnect(): void {
-    console.warn(`[ WSClient ][ INIT ][ RECONNECT ][ RECONNECT_WILL_THROUGHT: ${this.reconnectionDelay} ms; ]`);
+  public async reconnect(): Promise<void> {
+    await new Promise((resolve, reject) => {
+      console.warn(`[ WSClient ][ INIT ][ RECONNECT ][ RECONNECT_WILL_THROUGHT: ${this.reconnectionDelay} ms; ]`);
 
-    this.dropConnectionData();
+      this.dropConnectionData();
 
-    this.reconnectTimeOut = window.setTimeout(async () => {
-      console.warn("[ WSClient ][ TRY ][ RECONNECT ]");
+      this.reconnectTimeOut = window.setTimeout(async () => {
+        console.warn("[ WSClient ][ TRY ][ RECONNECT ]");
 
-      try {
-        await this.connect();
-        await this.assigmentToUserOfTheConnection();
+        try {
+          await this.connect();
+          await this.assigmentToUserOfTheConnection();
 
-        window.clearTimeout(this.reconnectTimeOut);
-        console.warn("[ WSClient ][ RECONNECT ][ SUCCESS ]");
-      } catch (error) {
-        console.warn("[ WSClient ][ RECONNECT ][ ERROR ]");
-      }
-    }, this.reconnectionDelay);
+          console.warn("[ WSClient ][ RECONNECT ][ SUCCESS ]");
+
+          resolve();
+        } catch (error) {
+          console.warn("[ WSClient ][ RECONNECT ][ ERROR ]");
+
+          reject();
+        } finally {
+          window.clearTimeout(this.reconnectTimeOut);
+        }
+      }, this.reconnectionDelay);
+    });
   }
 
   public async disconnect(reason = "[ DISCONNECT ]") {
-    // Нужен для того чтобы правильно проводить LOGOUT;
-    // Не используется если CLOSE или ERROR, так как но
-    // может быть закрыто или упать с ошибкой по разным
-    // причинам.
+    // Нужен для того чтобы закрыть соединение ПОЛНОСТЬЮ;
 
-    await new Promise((resolve) => {
-      if (this.connection instanceof WebSocket) {
-        this.once(wsEventEnum.CLOSE, (event) => {
+    // Шаг 1: Разъединяем uid и wsid, на этом шаге соединение браузера с сервером ещё активно.
+    // Шаг 2: Вызываем метод нативный метод закрытия соединения, на этом шаге соединение разрывается
+    //   и сервер очишает всех подписчиков.
+    // Шаг 3: все поля в объекте приводятся к значениям по умолчанию и все счетчики сбрасываются.
+    // Не используется если CLOSE или ERROR, так как но может быть закрыто или упать с ошибкой по разным
+    // причинам. И при CLOSE или ERROR необходимо выполнять reconnect если явно небыл вызыван этот
+    // метод disconnect;
+    await new Promise(async (resolve, reject) => {
+      try {
+        this.once(wsEventEnum.CANCEL_ASSIGMENT, () => {
+          if (this.connection instanceof WebSocket) {
+            this.connection.close(1000, reason);
+          } else {
+            console.error(`[ WSClient ][ DISCONNECT ][ CONNECTION_IS_NOT_WEB_SOCKET_INSTANCE ]`);
+          }
+        });
+
+        this.once(wsEventEnum.CLOSE, () => {
           this.dropConnectionData();
           this.uid = "";
 
           resolve();
         });
 
-        this.connection.close(1000, reason);
+        await this.cancelAssigmentToUserOfTheConnection();
+
+        console.log(`[ WSClient ][ DISCONNECT ][ SUCCESS ]`);
+      } catch (error) {
+        console.error(`[ WSClient ][ DISCONNECT ][ ERROR ]`);
+        console.error(error);
+
+        reject(error);
+      } finally {
+        console.log(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ]`);
+        console.log(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${this.listenersCount} ]`);
       }
     });
-
-    console.warn(`[ WSClient ][ DISCONNECT ][ REASON: ${reason} ]`);
-    console.warn(`[ WSClient ][ DISCONNECT ][ CLEAR_LISTENERS ][ LISTENERS_COUNT: ${this.listenersCount} ]`);
   }
 
   public send(
@@ -173,17 +212,15 @@ export class WSClient extends EventEmitter implements IWSClient {
     }
   }
 
+  // При login необходимо обьединить uid и wsid;
   public async assigmentToUserOfTheConnection() {
-    if (this.uid.length > 0) {
-      await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
+      if (this.uid.length > 0) {
         if (!this.isAssigment) {
           if (this.connection instanceof WebSocket) {
             if (this.connection.readyState === WebSocket.OPEN) {
               this.connection.send(makeMessage(assigment_to_user_of_the_connection_channel, { uid: this.uid }));
-
-              this.once(wsEventEnum.ASSIGMENT, (data) => {
-                resolve();
-              });
+              this.once(wsEventEnum.ASSIGMENT, resolve);
             } else {
               console.info(`[ WSClient ][ REDY_STATE: ${this.connection.readyState} ]`);
 
@@ -199,36 +236,36 @@ export class WSClient extends EventEmitter implements IWSClient {
 
           reject();
         }
-      });
-    } else {
-      console.error(
-        "[ WSClient ][ USER_ID_FOUND ] you need use method setUserID(uid: string), so insert userID into WSClient;",
-      );
-    }
+      } else {
+        console.error(
+          "[ WSClient ][ USER_ID_FOUND ] you need use method setUserID(uid: string), so insert userID into WSClient;",
+        );
+
+        reject();
+      }
+    });
   }
 
+  // При logout необходимо разъединить uid и wsid;
   public async cancelAssigmentToUserOfTheConnection() {
-    if (this.uid.length > 0) {
-      await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
+      if (this.uid.length > 0) {
         if (this.connection instanceof WebSocket && this.isAssigment) {
           this.send(cancel_assigment_to_user_of_the_connection_channel, { uid: this.uid });
-
-          this.once(wsEventEnum.CANCEL_ASSIGMENT, () => {
-            this.handleCancelAssigment();
-
-            resolve();
-          });
+          this.once(wsEventEnum.CANCEL_ASSIGMENT, resolve);
         } else {
           console.error("[ WSClient ][ HAS_NOT CONNECTION | TOKEN | IS_NO_ASSIGMENT ]");
 
           reject();
         }
-      });
-    } else {
-      console.error(
-        "[ WSClient ][ USER_ID_FOUND ] you need use method setUserID(uid: string), so insert userID into WSClient;",
-      );
-    }
+      } else {
+        console.error(
+          "[ WSClient ][ USER_ID_FOUND ] you need use method setUserID(uid: string), so insert userID into WSClient;",
+        );
+
+        reject();
+      }
+    });
   }
 
   private handleOpen() {
@@ -259,7 +296,7 @@ export class WSClient extends EventEmitter implements IWSClient {
   }
 
   @action("[ WSClient ][ ASSIGMENT ]")
-  private handleAssigment({ wsid, uid }) {
+  private handleAssigment({ wsid, uid }: { wsid: string; uid: string }) {
     this.readyState = WebSocket.OPEN;
     this.isAssigment = true;
     this.wsid = wsid;

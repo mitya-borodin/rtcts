@@ -13,7 +13,7 @@ export class DBConnection implements IDBConnection {
   }
 
   public async connection(): Promise<Db> {
-    this.client = await MongoClient.connect(this.config.db.url);
+    this.client = await MongoClient.connect(this.config.db.url, { useNewUrlParser: true });
     this.DB = this.client.db(this.config.db.name);
 
     console.log(

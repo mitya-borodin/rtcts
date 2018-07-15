@@ -2,24 +2,30 @@ import * as express from "express";
 import * as passport from "passport";
 import { IInsert } from "../interfaces/IInsert";
 import { IPersist } from "../interfaces/IPersist";
-import { IUserGroup } from "../interfaces/IUserGroup";
+import { IUser } from "../interfaces/IUser";
 import { IChannels } from "./interfaces/IChannels";
 import { IModel } from "./interfaces/IModel";
 
-export class Service<P extends IPersist, I extends IInsert, C extends IChannels, G extends IUserGroup> {
+export class Service<
+  M extends IModel<P, I>,
+  P extends IPersist,
+  I extends IInsert,
+  C extends IChannels,
+  U extends IUser & IPersist
+> {
   protected readonly name: string;
   protected readonly router: express.Router;
   protected readonly Insert: { new (data: any): I };
   protected readonly Persist: { new (data: any): P };
-  protected readonly model: IModel<P, I>;
+  protected readonly model: M;
   protected readonly channels: C;
   protected readonly ACL: {
-    readonly collection: G[];
-    readonly model: G[];
-    readonly create: G[];
-    readonly remove: G[];
-    readonly update: G[];
-    readonly channel: G[];
+    readonly collection: string[];
+    readonly model: string[];
+    readonly create: string[];
+    readonly remove: string[];
+    readonly update: string[];
+    readonly channel: string[];
   };
 
   constructor(
@@ -27,15 +33,15 @@ export class Service<P extends IPersist, I extends IInsert, C extends IChannels,
     router: express.Router,
     Persist: { new (data: any): P },
     Insert: { new (data: any): I },
-    model: IModel<P, I>,
+    model: M,
     channels: C,
     ACL: {
-      collection: G[];
-      create: G[];
-      model: G[];
-      remove: G[];
-      update: G[];
-      channel: G[];
+      collection: string[];
+      create: string[];
+      model: string[];
+      remove: string[];
+      update: string[];
+      channel: string[];
     },
   ) {
     this.name = name;
@@ -52,7 +58,7 @@ export class Service<P extends IPersist, I extends IInsert, C extends IChannels,
       async (req: express.Request, res: express.Response) => {
         if (req.user && this.ACL.collection.includes(req.user.group)) {
           try {
-            const collection = await this.model.read();
+            const collection = await this.collection(req, req.user as U);
 
             res.status(200).json(collection.map((item) => item.toJS()));
           } catch (error) {
@@ -69,7 +75,7 @@ export class Service<P extends IPersist, I extends IInsert, C extends IChannels,
       async (req: express.Request, res: express.Response) => {
         if (req.user && this.ACL.model.includes(req.user.group)) {
           try {
-            const result: P | null = await this.model.readById(req.params.id);
+            const result: P | null = await this.singleModel(req, req.user as U);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -90,9 +96,7 @@ export class Service<P extends IPersist, I extends IInsert, C extends IChannels,
       async (req: express.Request, res: express.Response) => {
         if (req.user && this.ACL.model.includes(req.user.group)) {
           try {
-            const { wsid, ...data } = req.body;
-            const insert = new this.Insert(data);
-            const result: P | null = await this.model.create(insert.toJS(), req.user.id, wsid);
+            const result: P | null = await this.create(req, req.user as U);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -114,14 +118,12 @@ export class Service<P extends IPersist, I extends IInsert, C extends IChannels,
       async (req: express.Request, res: express.Response) => {
         if (req.user && this.ACL.model.includes(req.user.group)) {
           try {
-            const { wsid, ...data } = req.body;
-            const persist = new this.Persist(data);
-            const result: P | null = await this.model.update(persist.toJS(), req.user.id, wsid);
+            const result: P | null = await this.update(req, req.user as U);
 
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`Model not found by id: /${data.id}`);
+              res.status(404).send(`Model not found by id: /${req.body.id}`);
             }
           } catch (error) {
             console.error(error);
@@ -138,13 +140,12 @@ export class Service<P extends IPersist, I extends IInsert, C extends IChannels,
       async (req: express.Request, res: express.Response) => {
         if (req.user && this.ACL.model.includes(req.user.group)) {
           try {
-            const { wsid, id } = req.body;
-            const result: P | null = await this.model.remove(id, req.user.id, wsid);
+            const result: P | null = await this.remove(req, req.user as U);
 
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`Model not found by id: ${id}`);
+              res.status(404).send(`Model not found by id: ${req.body.id}`);
             }
           } catch (error) {
             res.status(500).send(error.message);
@@ -181,5 +182,33 @@ export class Service<P extends IPersist, I extends IInsert, C extends IChannels,
         }
       },
     );
+  }
+
+  protected async collection(req: express.Request, user: U): Promise<P[]> {
+    return await this.model.read({});
+  }
+
+  protected async singleModel(req: express.Request, user: U): Promise<P | null> {
+    return await this.model.readById(req.params.id);
+  }
+
+  protected async create(req: express.Request, user: U): Promise<P | null> {
+    const { wsid, ...data } = req.body;
+    const insert = new this.Insert(data);
+
+    return await this.model.create(insert.toJS(), user.id, wsid);
+  }
+
+  protected async update(req: express.Request, user: U): Promise<P | null> {
+    const { wsid, ...data } = req.body;
+    const persist = new this.Persist(data);
+
+    return await this.model.update(persist.toJS(), user.id, wsid);
+  }
+
+  protected async remove(req: express.Request, user: U): Promise<P | null> {
+    const { wsid, id } = req.body;
+
+    return await this.model.remove(id, user.id, wsid);
   }
 }

@@ -24,7 +24,7 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
     this.send = send;
   }
 
-  public async read(query: object = {}, options?: FindOneOptions): Promise<P[]> {
+  public async read(query: { [key: string]: any } = {}, options?: FindOneOptions, uid?: string): Promise<P[]> {
     const items = await this.repository.find(query, options);
 
     return items.map((item) => new this.Persist(item));
@@ -54,7 +54,7 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
   }
 
   public async create(
-    data: object,
+    data: { [key: string]: any },
     uid: string,
     wsid: string,
     options?: CollectionInsertOneOptions,
@@ -68,7 +68,12 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
     return persist;
   }
 
-  public async update(data: object, uid: string, wsid: string, options?: FindOneAndReplaceOption): Promise<P | null> {
+  public async update(
+    data: { [key: string]: any },
+    uid: string,
+    wsid: string,
+    options?: FindOneAndReplaceOption,
+  ): Promise<P | null> {
     let persist: P = new this.Persist(data);
     const { _id, ...$set } = toMongo(persist);
 

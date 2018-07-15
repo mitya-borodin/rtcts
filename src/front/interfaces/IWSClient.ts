@@ -1,15 +1,16 @@
 import { IEventEmitter } from "../../interfaces/IEventEmitter";
 
 export interface IWSClient extends IEventEmitter {
-  readyState: number;
+  isOpen: boolean;
   isAssigment: boolean;
+  readyState: number;
   wsid: string;
 
   setUserID(uid: string): void;
 
   connect(): Promise<void>;
 
-  reconnect(): void;
+  reconnect(): Promise<void>;
 
   disconnect(reason?: string): void;
 

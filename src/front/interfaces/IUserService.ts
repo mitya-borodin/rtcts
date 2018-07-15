@@ -1,18 +1,17 @@
 import { IPersist } from "../../interfaces/IPersist";
 import { IUser } from "../../interfaces/IUser";
-import { IUserGroup } from "../../interfaces/IUserGroup";
 import { IService } from "./IService";
 
-export interface IUserService<U extends IUser<G> & IPersist, G extends IUserGroup> extends IService<U> {
-  signIn(login: string, password: string): Promise<string | void>;
+export interface IUserService<U extends IUser & IPersist> extends IService<U> {
+  signIn(data: { [key: string]: any }): Promise<string | void>;
 
-  signUp(data: object): Promise<string | void>;
+  signUp(data: object): Promise<{ token: string; user: object } | void>;
 
-  load(token: string): Promise<U | void>;
+  current(): Promise<U | void>;
 
-  updateLogin(id: string, login: string): Promise<U | void>;
+  updateLogin(data: { [key: string]: any }): Promise<U | void>;
 
-  updatePassword(id: string, password: string, password_confirm: string): Promise<U | void>;
+  updatePassword(data: { [key: string]: any }): Promise<U | void>;
 
-  updateGroup(ids: string[], group: G): Promise<U[] | void>;
+  updateGroup(ids: string[], group: string): Promise<U[] | void>;
 }

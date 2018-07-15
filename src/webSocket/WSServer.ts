@@ -7,7 +7,6 @@ import { IConnection } from "../back/interfaces/IConnection";
 import { IUserModel } from "../back/interfaces/IUserModel";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
-import { IUserGroup } from "../interfaces/IUserGroup";
 import { isArray, isString } from "../utils/isType";
 import {
   assigment_to_user_of_the_connection_channel,
@@ -17,7 +16,7 @@ import {
 } from "./const";
 import { makeErrorMessage, makeMessage, recognizeMessage } from "./helpers";
 
-export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G extends IUserGroup> {
+export class WSServer<U extends IUserModel<IUser & IPersist, IUser>> {
   private config: IAppConfig;
   private server: WebSocket.Server;
   private connections: Set<IConnection>;
@@ -68,6 +67,9 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
         for (const connection of this.connections) {
           if (connection.wasTermintate()) {
             this.connections.delete(connection);
+
+            console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
+            console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
           }
         }
       }, 1000);
@@ -88,13 +90,14 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
     ws.on("close", (code, message) => {
       ws.removeEventListener("message", messageHandler);
       ws.removeAllListeners();
+      ws.terminate();
       this.connections.delete(connection);
       this.channels.deleteConnection(connection);
+      this.server.clients.delete(ws);
 
       console.log("");
       console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
       console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
-      console.log("");
       console.log(chalk.grey.bold(`[ CLOSE ][ CODE ]: ${code}`));
       console.log(chalk.grey.bold(`[ CLOSE ][ MESSAGE ]: ${message}`));
       console.log(chalk.grey.bold(`[ CLOSE ]${connection.getConnectionID()}`));
@@ -102,8 +105,10 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
     ws.on("error", (error) => {
       ws.removeEventListener("message", messageHandler);
       ws.removeAllListeners();
+      ws.terminate();
       this.connections.delete(connection);
       this.channels.deleteConnection(connection);
+      this.server.clients.delete(ws);
 
       console.log("");
       console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
@@ -129,11 +134,11 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
           ) {
             this.user
               .readById(payload.uid)
-              .then((user: IUser<G> & IPersist | null) => {
+              .then((user: IUser & IPersist | null) => {
                 if (user) {
-                  connection.setUserID(user.id);
-
                   if (channelName === assigment_to_user_of_the_connection_channel) {
+                    connection.setUserID(user.id);
+
                     this.channels.addConnection(connection);
 
                     connection.send(
@@ -144,6 +149,7 @@ export class WSServer<U extends IUserModel<IUser<G> & IPersist, IUser<G>, G>, G 
                       }),
                     );
                   }
+
                   if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
                     this.channels.deleteConnection(connection);
 

@@ -1,7 +1,7 @@
 export interface IEventEmitter {
   listenersCount: number;
 
-  emit(name, payload?: object): void;
+  emit(name: string, payload?: any): void;
 
   has(name: string, callBack: any): boolean;
 

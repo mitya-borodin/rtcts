@@ -1,10 +1,11 @@
 import { ObservableMap } from "mobx";
-import { IStore } from "./IStore";
+import { IEventEmitter } from "../../interfaces/IEventEmitter";
 
-export interface IRepositoryStore<T> extends IStore {
-  list: T[];
-  plainMap: Map<string, T>;
+export interface IRepository<T> extends IEventEmitter {
+  isLoading: boolean;
   map: ObservableMap<string, T>;
+  plainMap: Map<string, T>;
+  list: T[];
 
   init(): Promise<void>;
 

@@ -76,14 +76,14 @@ export class MongoDBRepository<D> implements IRepository<D> {
     const collection: Collection<D> = await this.getCollection();
     const insert: InsertWriteOpResult = await collection.insertMany(docs, options);
 
-    return insert.ops.map((data) => this.prepareId(data));
+    return insert.ops.map((data: any) => this.prepareId(data));
   }
 
   public async insertOne(doc: object, options?: CollectionInsertOneOptions): Promise<D> {
     const collection: Collection<D> = await this.getCollection();
     const insert: InsertOneWriteOpResult = await collection.insertOne(doc, options);
 
-    return insert.ops.map((data) => this.prepareId(data))[0];
+    return insert.ops.map((data: any) => this.prepareId(data))[0];
   }
 
   public async find(query: object, options?: FindOneOptions): Promise<D[]> {
@@ -95,12 +95,12 @@ export class MongoDBRepository<D> implements IRepository<D> {
 
       const items = await cursor.toArray();
 
-      return items.map((data) => this.prepareId(data));
+      return items.map((data: any) => this.prepareId(data));
     } else {
       const cursor: Cursor = await collection.find(this.prepareObjectId(query));
       const items = await cursor.toArray();
 
-      return items.map((data) => this.prepareId(data));
+      return items.map((data: any) => this.prepareId(data));
     }
   }
 

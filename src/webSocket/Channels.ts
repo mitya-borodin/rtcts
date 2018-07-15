@@ -44,9 +44,7 @@ export class Channels implements IChannels {
 
       console.log("");
       console.log(chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ]${id}`));
-      console.log(
-        chalk.redBright.bold(`[ CHANNELS ][ DELETE_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`),
-      );
+      console.log(chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`));
     } else {
       console.log("");
       console.log(chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ][ ERROR ][ NOT_FOUND ] ${id}`));
@@ -61,10 +59,12 @@ export class Channels implements IChannels {
 
     if (channel) {
       if (connection) {
-        channel.set(connectionID, connection);
+        if (!channel.has(connectionID)) {
+          channel.set(connectionID, connection);
 
-        console.log("");
-        console.log(chalk.yellow.bold(`[ CHANNELS ][ DONE_ON ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`));
+          console.log("");
+          console.log(chalk.yellow.bold(`[ CHANNELS ][ DONE_ON ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`));
+        }
       }
     } else {
       if (connection) {
@@ -88,10 +88,12 @@ export class Channels implements IChannels {
     const channel = this.channels.get(chName);
 
     if (channel) {
-      channel.delete(Connection.getConnectionID(uid, wsid));
+      if (channel.has(Connection.getConnectionID(uid, wsid))) {
+        channel.delete(Connection.getConnectionID(uid, wsid));
 
-      console.log("");
-      console.log(chalk.red.bold(`[ CHANNELS ][ DONE_OFF ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`));
+        console.log("");
+        console.log(chalk.red.bold(`[ CHANNELS ][ DONE_OFF ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`));
+      }
     } else {
       console.log("");
       console.log(chalk.redBright(`[ CHANNELS ][ OFF ][ ERROR ][ ${chName} ][ NOT_FOUND ]`));

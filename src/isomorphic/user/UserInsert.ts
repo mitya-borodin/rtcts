@@ -1,18 +1,17 @@
 import { IUser } from "../../interfaces/IUser";
-import { IUserGroup } from "../../interfaces/IUserGroup";
 import { isString } from "../../utils/isType";
 
-export class UserInsert<G extends IUserGroup> implements IUser<G> {
+export class UserInsert implements IUser {
   public readonly login: string;
+  public readonly group: string;
   public readonly salt: string;
-  public readonly group: G;
   public hashed_password: string;
 
   constructor(data?: any) {
     this.login = "";
+    this.group = "";
     this.salt = "";
     this.hashed_password = "";
-    this.group = "" as G;
 
     if (data) {
       if (data.login && isString(data.login)) {
@@ -21,16 +20,16 @@ export class UserInsert<G extends IUserGroup> implements IUser<G> {
         throw new Error(`[${this.constructor.name}][ login ], must be a string;`);
       }
 
-      if (data.salt && isString(data.salt)) {
-        this.salt = data.salt;
-      }
-
-      if (data.hashed_password && isString(data.hashed_password)) {
-        this.salt = data.salt;
-      }
-
       if (isString(data.group)) {
         this.group = data.group;
+      }
+
+      if (isString(data.salt)) {
+        this.salt = data.salt;
+      }
+
+      if (isString(data.hashed_password)) {
+        this.hashed_password = data.hashed_password;
       }
     }
   }

@@ -18,7 +18,7 @@ export class EventEmitter implements IEventEmitter {
     return this.subscriptions.size;
   }
 
-  public emit(name, payload?: object): void {
+  public emit(name: string, payload?: any): void {
     const listeners = this.subscriptions.get(name);
 
     if (listeners) {
@@ -27,7 +27,7 @@ export class EventEmitter implements IEventEmitter {
   }
 
   public once(name: string, callBack: any): void {
-    const cb = (...args) => {
+    const cb = (...args: any[]) => {
       callBack(...args);
       this.off(name, cb);
     };
@@ -52,7 +52,7 @@ export class EventEmitter implements IEventEmitter {
       if (!listeners.has(callBack)) {
         listeners.add(callBack);
       } else {
-        console.warn(`[ ${this.constructor.name} ][ ON ][ CALLBACK ][ ${name} ][ ALREADY_EXIST ]`);
+        console.warn(`[ EVENT_EMITTER ][ ${this.constructor.name} ][ ON ][ ${name} ][ ALREADY_EXIST ]`);
       }
     } else {
       this.subscriptions.set(name, new Set([callBack]));
@@ -66,10 +66,10 @@ export class EventEmitter implements IEventEmitter {
       if (listeners.has(callBack)) {
         listeners.delete(callBack);
       } else {
-        console.warn(`[ ${this.constructor.name} ][ OFF ][ CALLBACK ][ ${name} ][ NOT_EXIST ]`);
+        console.warn(`[ EVENT_EMITTER ][ ${this.constructor.name} ][ OFF ][ ${name} ][ NOT_EXIST ]`);
       }
     } else {
-      console.error(`[ ${this.constructor.name} ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`);
+      console.error(`[ EVENT_EMITTER ][ ${this.constructor.name} ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`);
     }
   }
 

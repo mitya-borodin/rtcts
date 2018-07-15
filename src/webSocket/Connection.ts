@@ -33,7 +33,7 @@ export class Connection implements IConnection {
     }
 
     console.log("");
-    console.log(chalk.redBright(`[ CONNECTION ][ ERROR ][ getConnectionID ] user ID (uid) is not defined;`));
+    console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ GET_CONNECTION_ID ][ UID_IS_NOT_DEFINED ]`));
 
     return "";
   }
@@ -44,7 +44,7 @@ export class Connection implements IConnection {
     }
 
     console.log("");
-    console.log(chalk.redBright(`[ CONNECTION ][ ERROR ][ isOwner ] user ID (uid) is not defined;`));
+    console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ IS_OWNER ][ UID_IS_NOT_DEFINED ]`));
 
     return false;
   }
@@ -55,7 +55,7 @@ export class Connection implements IConnection {
     }
 
     console.log("");
-    console.log(chalk.redBright(`[ CONNECTION ][ ERROR ][ isItSelf ] user ID (uid) is not defined;`));
+    console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ IS_ITSELF ][ UID_IS_NOT_DEFINED ]`));
 
     return false;
   }
@@ -65,7 +65,7 @@ export class Connection implements IConnection {
       this.uid = uid;
     } else {
       console.log("");
-      console.log(chalk.redBright(`[ CONNECTION ][ ERROR ] user ID (uid) already exist;`));
+      console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ USER_ID_ALREADY_EXIST ]`));
     }
   }
 
@@ -93,6 +93,7 @@ export class Connection implements IConnection {
       return true;
     }
   }
+
   public close(message?: string): void {
     this.connection.removeEventListener("pong", this.heartbeat);
     this.connection.removeAllListeners();
@@ -104,6 +105,7 @@ export class Connection implements IConnection {
 
   public terminate(message?: string): void {
     this.isAlive = false;
+    this.connection.close(1000, "[ CLOSE ] " + message);
     this.connection.removeEventListener("pong", this.heartbeat);
     this.connection.removeAllListeners();
     this.connection.terminate();

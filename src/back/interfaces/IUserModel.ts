@@ -1,16 +1,17 @@
 import { IInsert } from "../../interfaces/IInsert";
 import { IPersist } from "../../interfaces/IPersist";
-import { IUserGroup } from "../../interfaces/IUserGroup";
 import { IModel } from "./IModel";
 
-export interface IUserModel<P extends IPersist, I extends IInsert, G extends IUserGroup> extends IModel<P, I> {
-  signUp(data: { [key: string]: any }): Promise<string>;
+export interface IUserModel<P extends IPersist, I extends IInsert> extends IModel<P, I> {
+  readAll(): Promise<P[]>;
 
-  signIn(login: string, password: string): Promise<string | null>;
+  signUp(data: { [key: string]: any }): Promise<{ token: string; user: object }>;
 
-  updateLogin(id: string, login: string, uid: string, wsid: string): Promise<P | null>;
+  signIn(data: { [key: string]: any }): Promise<string | null>;
 
-  updatePassword(id: string, password: string, passwordConfirm: string, uid: string, wsid: string): Promise<P | null>;
+  updateLogin(data: { [key: string]: any }, uid: string, wsid: string): Promise<P | null>;
 
-  updateGroup(ids: string[], group: G): Promise<P[]>;
+  updatePassword(data: { [key: string]: any }, uid: string, wsid: string): Promise<P | null>;
+
+  updateGroup(ids: string[], group: string, uid: string, wsid: string): Promise<P[]>;
 }

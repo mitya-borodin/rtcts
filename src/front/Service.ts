@@ -1,3 +1,6 @@
+import { userRepositoryEventEnum } from "../enums/userRepositoryEventEnum";
+import { isString } from "../utils/isType";
+import { IMediator } from "./interfaces/IMediator";
 import { IService } from "./interfaces/IService";
 import { IWSClient } from "./interfaces/IWSClient";
 
@@ -7,14 +10,45 @@ export class Service<T> implements IService<T> {
   protected ws: IWSClient;
   protected root: string;
   protected channelName: string;
+  protected group: string;
+  protected ACL: {
+    collection: string[];
+    model: string[];
+    create: string[];
+    remove: string[];
+    update: string[];
+    onChannel: string[];
+    offChannel: string[];
+  };
+  protected mediator: IMediator;
 
-  constructor(name: string, Class: { new (data?: any): T }, ws: IWSClient, channelName: string, root = "/service") {
+  constructor(
+    name: string,
+    Class: { new (data?: any): T },
+    ws: IWSClient,
+    channelName: string,
+    ACL: {
+      collection: string[];
+      model: string[];
+      create: string[];
+      remove: string[];
+      update: string[];
+      onChannel: string[];
+      offChannel: string[];
+    },
+    mediator: IMediator,
+    root = "/service",
+  ) {
+    // DEPS
     this.name = name.toLocaleLowerCase();
     this.Class = Class;
     this.ws = ws;
     this.channelName = channelName;
     this.root = root;
+    this.ACL = ACL;
+    this.mediator = mediator;
 
+    // BINDINGS
     this.collection = this.collection.bind(this);
     this.model = this.model.bind(this);
     this.create = this.create.bind(this);
@@ -27,69 +61,94 @@ export class Service<T> implements IService<T> {
     this.put = this.put.bind(this);
     this.del = this.del.bind(this);
     this.fetch = this.fetch.bind(this);
+
+    // SUBSCRIPTIONS
+    this.mediator.on(userRepositoryEventEnum.SET_USER_GROUP, (group: string) => {
+      if (isString(group)) {
+        this.group = group;
+      }
+    });
+
+    this.mediator.on(userRepositoryEventEnum.CLEAR_USER_GROUP, () => {
+      this.group = "";
+    });
   }
 
   public async collection(): Promise<T[] | void> {
-    const output: object[] | void = await this.get(`/${this.name}/collection`);
+    if (this.ACL.collection.includes(this.group)) {
+      const output: object[] | void = await this.get(`/${this.name}/collection`);
 
-    if (output) {
-      return output.map((item) => new this.Class(item));
+      if (output) {
+        return output.map((item) => new this.Class(item));
+      }
     }
   }
 
   public async model(id: string): Promise<T | void> {
-    const output: object | void = await this.get(`/${this.name}/model?id=${id}`);
+    if (this.ACL.model.includes(this.group)) {
+      const output: object | void = await this.get(`/${this.name}/model?id=${id}`);
 
-    if (output) {
-      return new this.Class(output);
+      if (output) {
+        return new this.Class(output);
+      }
     }
   }
 
   public async create(input: object): Promise<T | void> {
-    const output: object | void = await this.put(`/${this.name}/create`, input);
+    if (this.ACL.create.includes(this.group)) {
+      const output: object | void = await this.put(`/${this.name}/create`, input);
 
-    if (output) {
-      return new this.Class(output);
+      if (output) {
+        return new this.Class(output);
+      }
     }
   }
 
   public async update(input: object): Promise<T | void> {
-    const output: object | void = await this.post(`/${this.name}/update`, input);
+    if (this.ACL.update.includes(this.group)) {
+      const output: object | void = await this.post(`/${this.name}/update`, input);
 
-    if (output) {
-      return new this.Class(output);
+      if (output) {
+        return new this.Class(output);
+      }
     }
   }
 
   public async remove(id: string): Promise<T | void> {
-    const output: object | void = await this.del(`/${this.name}/remove`, { id });
+    if (this.ACL.remove.includes(this.group)) {
+      const output: object | void = await this.del(`/${this.name}/remove`, { id });
 
-    if (output) {
-      return new this.Class(output);
+      if (output) {
+        return new this.Class(output);
+      }
     }
   }
 
   public async onChannel(): Promise<void> {
-    await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "on" });
+    if (this.ACL.onChannel.includes(this.group)) {
+      await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "on" });
+    }
   }
 
   public async offChannel(): Promise<void> {
-    await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "off" });
+    if (this.ACL.offChannel.includes(this.group)) {
+      await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "off" });
+    }
   }
 
-  protected async get(URL) {
+  protected async get(URL: string) {
     return await this.fetch(URL, "GET");
   }
 
-  protected async post(URL, body?: object) {
+  protected async post(URL: string, body?: object) {
     return await this.fetch(URL, "POST", body);
   }
 
-  protected async put(URL, body?: object) {
+  protected async put(URL: string, body?: object) {
     return await this.fetch(URL, "PUT", body);
   }
 
-  protected async del(URL, body?: object) {
+  protected async del(URL: string, body?: object) {
     return await this.fetch(URL, "DELETE", body);
   }
 

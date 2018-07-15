@@ -2,7 +2,6 @@ import { Strategy } from "passport-jwt";
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
-import { IUserGroup } from "../interfaces/IUserGroup";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
 import { IUserModel } from "./interfaces/IUserModel";
@@ -13,11 +12,10 @@ import { IUserModel } from "./interfaces/IUserModel";
  * то выполняется этот callBack и проиходит запрос в БД на предмет посика пользователя по ObjectId.
  * */
 
-export class AuthStrategy<P extends IUser<G> & IPersist, I extends IUser<G>, G extends IUserGroup>
-  implements IAuthStrategy {
+export class AuthStrategy<P extends IUser & IPersist, I extends IUser> implements IAuthStrategy {
   protected readonly strategy: PassportStrategy;
 
-  constructor(config: IAppConfig, userModel: IUserModel<P, I, G>) {
+  constructor(config: IAppConfig, userModel: IUserModel<P, I>) {
     this.strategy = new Strategy(
       {
         jwtFromRequest: config.jwt.form_request,

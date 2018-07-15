@@ -1,10 +1,9 @@
 import { IPersist } from "../../interfaces/IPersist";
 import { IUser } from "../../interfaces/IUser";
-import { IUserGroup } from "../../interfaces/IUserGroup";
 import { detectID } from "../../utils/detectID";
 import { UserInsert } from "./UserInsert";
 
-export class User<G extends IUserGroup> extends UserInsert<G> implements IUser<G>, IPersist {
+export class User extends UserInsert implements IUser, IPersist {
   public readonly id: string;
 
   constructor(data?: any) {
