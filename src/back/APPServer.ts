@@ -37,7 +37,6 @@ export class APPServer {
 
   public run(): void {
     if (!this.wasRun) {
-      console.log(this.authStrategy.getStrategy());
       passport.use(this.authStrategy.getStrategy());
 
       this.app.use(bodyParser.json());
