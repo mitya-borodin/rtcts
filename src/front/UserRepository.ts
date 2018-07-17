@@ -25,15 +25,15 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
   ) {
     super(Persist, service, wsClient, channelName, mediator);
 
-    // DEPS
-    this.Persist = Persist;
-
     // BINDINGS
     this.init = this.init.bind(this);
     this.signIn = this.signIn.bind(this);
     this.signOut = this.signOut.bind(this);
     this.signUp = this.signUp.bind(this);
-    this.destroy = this.destroy.bind(this);
+    this.updateLogin = this.updateLogin.bind(this);
+    this.updatePassword = this.updatePassword.bind(this);
+    this.updateGroup = this.updateGroup.bind(this);
+    this.remove = this.remove.bind(this);
   }
 
   get isToken() {
@@ -48,7 +48,14 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
   @computed({ name: "[ USER_REPOSITORY ][ USER ]", keepAlive: true })
   get user(): U | void {
     if (isString(this.currentUserID)) {
-      return this.map.get(this.currentUserID);
+      const user: U | void = this.map.get(this.currentUserID);
+
+      if (user instanceof this.Persist) {
+        this.mediator.emit(userRepositoryEventEnum.SET_USER, user);
+        this.mediator.emit(userRepositoryEventEnum.SET_USER_GROUP, user.group);
+      }
+
+      return user;
     }
   }
 
@@ -302,6 +309,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
 
       this.endLoad();
 
+      this.mediator.emit(userRepositoryEventEnum.CLEAR_USER);
       this.mediator.emit(userRepositoryEventEnum.CLEAR_USER_GROUP);
 
       console.log(`[ ${this.constructor.name} ][ DESTROY ][ SUCCESS ]`);
@@ -319,10 +327,15 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
 
         if (user instanceof this.Persist) {
           await runInAction(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ SUCCESS ]`, async () => {
-            this.mediator.emit(userRepositoryEventEnum.SET_USER_GROUP, user.group);
-
             this.currentUserID = user.id;
             this.collection.set(this.currentUserID, user);
+
+            const observableUser = this.collection.get(this.currentUserID);
+
+            if (observableUser instanceof this.Persist) {
+              this.mediator.emit(userRepositoryEventEnum.SET_USER, observableUser);
+              this.mediator.emit(userRepositoryEventEnum.SET_USER_GROUP, observableUser.group);
+            }
 
             this.wsClient.setUserID(this.currentUserID);
 
