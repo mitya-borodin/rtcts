@@ -1,5 +1,6 @@
 export enum userRepositoryEventEnum {
   LOGIN = "LOGIN",
+  LOGIN_FAIL = "LOGIN_FAIL",
   LOGOUT = "LOGOUT",
   GO_TO_LOGIN = "GO_TO_LOGIN",
   SET_USER = "SET_USER",

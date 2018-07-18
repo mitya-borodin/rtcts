@@ -84,7 +84,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
             this.wasInit = true;
           });
         } else {
-          this.emit(userRepositoryEventEnum.GO_TO_LOGIN);
+          this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
         }
       } catch (error) {
         console.error(`[ ${this.constructor.name}  ][ INIT ][ ERROR ]`);
@@ -110,6 +110,8 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
             localStorage.setItem("token", token);
 
             await this.init();
+          } else {
+            this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
           }
         }
 
@@ -119,6 +121,8 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
         console.error(error);
 
         this.destroy();
+
+        this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
       } finally {
         this.endLoad();
       }
@@ -138,7 +142,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
 
       await new Promise((resolve, reject) => {
         try {
-          this.once(userRepositoryEventEnum.LOGOUT, () => {
+          this.mediator.once(userRepositoryEventEnum.LOGOUT, () => {
             setTimeout(async () => {
               if (this.wsClient.isAssigment) {
                 await this.wsClient.cancelAssigmentToUserOfTheConnection();
@@ -150,7 +154,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
           });
 
           this.startLoad();
-          this.emit(userRepositoryEventEnum.LOGOUT);
+          this.mediator.emit(userRepositoryEventEnum.LOGOUT);
         } catch (error) {
           console.error(`[ ${this.constructor.name} ][ LOGOUT ][ ERROR ]`);
           console.error(error);
@@ -305,7 +309,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
 
       this.currentUserID = undefined;
 
-      this.emit(userRepositoryEventEnum.GO_TO_LOGIN);
+      this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
 
       this.endLoad();
 
@@ -347,9 +351,11 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
               await this.wsClient.assigmentToUserOfTheConnection();
             }
 
-            this.emit(userRepositoryEventEnum.LOGIN);
+            this.mediator.emit(userRepositoryEventEnum.LOGIN);
           });
         } else {
+          this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
+
           console.error(
             `[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ERROR ][ USER_IN_NOT_INSTANCEOF ][ ${
               this.Persist.name
@@ -360,7 +366,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
           this.destroy();
         }
       } else {
-        this.emit(userRepositoryEventEnum.GO_TO_LOGIN);
+        this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
       }
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ERROR ]`);
