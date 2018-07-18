@@ -309,10 +309,9 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
 
       this.currentUserID = undefined;
 
-      this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
-
       this.endLoad();
 
+      this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
       this.mediator.emit(userRepositoryEventEnum.CLEAR_USER);
       this.mediator.emit(userRepositoryEventEnum.CLEAR_USER_GROUP);
 
@@ -354,8 +353,6 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
             this.mediator.emit(userRepositoryEventEnum.LOGIN);
           });
         } else {
-          this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
-
           console.error(
             `[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ERROR ][ USER_IN_NOT_INSTANCEOF ][ ${
               this.Persist.name
@@ -364,6 +361,8 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
           console.error(user);
 
           this.destroy();
+
+          this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
         }
       } else {
         this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
