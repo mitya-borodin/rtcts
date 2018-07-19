@@ -18,4 +18,11 @@ export class User extends UserInsert implements IUser, IPersist {
       id: this.id,
     };
   }
+
+  public toJSSecure(): { [key: string]: any } {
+    return {
+      ...super.toJSSecure(),
+      id: this.id,
+    };
+  }
 }

@@ -55,12 +55,10 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          const currentUser = req.user;
-
-          if (currentUser) {
-            res.status(200).json(currentUser);
-          } else {
-            res.status(404).send("Current user is not recognized;");
+          try {
+            res.status(200).json(this.current(req.user));
+          } catch (error) {
+            res.status(500).send(error.message);
           }
         } catch (error) {
           res.status(500).send(error.message);
@@ -182,5 +180,11 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
     }
 
     return await this.model.read({}, { projection: { login: 1, group: 1 } }, user.id);
+  }
+
+  protected current(user: U & IPersist): object {
+    const persistUser = new this.Persist(user);
+
+    return persistUser.toJSSecure();
   }
 }

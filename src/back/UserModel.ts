@@ -31,14 +31,17 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
 
   public async read(query = {}, options = {}, uid = "") {
     if (isString(uid) && uid.length > 0) {
-      return await super.read({ _id: new ObjectId(uid) }, { projection: { login: 1, group: 1 } });
+      return await super.read(
+        { _id: new ObjectId(uid) },
+        { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } },
+      );
     }
 
     return [];
   }
 
   public async readAll() {
-    return await super.read({}, { projection: { login: 1, group: 1 } });
+    return await super.read({}, { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } });
   }
 
   public async init() {

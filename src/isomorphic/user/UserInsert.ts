@@ -42,4 +42,11 @@ export class UserInsert implements IUser {
       salt: this.salt,
     };
   }
+
+  public toJSSecure(): { [key: string]: any } {
+    return {
+      group: this.group,
+      login: this.login,
+    };
+  }
 }
