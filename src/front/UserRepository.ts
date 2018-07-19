@@ -10,7 +10,7 @@ import { IUserService } from "./interfaces/IUserService";
 import { IWSClient } from "./interfaces/IWSClient";
 import { Repository } from "./Repository";
 
-export class UserRepository<U extends IUser & IPersist> extends Repository<U, IUserService<U>>
+export class UserRepository<U extends IUser & IPersist, S extends IUserService<U>> extends Repository<U, S>
   implements IUserRepository<U> {
   protected Persist: { new (data: any): U };
 
@@ -18,7 +18,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
 
   constructor(
     Persist: { new (data: any): U },
-    service: IUserService<U>,
+    service: S,
     wsClient: IWSClient,
     channelName: string,
     mediator: IMediator,
