@@ -11,8 +11,7 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
   M,
   U & IPersist,
   U,
-  IChannels,
-  U & IPersist
+  IChannels
 > {
   protected model: M;
   protected readonly ACL: {

@@ -2,17 +2,10 @@ import * as express from "express";
 import * as passport from "passport";
 import { IInsert } from "../interfaces/IInsert";
 import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
 import { IChannels } from "./interfaces/IChannels";
 import { IModel } from "./interfaces/IModel";
 
-export class Service<
-  M extends IModel<P, I>,
-  P extends IPersist,
-  I extends IInsert,
-  C extends IChannels,
-  U extends IUser & IPersist
-> {
+export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInsert, C extends IChannels> {
   protected readonly name: string;
   protected readonly router: express.Router;
   protected readonly Insert: { new (data: any): I };
