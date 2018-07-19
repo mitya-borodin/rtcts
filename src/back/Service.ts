@@ -52,13 +52,22 @@ export class Service<
     this.channels = channels;
     this.ACL = ACL;
 
+    this.collection();
+    this.readModel();
+    this.create();
+    this.update();
+    this.remove();
+    this.channel();
+  }
+
+  protected collection(): void {
     this.router.get(
-      `/${name}/collection`,
+      `/${this.name}/collection`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.collection.includes(req.user.group)) {
+        if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
           try {
-            const collection = await this.collection(req, req.user as U);
+            const collection = await this.model.read({});
 
             res.status(200).json(collection.map((item) => item.toJS()));
           } catch (error) {
@@ -69,13 +78,16 @@ export class Service<
         }
       },
     );
+  }
+
+  protected readModel(): void {
     this.router.get(
-      `/${name}/model`,
+      `/${this.name}/model`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.model.includes(req.user.group)) {
+        if (this.ACL.model.length === 0 || (req.user && this.ACL.model.includes(req.user.group))) {
           try {
-            const result: P | null = await this.singleModel(req, req.user as U);
+            const result: P | null = await this.model.readById(req.params.id);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -90,13 +102,18 @@ export class Service<
         }
       },
     );
+  }
+
+  protected create(): void {
     this.router.put(
-      `/${name}/create`,
+      `/${this.name}/create`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.model.includes(req.user.group)) {
+        if (this.ACL.create.length === 0 || (req.user && this.ACL.create.includes(req.user.group))) {
           try {
-            const result: P | null = await this.create(req, req.user as U);
+            const { wsid, ...data } = req.body;
+            const insert = new this.Insert(data);
+            const result = await this.model.create(insert.toJS(), req.user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -112,13 +129,18 @@ export class Service<
         }
       },
     );
+  }
+
+  protected update(): void {
     this.router.post(
-      `/${name}/update`,
+      `/${this.name}/update`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.model.includes(req.user.group)) {
+        if (this.ACL.update.length === 0 || (req.user && this.ACL.update.includes(req.user.group))) {
           try {
-            const result: P | null = await this.update(req, req.user as U);
+            const { wsid, ...data } = req.body;
+            const persist = new this.Persist(data);
+            const result: P | null = await this.model.update(persist.toJS(), req.user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -134,13 +156,17 @@ export class Service<
         }
       },
     );
+  }
+
+  protected remove(): void {
     this.router.delete(
-      `/${name}/remove`,
+      `/${this.name}/remove`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.model.includes(req.user.group)) {
+        if (this.ACL.remove.length === 0 || (req.user && this.ACL.remove.includes(req.user.group))) {
           try {
-            const result: P | null = await this.remove(req, req.user as U);
+            const { wsid, id } = req.body;
+            const result: P | null = await this.model.remove(id, req.user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -155,11 +181,14 @@ export class Service<
         }
       },
     );
+  }
+
+  protected channel(): void {
     this.router.post(
-      `/${name}/channel`,
+      `/${this.name}/channel`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.channel.includes(req.user.group)) {
+        if (this.ACL.channel.length === 0 || (req.user && this.ACL.channel.includes(req.user.group))) {
           try {
             const { action, channelName, wsid } = req.body;
 
@@ -182,33 +211,5 @@ export class Service<
         }
       },
     );
-  }
-
-  protected async collection(req: express.Request, user: U): Promise<P[]> {
-    return await this.model.read({});
-  }
-
-  protected async singleModel(req: express.Request, user: U): Promise<P | null> {
-    return await this.model.readById(req.params.id);
-  }
-
-  protected async create(req: express.Request, user: U): Promise<P | null> {
-    const { wsid, ...data } = req.body;
-    const insert = new this.Insert(data);
-
-    return await this.model.create(insert.toJS(), user.id, wsid);
-  }
-
-  protected async update(req: express.Request, user: U): Promise<P | null> {
-    const { wsid, ...data } = req.body;
-    const persist = new this.Persist(data);
-
-    return await this.model.update(persist.toJS(), user.id, wsid);
-  }
-
-  protected async remove(req: express.Request, user: U): Promise<P | null> {
-    const { wsid, id } = req.body;
-
-    return await this.model.remove(id, user.id, wsid);
   }
 }

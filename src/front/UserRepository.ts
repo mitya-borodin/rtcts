@@ -170,7 +170,7 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
   }
 
   @action("[ USER_REPOSITORY ][ SIGN_UP ]")
-  public async signUp(data: { [key: string]: any }): Promise<void> {
+  public async signUp(data: { [key: string]: any }): Promise<boolean> {
     try {
       console.time(`[ ${this.constructor.name} ][ SIGN_UP ]`);
 
@@ -178,21 +178,31 @@ export class UserRepository<U extends IUser & IPersist> extends Repository<U, IU
 
       const result: { token: string; user: object } | void = await this.service.signUp(data);
 
+      console.timeEnd(`[ ${this.constructor.name}  ][ SIGN_UP ]`);
+
       if (result) {
         const user = new this.Persist(result.user);
 
         this.map.set(user.id, user);
-      }
 
-      console.timeEnd(`[ ${this.constructor.name}  ][ SIGN_UP ]`);
+        this.endLoad();
+
+        return true;
+      } else {
+        this.endLoad();
+      }
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ SIGN_UP ][ ERROR ]`);
       console.error(error);
 
       this.destroy();
+
+      return false;
     } finally {
       this.endLoad();
     }
+
+    return false;
   }
 
   @action("[ USER_REPOSITORY ][ UPDATE_LOGIN ]")

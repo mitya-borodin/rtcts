@@ -73,7 +73,10 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
 
           const user: P = await this.repository.insertOne(insert.toJS());
 
-          return { token: jwt.sign({ _id: user.id }, this.config.jwt.secret_key), user };
+          return {
+            token: jwt.sign({ _id: user.id }, this.config.jwt.secret_key),
+            user: new this.Persist(user).toJSSecure(),
+          };
         }
 
         return Promise.reject(isValidPassword);

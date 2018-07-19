@@ -50,13 +50,48 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
   ) {
     super(name, router, Persist, Insert, model, channels, ACL);
 
+    this.current();
+    this.signIn();
+    this.signUp();
+    this.updateLogin();
+    this.updatePassword();
+    this.updateGroup();
+  }
+
+  protected collection(): void {
     this.router.get(
-      `/${name}/current`,
+      `/${this.name}/collection`,
+      passport.authenticate("jwt", { session: false }),
+      async (req: express.Request, res: express.Response) => {
+        if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
+          try {
+            let collection: U[] = [];
+
+            if (req.user.group === userGroupEnum.admin) {
+              collection = await this.model.readAll();
+            } else {
+              collection = await this.model.read({}, { projection: { login: 1, group: 1 } }, req.user.id);
+            }
+
+            res.status(200).json(collection.map((item) => item.toJS()));
+          } catch (error) {
+            res.status(500).send(error.message);
+          }
+        } else {
+          res.status(403).send();
+        }
+      },
+    );
+  }
+
+  protected current(): void {
+    this.router.get(
+      `/${this.name}/current`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
           try {
-            res.status(200).json(this.current(req.user));
+            res.status(200).json(new this.Persist(req.user).toJSSecure());
           } catch (error) {
             res.status(500).send(error.message);
           }
@@ -65,12 +100,14 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
         }
       },
     );
+  }
 
+  protected signUp(): void {
     this.router.post(
-      `/${name}/signUp`,
+      `/${this.name}/signUp`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.updateLogin.includes(req.user.group)) {
+        if (this.ACL.signUp.length === 0 || (req.user && this.ACL.signUp.includes(req.user.group))) {
           try {
             const result: { token: string; user: object } = await this.model.signUp(req.body);
 
@@ -83,8 +120,10 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
         }
       },
     );
+  }
 
-    this.router.post(`/${name}/signIn`, async (req: express.Request, res: express.Response) => {
+  protected signIn(): void {
+    this.router.post(`/${this.name}/signIn`, async (req: express.Request, res: express.Response) => {
       try {
         const result: string | null = await this.model.signIn(req.body);
 
@@ -103,12 +142,14 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
         res.status(500).send(error.message);
       }
     });
+  }
 
+  protected updateLogin(): void {
     this.router.post(
-      `/${name}/updateLogin`,
+      `/${this.name}/updateLogin`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.updateLogin.includes(req.user.group)) {
+        if (this.ACL.updateLogin.length === 0 || (req.user && this.ACL.updateLogin.includes(req.user.group))) {
           try {
             const { wsid, ...data } = req.body;
             const result: U & IPersist | null = await this.model.updateLogin(data, req.user.id, wsid);
@@ -126,12 +167,14 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
         }
       },
     );
+  }
 
+  protected updatePassword(): void {
     this.router.post(
-      `/${name}/updatePassword`,
+      `/${this.name}/updatePassword`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.updatePassword.includes(req.user.group)) {
+        if (this.ACL.updatePassword.length === 0 || (req.user && this.ACL.updatePassword.includes(req.user.group))) {
           try {
             const { wsid, ...data } = req.body;
             const result: U & IPersist | null = await this.model.updatePassword(data, req.user.id, wsid);
@@ -149,12 +192,14 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
         }
       },
     );
+  }
 
+  protected updateGroup(): void {
     this.router.post(
-      `/${name}/updateGroup`,
+      `/${this.name}/updateGroup`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (req.user && this.ACL.updateGroup.includes(req.user.group)) {
+        if (this.ACL.updateGroup.length === 0 || (req.user && this.ACL.updateGroup.includes(req.user.group))) {
           try {
             const { ids, group, wsid } = req.body;
             const result: Array<U & IPersist> = await this.model.updateGroup(ids, group, req.user.id, wsid);
@@ -172,19 +217,5 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
         }
       },
     );
-  }
-
-  protected async collection(req: express.Request, user: U & IPersist): Promise<Array<U & IPersist>> {
-    if (user.group === userGroupEnum.admin) {
-      return await this.model.readAll();
-    }
-
-    return await this.model.read({}, { projection: { login: 1, group: 1 } }, user.id);
-  }
-
-  protected current(user: U & IPersist): object {
-    const persistUser = new this.Persist(user);
-
-    return persistUser.toJSSecure();
   }
 }

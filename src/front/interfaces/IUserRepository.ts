@@ -13,7 +13,7 @@ export interface IUserRepository<U extends IUser & IPersist> extends IRepository
 
   signOut(): Promise<void>;
 
-  signUp(data: { [key: string]: any }): Promise<void>;
+  signUp(data: { [key: string]: any }): Promise<boolean>;
 
   updateLogin(data: { [key: string]: any }): Promise<void>;
 
