@@ -20,3 +20,4 @@ export { overlaps } from "./utils/overlaps";
 export { intersection } from "./utils/intersection";
 export { yearOnly } from "./utils/yearOnly";
 export { checkPassword } from "./utils/checkPassword";
+export { getAttribute } from "./utils/getAttribute";

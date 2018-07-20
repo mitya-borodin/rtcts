@@ -4,6 +4,7 @@
     "experimentalDecorators": true,
     "preserveSymlinks": true,
     "target": "es6",
+    "jsx": "react",
     "module": "commonjs",
     "lib": ["es6", "es7", "dom"],
     "declaration": true,
