@@ -55,6 +55,11 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
     this.wsClient.on(wsEventEnum.CANCEL_ASSIGMENT, this.handleCancelAssigment);
   }
 
+  @computed({ name: "[ REPOSITORY ][ IS_INIT ]" })
+  get isInit(): boolean {
+    return this.wasInit;
+  }
+
   @computed({ name: "[ REPOSITORY ][ IS_LOADING ]" })
   get isLoading(): boolean {
     return this.loading;

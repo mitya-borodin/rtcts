@@ -2,6 +2,7 @@ import { ObservableMap } from "mobx";
 import { IEventEmitter } from "../../interfaces/IEventEmitter";
 
 export interface IRepository<T> extends IEventEmitter {
+  isInit: boolean;
   isLoading: boolean;
   map: ObservableMap<string, T>;
   plainMap: Map<string, T>;
