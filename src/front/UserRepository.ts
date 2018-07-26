@@ -89,6 +89,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       } catch (error) {
         console.error(`[ ${this.constructor.name}  ][ INIT ][ ERROR ]`);
         console.error(error);
+
+        return Promise.reject(error);
       }
     }
   }
@@ -123,6 +125,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         this.destroy();
 
         this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
+
+        return Promise.reject(error);
       } finally {
         this.endLoad();
       }
@@ -138,9 +142,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
   @action("[ USER_REPOSITORY ][ SIGN_OUT ]")
   public async signOut(): Promise<void> {
     if (this.isAuthorized) {
-      console.time(`[ ${this.constructor.name} ][ SIGN_OUT ]`);
-
-      await new Promise((resolve, reject) => {
+      return await new Promise<void>((resolve, reject) => {
         try {
           this.mediator.once(userRepositoryEventEnum.LOGOUT, () => {
             setTimeout(async () => {
@@ -150,20 +152,20 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
               this.destroy();
               resolve();
+              console.timeEnd(`[ ${this.constructor.name} ][ SIGN_OUT ]`);
             }, 100);
           });
 
+          console.time(`[ ${this.constructor.name} ][ SIGN_OUT ]`);
           this.startLoad();
           this.mediator.emit(userRepositoryEventEnum.LOGOUT);
         } catch (error) {
           console.error(`[ ${this.constructor.name} ][ LOGOUT ][ ERROR ]`);
           console.error(error);
 
-          reject();
+          reject(error);
         }
       });
-
-      console.timeEnd(`[ ${this.constructor.name} ][ SIGN_OUT ]`);
     } else {
       console.warn(`[ ${this.constructor.name} ][ LOGOUT ][ NOT_LOGIN ]`);
     }
@@ -230,6 +232,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ UPDATE_LOGIN ][ ERROR ]`);
       console.error(error);
+
+      return Promise.reject(error);
     }
   }
 
@@ -258,6 +262,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ERROR ]`);
       console.error(error);
+
+      return Promise.reject(error);
     }
   }
 
@@ -286,6 +292,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ ERROR ]`);
       console.error(error);
+
+      return Promise.reject(error);
     }
   }
 
@@ -307,6 +315,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR ]`);
       console.error(error);
+
+      return Promise.reject(error);
     }
   }
 
@@ -329,6 +339,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ DESTROY ][ ERROR ]`);
       console.error(error);
+
+      return Promise.reject(error);
     }
   }
 
@@ -382,6 +394,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       console.error(error);
 
       this.destroy();
+
+      return Promise.reject(error);
     } finally {
       this.endLoad();
     }

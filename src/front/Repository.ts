@@ -117,6 +117,8 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
       } catch (error) {
         console.error(`[ REPOSITORY ][ INIT ][ ${this.constructor.name} ][ ERROR ]`);
         console.error(error);
+
+        return Promise.reject(error);
       } finally {
         this.endLoad();
       }
@@ -149,6 +151,8 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
       } catch (error) {
         console.error(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ ERROR ]`);
         console.error(error);
+
+        return Promise.reject(error);
       } finally {
         this.endLoad();
       }
@@ -183,6 +187,8 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
       } catch (error) {
         console.error(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ ERROR ]`);
         console.error(error);
+
+        return Promise.reject(error);
       } finally {
         this.endLoad();
       }
@@ -217,6 +223,8 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
       } catch (error) {
         console.error(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ ERROR ]`);
         console.error(error);
+
+        return Promise.reject(error);
       } finally {
         this.endLoad();
       }
@@ -304,6 +312,8 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
     } catch (error) {
       console.error(`[ REPOSITORY ][ ${this.constructor.name} ][ ASSIGMENT ][ ERROR ]`);
       console.error(error);
+
+      return Promise.reject(error);
     }
   }
 
@@ -319,6 +329,8 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
     } catch (error) {
       console.error(`[ REPOSITORY ][ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR ]`);
       console.error(error);
+
+      return Promise.reject(error);
     }
   }
 }

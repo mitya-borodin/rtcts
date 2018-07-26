@@ -79,7 +79,7 @@ export class WSClient extends EventEmitter implements IWSClient {
 
     this.readyState = WebSocket.CONNECTING;
 
-    await new Promise((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       this.connection = new WebSocket(this.path);
 
       this.connection.onopen = () => {
@@ -127,7 +127,7 @@ export class WSClient extends EventEmitter implements IWSClient {
 
   @action("[ WSClient ][ RECONNECT ]")
   public async reconnect(): Promise<void> {
-    await new Promise((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       console.warn(`[ WSClient ][ INIT ][ RECONNECT ][ RECONNECT_WILL_THROUGHT: ${this.reconnectionDelay} ms; ]`);
 
       this.dropConnectionData();
@@ -145,7 +145,7 @@ export class WSClient extends EventEmitter implements IWSClient {
         } catch (error) {
           console.warn("[ WSClient ][ RECONNECT ][ ERROR ]");
 
-          reject();
+          reject(error);
         } finally {
           window.clearTimeout(this.reconnectTimeOut);
         }
@@ -163,7 +163,7 @@ export class WSClient extends EventEmitter implements IWSClient {
     // Не используется если CLOSE или ERROR, так как но может быть закрыто или упать с ошибкой по разным
     // причинам. И при CLOSE или ERROR необходимо выполнять reconnect если явно небыл вызыван этот
     // метод disconnect;
-    await new Promise(async (resolve, reject) => {
+    return await new Promise<void>(async (resolve, reject) => {
       try {
         this.once(wsEventEnum.CANCEL_ASSIGMENT, () => {
           if (this.connection instanceof WebSocket) {
@@ -214,7 +214,7 @@ export class WSClient extends EventEmitter implements IWSClient {
 
   // При login необходимо обьединить uid и wsid;
   public async assigmentToUserOfTheConnection() {
-    await new Promise((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       if (this.uid.length > 0) {
         if (!this.isAssigment) {
           if (this.connection instanceof WebSocket) {
@@ -248,7 +248,7 @@ export class WSClient extends EventEmitter implements IWSClient {
 
   // При logout необходимо разъединить uid и wsid;
   public async cancelAssigmentToUserOfTheConnection() {
-    await new Promise((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       if (this.uid.length > 0) {
         if (this.connection instanceof WebSocket && this.isAssigment) {
           this.send(cancel_assigment_to_user_of_the_connection_channel, { uid: this.uid });
