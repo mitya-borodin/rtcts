@@ -91,7 +91,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
   }
 
   public async init(): Promise<void> {
-    if (!this.wasInit) {
+    if (!this.isInit) {
       try {
         console.time(`[ ${this.constructor.name}  ][ INIT ]`);
 
@@ -124,135 +124,151 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
   }
 
   public async create(data: object): Promise<T | void> {
-    try {
-      console.time(`[ ${this.constructor.name}  ][ CREATE ]`);
+    if (this.isInit) {
+      try {
+        console.time(`[ ${this.constructor.name}  ][ CREATE ]`);
 
-      this.startLoad();
+        this.startLoad();
 
-      const item: T | void = await this.service.create(data);
+        const item: T | void = await this.service.create(data);
 
-      if (item) {
-        runInAction(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
-          if (isString(item.id)) {
-            this.collection.set(item.id, item);
-          } else {
-            console.error(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ ERROR ]`);
-            console.error(item);
-          }
-        });
+        if (item) {
+          runInAction(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
+            if (isString(item.id)) {
+              this.collection.set(item.id, item);
+            } else {
+              console.error(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ ERROR ]`);
+              console.error(item);
+            }
+          });
+        }
+
+        console.timeEnd(`[ ${this.constructor.name}  ][ CREATE ]`);
+
+        return item;
+      } catch (error) {
+        console.error(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ ERROR ]`);
+        console.error(error);
+      } finally {
+        this.endLoad();
       }
-
-      console.timeEnd(`[ ${this.constructor.name}  ][ CREATE ]`);
-
-      return item;
-    } catch (error) {
-      console.error(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ ERROR ]`);
-      console.error(error);
-    } finally {
-      this.endLoad();
+    } else {
+      throw new Error(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ create ]`);
     }
   }
 
   public async update(data: object): Promise<T | void> {
-    try {
-      console.time(`[ ${this.constructor.name}  ][ UPDATE ]`);
+    if (this.isInit) {
+      try {
+        console.time(`[ ${this.constructor.name}  ][ UPDATE ]`);
 
-      this.startLoad();
+        this.startLoad();
 
-      const item: T | void = await this.service.update(data);
+        const item: T | void = await this.service.update(data);
 
-      if (item) {
-        runInAction(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
-          if (isString(item.id)) {
-            this.collection.set(item.id, item);
-          } else {
-            console.error(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ ERROR ]`);
-            console.error(item);
-          }
-        });
+        if (item) {
+          runInAction(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
+            if (isString(item.id)) {
+              this.collection.set(item.id, item);
+            } else {
+              console.error(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ ERROR ]`);
+              console.error(item);
+            }
+          });
+        }
+
+        console.timeEnd(`[ ${this.constructor.name}  ][ UPDATE ]`);
+
+        return item;
+      } catch (error) {
+        console.error(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ ERROR ]`);
+        console.error(error);
+      } finally {
+        this.endLoad();
       }
-
-      console.timeEnd(`[ ${this.constructor.name}  ][ UPDATE ]`);
-
-      return item;
-    } catch (error) {
-      console.error(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ ERROR ]`);
-      console.error(error);
-    } finally {
-      this.endLoad();
+    } else {
+      throw new Error(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ update ]`);
     }
   }
 
   public async remove(id: string): Promise<T | void> {
-    try {
-      console.time(`[ ${this.constructor.name}  ][ REMOVE ]`);
+    if (this.isInit) {
+      try {
+        console.time(`[ ${this.constructor.name}  ][ REMOVE ]`);
 
-      this.startLoad();
+        this.startLoad();
 
-      const item: T | void = await this.service.remove(id);
+        const item: T | void = await this.service.remove(id);
 
-      if (item) {
-        runInAction(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
-          if (isString(item.id)) {
-            this.collection.delete(item.id);
-          } else {
-            console.error(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ ERROR ]`);
-            console.error(item);
-          }
-        });
+        if (item) {
+          runInAction(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
+            if (isString(item.id)) {
+              this.collection.delete(item.id);
+            } else {
+              console.error(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ ERROR ]`);
+              console.error(item);
+            }
+          });
+        }
+
+        console.timeEnd(`[ ${this.constructor.name}  ][ REMOVE ]`);
+
+        return item;
+      } catch (error) {
+        console.error(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ ERROR ]`);
+        console.error(error);
+      } finally {
+        this.endLoad();
       }
-
-      console.timeEnd(`[ ${this.constructor.name}  ][ REMOVE ]`);
-
-      return item;
-    } catch (error) {
-      console.error(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ ERROR ]`);
-      console.error(error);
-    } finally {
-      this.endLoad();
+    } else {
+      throw new Error(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ remove ]`);
     }
   }
 
   public receiveMessage([channelName, payload]: [string, any]): T | void | Promise<void> {
-    try {
-      console.log(`[ REPOSITORY ][ RECEIVE_MESSAGE ][ ${this.constructor.name} ]`, [channelName, payload]);
+    if (this.isInit) {
+      try {
+        console.log(`[ REPOSITORY ][ RECEIVE_MESSAGE ][ ${this.constructor.name} ]`, [channelName, payload]);
 
-      if (this.channelName === channelName) {
-        if (payload.create) {
-          const item: T = new this.Persist(payload.create);
+        if (this.channelName === channelName) {
+          if (payload.create) {
+            const item: T = new this.Persist(payload.create);
 
-          if (isString(item.id)) {
-            this.collection.set(item.id, item);
-          } else {
-            console.error(`[ REPOSITORY ][ CREATE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, item);
+            if (isString(item.id)) {
+              this.collection.set(item.id, item);
+            } else {
+              console.error(`[ REPOSITORY ][ CREATE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, item);
+            }
+
+            return item;
           }
 
-          return item;
-        }
+          if (payload.update) {
+            const item: T = new this.Persist(payload.update);
 
-        if (payload.update) {
-          const item: T = new this.Persist(payload.update);
+            if (isString(item.id)) {
+              this.collection.set(item.id, item);
+            } else {
+              console.error(`[ REPOSITORY ][ UPDATE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, item);
+            }
 
-          if (isString(item.id)) {
-            this.collection.set(item.id, item);
-          } else {
-            console.error(`[ REPOSITORY ][ UPDATE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, item);
+            return item;
           }
 
-          return item;
+          if (payload.remove) {
+            const item: T | void = this.collection.get(payload.remove.id);
+
+            this.collection.delete(payload.remove.id);
+
+            return item;
+          }
         }
-
-        if (payload.remove) {
-          const item: T | void = this.collection.get(payload.remove.id);
-
-          this.collection.delete(payload.remove.id);
-
-          return item;
-        }
+      } catch (error) {
+        console.error(`[ REPOSITORY ][ RECEIVE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, [channelName, payload]);
+        console.error(error);
       }
-    } catch (error) {
-      console.error(`[ REPOSITORY ][ RECEIVE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, [channelName, payload]);
-      console.error(error);
+    } else {
+      console.warn(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ receiveMessage ]`);
     }
   }
 

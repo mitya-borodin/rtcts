@@ -1,5 +1,6 @@
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
+import { FindOneAndReplaceOption } from "mongodb";
 import { userGroupEnum } from "../enums/userGroupEnum";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
@@ -151,5 +152,22 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
     await this.repository.updateMany(query, { $set: { group } });
 
     return super.read(query, { projection: { login: 1, group: 1 } });
+  }
+
+  public async update(
+    data: { [key: string]: any },
+    uid: string,
+    wsid: string,
+    options?: FindOneAndReplaceOption,
+  ): Promise<P | null> {
+    const incomeUser: P = new this.Persist(data);
+    const currentUser = this.readById(incomeUser.id);
+
+    if (currentUser instanceof this.Persist) {
+      // Так как я заменяю весь объект мне нужно сохранить секретные поля, salt, hashed_password;
+      return await super.update({ ...currentUser.toJS(), ...incomeUser.toJSSecure() }, uid, wsid, options);
+    }
+
+    return null;
   }
 }
