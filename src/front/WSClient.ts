@@ -269,7 +269,8 @@ export class WSClient extends EventEmitter implements IWSClient {
   }
 
   private handleOpen() {
-    // console.info("CONNECTION_OPEN");
+    this.isAlive = true;
+    // console.info("CONNECTION_OPEN", this.isAlive);
 
     this.headrBeatInterval = window.setInterval(async () => {
       if (this.isAlive) {
@@ -283,7 +284,7 @@ export class WSClient extends EventEmitter implements IWSClient {
         // console.info("HEARD_BEAT_WRONG", this.isAlive);
 
         if (this.connection instanceof WebSocket) {
-          this.once(wsEventEnum.CLOSE, () => setTimeout(this.reconnect, 100));
+          this.once(wsEventEnum.CLOSE, () => setTimeout(this.reconnect, 0));
 
           this.connection.close(1000, "The server does not respond on PONG_CHANNEL.");
         } else {

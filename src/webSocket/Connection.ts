@@ -10,21 +10,23 @@ export class Connection implements IConnection {
   }
   public wsid: string;
   public uid: string | void;
+  public readonly ws: WebSocket;
   private isAlive: boolean;
-  private readonly connection: WebSocket;
   private heartbeat: () => void;
 
   constructor(ws: WebSocket) {
-    this.connection = ws;
+    this.ws = ws;
     this.isAlive = true;
     this.wsid = uuid();
     this.uid = undefined;
 
     this.heartbeat = (): void => {
       this.isAlive = true;
+
+      // console.info("[ PONG ][ HEARD_BEAT ]", this.isAlive);
     };
 
-    this.connection.on("pong", this.heartbeat);
+    this.ws.on("pong", this.heartbeat);
   }
 
   public getConnectionID(): string {
@@ -70,14 +72,16 @@ export class Connection implements IConnection {
   }
 
   public send(data: any): void {
-    this.connection.send(data);
+    this.ws.send(data);
   }
 
   public wasTermintate(): boolean {
     if (this.isAlive) {
       this.isAlive = false;
 
-      this.connection.ping("", false, (error) => {
+      // console.info("[ PING ][ HEARD_BEAT ]", this.isAlive);
+
+      this.ws.ping("", false, (error) => {
         if (error) {
           console.error(error);
         }
@@ -95,9 +99,9 @@ export class Connection implements IConnection {
   }
 
   public close(message?: string): void {
-    this.connection.removeEventListener("pong", this.heartbeat);
-    this.connection.removeAllListeners();
-    this.connection.close(1000, "[ CLOSE ] " + message);
+    this.ws.removeEventListener("pong", this.heartbeat);
+    this.ws.removeAllListeners();
+    this.ws.close(1000, "[ CLOSE ] " + message);
 
     console.log("");
     console.log(chalk.blueBright(`[ CONNECTION ][ CLOSE ] ${message}`));
@@ -105,10 +109,9 @@ export class Connection implements IConnection {
 
   public terminate(message?: string): void {
     this.isAlive = false;
-    this.connection.close(1000, "[ CLOSE ] " + message);
-    this.connection.removeEventListener("pong", this.heartbeat);
-    this.connection.removeAllListeners();
-    this.connection.terminate();
+    this.ws.removeEventListener("pong", this.heartbeat);
+    this.ws.removeAllListeners();
+    this.ws.terminate();
 
     console.log("");
     console.log(chalk.blueBright(`[ CONNECTION ][ TERMINATE ] ${message || ""}`));

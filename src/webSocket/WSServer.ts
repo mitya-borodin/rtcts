@@ -44,9 +44,12 @@ export class WSServer<U extends IUserModel<IUser & IPersist, IUser>> {
       console.log(
         chalk.blueBright.bold(`[ WS ][ SERVER ][ RUN ][ ws://${this.config.ws.host}:${this.config.ws.port} ]`),
       );
+
       this.wasRun = true;
       this.server.on("connection", this.connectionHandler);
-      this.server.on("error", () => {
+      this.server.on("error", (error) => {
+        console.error(error);
+
         clearInterval(this.interval);
         let connsectionToDelete: IConnection[] = [];
 
@@ -66,7 +69,9 @@ export class WSServer<U extends IUserModel<IUser & IPersist, IUser>> {
       this.interval = setInterval(() => {
         for (const connection of this.connections) {
           if (connection.wasTermintate()) {
+            this.channels.deleteConnection(connection);
             this.connections.delete(connection);
+            this.server.clients.delete(connection.ws);
 
             console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
             console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
@@ -83,37 +88,40 @@ export class WSServer<U extends IUserModel<IUser & IPersist, IUser>> {
     this.connections.add(connection);
 
     console.log("");
-    console.log(chalk.cyan.bold("[ CONNECTION ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-    console.log(chalk.cyan.bold("[ CONNECTION ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+    console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
+    console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
 
     ws.on("message", messageHandler);
+
     ws.on("close", (code, message) => {
       ws.removeEventListener("message", messageHandler);
       ws.removeAllListeners();
       ws.terminate();
       this.connections.delete(connection);
       this.channels.deleteConnection(connection);
-      this.server.clients.delete(ws);
+      this.server.clients.delete(connection.ws);
 
       console.log("");
-      console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-      console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
       console.log(chalk.grey.bold(`[ CLOSE ][ CODE ]: ${code}`));
       console.log(chalk.grey.bold(`[ CLOSE ][ MESSAGE ]: ${message}`));
       console.log(chalk.grey.bold(`[ CLOSE ]${connection.getConnectionID()}`));
+      console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
+      console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
     });
+
     ws.on("error", (error) => {
       ws.removeEventListener("message", messageHandler);
       ws.removeAllListeners();
       ws.terminate();
       this.connections.delete(connection);
       this.channels.deleteConnection(connection);
-      this.server.clients.delete(ws);
+      this.server.clients.delete(connection.ws);
 
       console.log("");
       console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
       console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
-      console.log(chalk.redBright(`[ ERROR ]${connection.getConnectionID()}`));
+      console.log(chalk.cyan.bold(`[ ERROR ]${connection.getConnectionID()}`));
+
       console.error(error);
     });
   }

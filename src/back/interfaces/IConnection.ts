@@ -1,6 +1,9 @@
+import * as WebSocket from "ws";
+
 export interface IConnection {
   wsid: string;
   uid: string | void;
+  ws: WebSocket;
 
   getConnectionID(): string;
 
