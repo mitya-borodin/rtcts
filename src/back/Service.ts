@@ -85,7 +85,7 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`Model not found by id: /${req.params.id}`);
+              res.status(404).send(`Model not found by id: ${req.params.id}`);
             }
           } catch (error) {
             res.status(500).send(error.message);
@@ -138,7 +138,7 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`Model not found by id: /${req.body.id}`);
+              res.status(404).send(`Model not found by id: ${req.body.id}`);
             }
           } catch (error) {
             console.error(error);

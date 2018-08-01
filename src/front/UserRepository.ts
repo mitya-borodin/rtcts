@@ -245,15 +245,17 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       this.startLoad();
 
       if (isString(data.id) && isString(data.password) && isString(data.password_confirm)) {
-        let user: U | void = this.map.get(data.id);
+        const user = await this.service.updatePassword(data);
 
         if (user instanceof this.Persist) {
-          user = await this.service.updatePassword({ ...user.toJS(), ...data });
-
-          if (user instanceof this.Persist) {
-            this.collection.set(user.id, user);
-          }
+          this.collection.set(user.id, user);
         }
+      } else {
+        console.warn(
+          `[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ WARN ][ id: ${data.id} ][ password: ${
+            data.password
+          } ][ password_confirm: ${data.password_confirm} ]`,
+        );
       }
 
       this.endLoad();

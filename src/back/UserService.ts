@@ -83,6 +83,43 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
     );
   }
 
+  protected update(): void {
+    this.router.post(
+      `/${this.name}/update`,
+      passport.authenticate("jwt", { session: false }),
+      async (req: express.Request, res: express.Response) => {
+        try {
+          const { wsid, ...data } = req.body;
+          const persist = new this.Persist(data);
+
+          if (
+            this.ACL.update.length === 0 ||
+            persist.id === req.user.id ||
+            (req.user && this.ACL.update.includes(req.user.group))
+          ) {
+            try {
+              const result: U & IPersist | null = await this.model.update(persist.toJS(), req.user.id, wsid);
+
+              if (result) {
+                res.status(200).json(result.toJS());
+              } else {
+                res.status(404).send(`Model not found by id: ${req.body.id}`);
+              }
+            } catch (error) {
+              console.error(error);
+              res.status(500).send(error.message);
+            }
+          } else {
+            res.status(403).send();
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).send(error.message);
+        }
+      },
+    );
+  }
+
   protected current(): void {
     this.router.get(
       `/${this.name}/current`,
@@ -173,9 +210,15 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
       `/${this.name}/updatePassword`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (this.ACL.updatePassword.length === 0 || (req.user && this.ACL.updatePassword.includes(req.user.group))) {
+        const { wsid, ...data } = req.body;
+        const himSelfUpdate = data.id === req.user.id;
+
+        if (
+          himSelfUpdate ||
+          this.ACL.updatePassword.length === 0 ||
+          (req.user && this.ACL.updatePassword.includes(req.user.group))
+        ) {
           try {
-            const { wsid, ...data } = req.body;
             const result: U & IPersist | null = await this.model.updatePassword(data, req.user.id, wsid);
 
             if (result) {
@@ -184,7 +227,7 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
               res.status(404).send(`User not found.`);
             }
           } catch (error) {
-            res.status(500).send(error.message);
+            res.status(500).send(error.message || error);
           }
         } else {
           res.status(403).send();
@@ -198,9 +241,15 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
       `/${this.name}/updateGroup`,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (this.ACL.updateGroup.length === 0 || (req.user && this.ACL.updateGroup.includes(req.user.group))) {
+        const { ids, group, wsid } = req.body;
+        const himSelfUpdate = ids.length === 1 && ids[0] === req.user.id;
+
+        if (
+          this.ACL.updateGroup.length === 0 ||
+          himSelfUpdate ||
+          (req.user && this.ACL.updateGroup.includes(req.user.group))
+        ) {
           try {
-            const { ids, group, wsid } = req.body;
             const result: Array<U & IPersist> = await this.model.updateGroup(ids, group, req.user.id, wsid);
 
             if (result) {

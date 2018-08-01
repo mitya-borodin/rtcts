@@ -131,12 +131,14 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
           const salt = getSalt();
           const hashed_password = encryptPassword(data.password, salt);
 
-          return super.update({ ...result, salt, hashed_password }, uid, wsid, { projection: { login: 1, group: 1 } });
+          return super.update({ ...result, salt, hashed_password }, uid, wsid, {
+            projection: { salt: 0, hashed_password: 0 },
+          });
         }
 
         return null;
       } else {
-        return Promise.reject(isValidPassword);
+        return Promise.reject("Пароль неудовлетворяет правилам.");
       }
     }
 
@@ -146,12 +148,16 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
     );
   }
 
-  public async updateGroup(ids: string[], group: IUserGroup): Promise<P[]> {
+  public async updateGroup(ids: string[], group: IUserGroup, uid: string, wsid: string): Promise<P[]> {
     const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
 
     await this.repository.updateMany(query, { $set: { group } });
 
-    return super.read(query, { projection: { login: 1, group: 1 } });
+    const users = await super.read(query, { projection: { salt: 0, hashed_password: 0 } });
+
+    this.send({ bulkUpdate: users.map((u) => u.toJS()) }, uid, wsid);
+
+    return users;
   }
 
   public async update(
@@ -161,9 +167,11 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
     options?: FindOneAndReplaceOption,
   ): Promise<P | null> {
     const incomeUser: P = new this.Persist(data);
-    const currentUser = this.readById(incomeUser.id);
+    const currentUser = await this.readById(incomeUser.id);
 
     if (currentUser instanceof this.Persist) {
+      // console.log({ ...currentUser.toJS(), ...incomeUser.toJSSecure() });
+
       // Так как я заменяю весь объект мне нужно сохранить секретные поля, salt, hashed_password;
       return await super.update({ ...currentUser.toJS(), ...incomeUser.toJSSecure() }, uid, wsid, options);
     }
