@@ -1,7 +1,7 @@
 import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
 import { IInsert } from "../interfaces/IInsert";
 import { IPersist } from "../interfaces/IPersist";
-import { isString } from "../utils/isType";
+import { isObject, isString } from "../utils/isType";
 import { IModel } from "./interfaces/IModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";
@@ -64,12 +64,16 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
     uid: string,
     wsid: string,
     options?: CollectionInsertOneOptions,
+    excludeCurrentDevice?: boolean,
   ): Promise<P | null> {
     const insert: I = new this.Insert(data);
-    const result: any = await this.repository.insertOne(insert.toJS(), options);
+    const result: any = await this.repository.insertOne(
+      insert.toJS(),
+      isObject(options) && Object.keys(options).length > 0 ? options : undefined,
+    );
     const persist: P = new this.Persist(result);
 
-    this.send({ create: persist.toJS() }, uid, wsid);
+    this.send({ create: persist.toJS() }, uid, wsid, excludeCurrentDevice);
 
     return persist;
   }
@@ -79,6 +83,7 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
+    excludeCurrentDevice?: boolean,
   ): Promise<P | null> {
     let persist: P = new this.Persist(data);
     const { _id, ...$set } = toMongo(persist);
@@ -88,14 +93,14 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
       { $set },
       {
         returnOriginal: false,
-        ...options,
+        ...(isObject(options) && Object.keys(options).length > 0 ? options : undefined),
       },
     );
 
     if (result !== null) {
       persist = new this.Persist(result);
 
-      this.send({ update: persist.toJS() }, uid, wsid);
+      this.send({ update: persist.toJS() }, uid, wsid, excludeCurrentDevice);
 
       return persist;
     }
@@ -108,13 +113,17 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
     uid: string,
     wsid: string,
     options?: { projection?: object; sort?: object },
+    excludeCurrentDevice?: boolean,
   ): Promise<P | null> {
-    const result: object | null = await this.repository.findByIdAndRemove(id);
+    const result: object | null = await this.repository.findByIdAndRemove(
+      id,
+      isObject(options) && Object.keys(options).length > 0 ? options : undefined,
+    );
 
     if (result !== null) {
       const persist: P = new this.Persist(result);
 
-      this.send({ remove: persist.toJS() }, uid, wsid);
+      this.send({ remove: persist.toJS() }, uid, wsid, excludeCurrentDevice);
 
       return persist;
     }
