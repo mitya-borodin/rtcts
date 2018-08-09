@@ -128,18 +128,18 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
   public async create(data: object): Promise<T | void> {
     if (this.isInit) {
       try {
-        console.time(`[ ${this.constructor.name}  ][ CREATE ]`);
+        console.time(`[ ${this.constructor.name} ][ CREATE ]`);
 
         this.startLoad();
 
         const item: T | void = await this.service.create(data);
 
         if (item) {
-          runInAction(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
+          runInAction(`[ ${this.constructor.name} ][ CREATE ][ SUCCESS ]`, () => {
             if (isString(item.id)) {
               this.collection.set(item.id, item);
             } else {
-              console.error(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ ERROR ]`);
+              console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR ]`);
               console.error(item);
             }
           });
@@ -149,7 +149,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
 
         return item;
       } catch (error) {
-        console.error(`[ REPOSITORY ][ CREATE ][ ${this.constructor.name} ][ ERROR ]`);
+        console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR ]`);
         console.error(error);
 
         return Promise.reject(error);
@@ -171,11 +171,11 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
         const item: T | void = await this.service.update(data);
 
         if (item) {
-          runInAction(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
+          runInAction(`[ ${this.constructor.name} ][ UPDATE ][ SUCCESS ]`, () => {
             if (isString(item.id)) {
               this.collection.set(item.id, item);
             } else {
-              console.error(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ ERROR ]`);
+              console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR ]`);
               console.error(item);
             }
           });
@@ -185,7 +185,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
 
         return item;
       } catch (error) {
-        console.error(`[ REPOSITORY ][ UPDATE ][ ${this.constructor.name} ][ ERROR ]`);
+        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR ]`);
         console.error(error);
 
         return Promise.reject(error);
@@ -207,11 +207,11 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
         const item: T | void = await this.service.remove(id);
 
         if (item) {
-          runInAction(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
+          runInAction(`[ ${this.constructor.name} ][ REMOVE ][ SUCCESS ]`, () => {
             if (isString(item.id)) {
               this.collection.delete(item.id);
             } else {
-              console.error(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ ERROR ]`);
+              console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR ]`);
               console.error(item);
             }
           });
@@ -221,7 +221,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
 
         return item;
       } catch (error) {
-        console.error(`[ REPOSITORY ][ REMOVE ][ ${this.constructor.name} ][ ERROR ]`);
+        console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR ]`);
         console.error(error);
 
         return Promise.reject(error);
@@ -236,7 +236,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
   public receiveMessage([channelName, payload]: [string, any]): T | void | Promise<void> {
     if (this.isInit) {
       try {
-        console.log(`[ REPOSITORY ][ RECEIVE_MESSAGE ][ ${this.constructor.name} ]`, [channelName, payload]);
+        console.log(`[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]`, [channelName, payload]);
 
         if (this.channelName === channelName) {
           if (payload.create) {
@@ -245,7 +245,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
             if (isString(item.id)) {
               this.collection.set(item.id, item);
             } else {
-              console.error(`[ REPOSITORY ][ CREATE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, item);
+              console.error(`[ ${this.constructor.name} ][ CREATE_MESSAGE ][ ERROR ]`, item);
             }
 
             return item;
@@ -257,7 +257,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
             if (isString(item.id)) {
               this.collection.set(item.id, item);
             } else {
-              console.error(`[ REPOSITORY ][ UPDATE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, item);
+              console.error(`[ ${this.constructor.name} ][ UPDATE_MESSAGE ][ ERROR ]`, item);
             }
 
             return item;
@@ -272,7 +272,7 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
           }
         }
       } catch (error) {
-        console.error(`[ REPOSITORY ][ RECEIVE_MESSAGE ][ ${this.constructor.name} ][ ERROR ]`, [channelName, payload]);
+        console.error(`[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ERROR ]`, [channelName, payload]);
         console.error(error);
       }
     } else {
@@ -281,19 +281,19 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
   }
 
   protected startLoad() {
-    runInAction(`[ REPOSITORY ][ ${this.constructor.name} ][ START_LODING ]`, () => {
+    runInAction(`[ ${this.constructor.name} ][ START_LODING ]`, () => {
       this.loading = true;
     });
   }
 
   protected endLoad() {
-    runInAction(`[ REPOSITORY ][ ${this.constructor.name} ][ END_LODING ]`, () => {
+    runInAction(`[ ${this.constructor.name} ][ END_LODING ]`, () => {
       this.loading = false;
     });
   }
 
   protected destroy(): void {
-    runInAction(`[ REPOSITORY ][ ${this.constructor.name} ][ DESTROY ]`, () => {
+    runInAction(`[ ${this.constructor.name} ][ DESTROY ]`, () => {
       this.wasInit = false;
       this.loading = false;
       this.collection.clear();
@@ -308,9 +308,9 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
         this.wsClient.on(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage);
       }
 
-      console.log(`[ REPOSITORY ][ ${this.constructor.name} ][ ASSIGMENT ]`);
+      console.log(`[ ${this.constructor.name} ][ ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ REPOSITORY ][ ${this.constructor.name} ][ ASSIGMENT ][ ERROR ]`);
+      console.error(`[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR ]`);
       console.error(error);
 
       return Promise.reject(error);
@@ -325,9 +325,9 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
 
       this.destroy();
 
-      console.log(`[ REPOSITORY ][ ${this.constructor.name} ][ CANCEL_ASSIGMENT ]`);
+      console.log(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ REPOSITORY ][ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR ]`);
+      console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR ]`);
       console.error(error);
 
       return Promise.reject(error);

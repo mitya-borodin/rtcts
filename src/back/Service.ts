@@ -54,8 +54,10 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
   }
 
   protected collection(): void {
+    const URL = `/${this.name}/collection`;
+
     this.router.get(
-      `/${this.name}/collection`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
@@ -64,18 +66,20 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
 
             res.status(200).json(collection.map((item) => item.toJS()));
           } catch (error) {
-            res.status(500).send(error.message);
+            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected readModel(): void {
+    const URL = `/${this.name}/model`;
+
     this.router.get(
-      `/${this.name}/model`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.model.length === 0 || (req.user && this.ACL.model.includes(req.user.group))) {
@@ -85,21 +89,25 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`Model not found by id: ${req.params.id}`);
+              res
+                .status(404)
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
             }
           } catch (error) {
-            res.status(500).send(error.message);
+            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected create(): void {
+    const URL = `/${this.name}/create`;
+
     this.router.put(
-      `/${this.name}/create`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.create.length === 0 || (req.user && this.ACL.create.includes(req.user.group))) {
@@ -111,22 +119,24 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              throw new Error("Ошибка создания модели.");
+              throw new Error("MODEL_DOES_NOT_CREATED");
             }
           } catch (error) {
             console.error(error);
-            res.status(500).send(error.message);
+            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected update(): void {
+    const URL = `/${this.name}/update`;
+
     this.router.post(
-      `/${this.name}/update`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.update.length === 0 || (req.user && this.ACL.update.includes(req.user.group))) {
@@ -138,22 +148,26 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`Model not found by id: ${req.body.id}`);
+              res
+                .status(404)
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
             }
           } catch (error) {
             console.error(error);
-            res.status(500).send(error.message);
+            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected remove(): void {
+    const URL = `/${this.name}/remove`;
+
     this.router.delete(
-      `/${this.name}/remove`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.remove.length === 0 || (req.user && this.ACL.remove.includes(req.user.group))) {
@@ -164,21 +178,25 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`Model not found by id: ${req.body.id}`);
+              res
+                .status(404)
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
             }
           } catch (error) {
-            res.status(500).send(error.message);
+            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected channel(): void {
+    const URL = `/${this.name}/channel`;
+
     this.router.post(
-      `/${this.name}/channel`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.channel.length === 0 || (req.user && this.ACL.channel.includes(req.user.group))) {
@@ -194,13 +212,13 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
 
               res.status(200).json({});
             } else {
-              res.status(404).send(`Channel action not found: /${action}`);
+              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ UNEXPECTED_ACTION: ${action} ]`);
             }
           } catch (error) {
-            res.status(500).send(error.message);
+            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
