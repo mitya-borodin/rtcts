@@ -30,10 +30,14 @@ export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I
     return items.map((item) => new this.Persist(item));
   }
 
-  public async readOne(query: { [key: string]: any } = {}, options?: FindOneOptions, uid?: string): Promise<P> {
+  public async readOne(query: { [key: string]: any } = {}, options?: FindOneOptions, uid?: string): Promise<P | null> {
     const item = await this.repository.findOne(query, options);
 
-    return new this.Persist(item);
+    if (item) {
+      return new this.Persist(item);
+    }
+
+    return null;
   }
 
   public async getMap(options?: FindOneOptions): Promise<Map<string, P>> {

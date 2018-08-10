@@ -84,14 +84,14 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.model.length === 0 || (req.user && this.ACL.model.includes(req.user.group))) {
           try {
-            const result: P | null = await this.model.readById(req.params.id);
+            const result: P | null = await this.model.readById(req.query.id);
 
             if (result) {
               res.status(200).json(result.toJS());
             } else {
               res
                 .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.query.id} ]`);
             }
           } catch (error) {
             res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);

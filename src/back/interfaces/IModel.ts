@@ -3,7 +3,7 @@ import { CollectionInsertOneOptions, FindOneOptions } from "mongodb";
 export interface IModel<P, I> {
   read(query: { [key: string]: any }, options?: FindOneOptions, uid?: string): Promise<P[]>;
 
-  readOne(query: { [key: string]: any }, options?: FindOneOptions, uid?: string): Promise<P>;
+  readOne(query: { [key: string]: any }, options?: FindOneOptions, uid?: string): Promise<P | null>;
 
   readById(id: string): Promise<P | null>;
 
