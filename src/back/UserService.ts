@@ -244,24 +244,22 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
         const { ids, group, wsid } = req.body;
         const himSelfUpdate = ids.length === 1 && ids[0] === req.user.id;
 
-        if (
-          this.ACL.updateGroup.length === 0 ||
-          himSelfUpdate ||
-          (req.user && this.ACL.updateGroup.includes(req.user.group))
-        ) {
-          try {
-            const result: Array<U & IPersist> = await this.model.updateGroup(ids, group, req.user.id, wsid);
+        if (req.user) {
+          if (this.ACL.updateGroup.length === 0 || himSelfUpdate || this.ACL.updateGroup.includes(req.user.group)) {
+            try {
+              const result: Array<U & IPersist> = await this.model.updateGroup(ids, group, req.user.id, wsid);
 
-            if (result) {
-              res.status(200).json(result.map((r) => r.toJS()));
-            } else {
-              res.status(404).send(`Users not found.`);
+              if (result) {
+                res.status(200).json(result.map((r) => r.toJS()));
+              } else {
+                res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`);
+              }
+            } catch (error) {
+              res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
             }
-          } catch (error) {
-            res.status(500).send(error.message);
+          } else {
+            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
-        } else {
-          res.status(403).send();
         }
       },
     );

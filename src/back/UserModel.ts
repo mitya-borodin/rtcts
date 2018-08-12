@@ -153,9 +153,9 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
 
     await this.repository.updateMany(query, { $set: { group } });
 
-    const users = await super.read(query, { projection: { salt: 0, hashed_password: 0 } });
+    const users = await super.read(query);
 
-    this.send({ bulkUpdate: users.map((u) => u.toJS()) }, uid, wsid);
+    this.send({ bulkUpdate: users.map((u) => u.toJSSecure()) }, uid, wsid);
 
     return users;
   }
