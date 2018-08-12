@@ -25,14 +25,14 @@ export class WSClient extends EventEmitter implements IWSClient {
   private reconnectTimeOut: number;
   private headrBeatInterval: number;
 
-  constructor(path = "ws", TLS = true, pingPongDelay = 1000, reconnectionDelay = 5000) {
+  constructor(host = window.location.host, path = "ws", TLS = true, pingPongDelay = 1000, reconnectionDelay = 5000) {
     super();
 
     this.isAlive = true;
 
     this.uid = "";
 
-    this.path = `${TLS ? "wss" : "ws"}://${window.location.host}/${path}`;
+    this.path = `${TLS ? "wss" : "ws"}://${host}/${path}`;
 
     // IS_ALIVE
     this.pingPongDelay = pingPongDelay;
