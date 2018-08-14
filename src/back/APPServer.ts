@@ -6,12 +6,14 @@ import { AddressInfo } from "net";
 import * as passport from "passport";
 import { isString } from "../utils/isType";
 import { IAppConfig } from "./interfaces/IAppConfig";
+import { IAPPServer } from "./interfaces/IAPPServer";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
 
-export class APPServer {
+export class APPServer<C extends IAppConfig = IAppConfig, STR extends IAuthStrategy = IAuthStrategy>
+  implements IAPPServer {
   private wasRun: boolean;
-  private config: IAppConfig;
-  private authStrategy: IAuthStrategy;
+  private config: C;
+  private authStrategy: STR;
   private app: express.Application;
   private WSMidelware: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
   private migrationRouter: express.Router;
@@ -19,8 +21,8 @@ export class APPServer {
   private server: http.Server;
 
   constructor(
-    config: IAppConfig,
-    authStrategy: IAuthStrategy,
+    config: C,
+    authStrategy: STR,
     WSMidelware: (req: express.Request, res: express.Response, next: express.NextFunction) => void,
     migrationRouter: express.Router,
     services: (app: express.Application) => void,
@@ -35,31 +37,57 @@ export class APPServer {
     this.server = http.createServer(this.app);
   }
 
-  public run(): void {
-    if (!this.wasRun) {
-      passport.use(this.authStrategy.getStrategy());
+  public async run(): Promise<void> {
+    try {
+      await new Promise((resolve, reject) => {
+        try {
+          if (!this.wasRun) {
+            try {
+              passport.use(this.authStrategy.getStrategy());
 
-      this.app.use(bodyParser.json());
-      this.app.use(passport.initialize());
-      this.app.use(this.WSMidelware);
+              this.app.use(bodyParser.json());
+              this.app.use(passport.initialize());
+              this.app.use(this.WSMidelware);
 
-      if (!this.config.production) {
-        this.app.use(this.migrationRouter);
-      }
+              if (!this.config.production) {
+                this.app.use(this.migrationRouter);
+              }
 
-      this.services(this.app);
+              this.services(this.app);
 
-      this.app.use((req: express.Request, res: express.Response) => {
-        res.status(404).send("Route Not found.");
-      });
+              this.app.use((req: express.Request, res: express.Response) => {
+                res.status(404).send("Route Not found.");
+              });
 
-      this.server.listen(this.config.server.port, this.config.server.host, () => {
-        const addressInfo: AddressInfo | string = this.server.address();
+              this.server.listen(this.config.server.port, this.config.server.host, () => {
+                const addressInfo: AddressInfo | string = this.server.address();
 
-        if (!isString(addressInfo)) {
-          console.log(chalk.blueBright.bold(`[ APP ][ SERVER ][ RUN ][ http://localhost:${addressInfo.port} ]`));
+                if (!isString(addressInfo)) {
+                  console.log(
+                    chalk.blueBright.bold(`[ APP ][ SERVER ][ RUN ][ http://localhost:${addressInfo.port} ]`),
+                  );
+                }
+
+                resolve();
+              });
+            } catch (error) {
+              console.error(error);
+
+              reject();
+            }
+          } else {
+            resolve();
+          }
+        } catch (error) {
+          console.error(error);
+
+          reject(error);
         }
       });
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject(error);
     }
   }
 }

@@ -75,119 +75,191 @@ export class Service<T, WS extends IWSClient = IWSClient, ME extends IMediator =
   }
 
   public async collection(): Promise<T[] | void> {
-    if (this.ACL.collection.includes(this.group)) {
-      const output: object[] | void = await this.get(`/${this.name}/collection`);
+    try {
+      if (this.ACL.collection.includes(this.group)) {
+        const output: object[] | void = await this.get(`/${this.name}/collection`);
 
-      if (output) {
-        return output.map((item) => new this.Class(item));
+        if (output) {
+          return output.map((item) => new this.Class(item));
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async model(id: string): Promise<T | void> {
-    if (this.ACL.model.includes(this.group)) {
-      const output: object | void = await this.get(`/${this.name}/model?id=${id}`);
+    try {
+      if (this.ACL.model.includes(this.group)) {
+        const output: object | void = await this.get(`/${this.name}/model?id=${id}`);
 
-      if (output) {
-        return new this.Class(output);
+        if (output) {
+          return new this.Class(output);
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async create(input: object): Promise<T | void> {
-    if (this.ACL.create.includes(this.group)) {
-      const output: object | void = await this.put(`/${this.name}/create`, input);
+    try {
+      if (this.ACL.create.includes(this.group)) {
+        const output: object | void = await this.put(`/${this.name}/create`, input);
 
-      if (output) {
-        return new this.Class(output);
+        if (output) {
+          return new this.Class(output);
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async update(input: object): Promise<T | void> {
-    if (this.ACL.update.includes(this.group)) {
-      const output: object | void = await this.post(`/${this.name}/update`, input);
+    try {
+      if (this.ACL.update.includes(this.group)) {
+        const output: object | void = await this.post(`/${this.name}/update`, input);
 
-      if (output) {
-        return new this.Class(output);
+        if (output) {
+          return new this.Class(output);
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async remove(id: string): Promise<T | void> {
-    if (this.ACL.remove.includes(this.group)) {
-      const output: object | void = await this.del(`/${this.name}/remove`, { id });
+    try {
+      if (this.ACL.remove.includes(this.group)) {
+        const output: object | void = await this.del(`/${this.name}/remove`, { id });
 
-      if (output) {
-        return new this.Class(output);
+        if (output) {
+          return new this.Class(output);
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async onChannel(): Promise<void> {
-    if (this.ACL.onChannel.includes(this.group)) {
-      await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "on" });
+    try {
+      if (this.ACL.onChannel.includes(this.group)) {
+        await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "on" });
+      }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async offChannel(): Promise<void> {
-    if (this.ACL.offChannel.includes(this.group)) {
-      await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "off" });
+    try {
+      if (this.ACL.offChannel.includes(this.group)) {
+        await this.post(`/${this.name}/channel`, { channelName: this.channelName, action: "off" });
+      }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   protected async get(URL: string) {
-    return await this.fetch(URL, "GET");
+    try {
+      return await this.fetch(URL, "GET");
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
+    }
   }
 
   protected async post(URL: string, body?: object) {
-    return await this.fetch(URL, "POST", body);
+    try {
+      return await this.fetch(URL, "POST", body);
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
+    }
   }
 
   protected async put(URL: string, body?: object) {
-    return await this.fetch(URL, "PUT", body);
+    try {
+      return await this.fetch(URL, "PUT", body);
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
+    }
   }
 
   protected async del(URL: string, body?: object) {
-    return await this.fetch(URL, "DELETE", body);
+    try {
+      return await this.fetch(URL, "DELETE", body);
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
+    }
   }
 
   private fetch(URL = "", method = "POST", body = {}): Promise<any | void> {
     return new Promise((resolve, reject) => {
-      fetch(
-        this.root + URL,
-        Object.assign(
-          {
-            headers: {
-              // tslint:disable-next-line:object-literal-key-quotes
-              Accept: "application/json",
-              // tslint:disable-next-line:object-literal-key-quotes
-              Authorization: `bearer ${localStorage.getItem("token")}`,
-              "Content-Type": "application/json",
-              ["x-ws-id"]: this.ws.wsid,
+      try {
+        fetch(
+          this.root + URL,
+          Object.assign(
+            {
+              headers: {
+                // tslint:disable-next-line:object-literal-key-quotes
+                Accept: "application/json",
+                // tslint:disable-next-line:object-literal-key-quotes
+                Authorization: `bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+                ["x-ws-id"]: this.ws.wsid,
+              },
+              method,
             },
-            method,
-          },
-          method === "GET" ? {} : { body: JSON.stringify(body) },
-        ),
-      )
-        .then((res: any) => {
-          if (res.status === 200) {
-            return res.json().then(resolve);
-          } else {
-            console.error({
-              status: res.status,
-              statusText: res.statusText,
-            });
+            method === "GET" ? {} : { body: JSON.stringify(body) },
+          ),
+        )
+          .then((res: any) => {
+            if (res.status === 200) {
+              return res.json().then(resolve);
+            } else {
+              console.error({
+                status: res.status,
+                statusText: res.statusText,
+              });
 
-            resolve();
-          }
-        })
-        .catch((error) => {
-          console.error(error);
+              resolve();
+            }
+          })
+          .catch((error) => {
+            console.error(error);
 
-          reject();
-        });
+            reject();
+          });
+      } catch (error) {
+        console.error(error);
+
+        return reject();
+      }
     });
   }
 }

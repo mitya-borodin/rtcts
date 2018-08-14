@@ -64,8 +64,8 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
-          try {
+        try {
+          if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
             let collection: U[] = [];
 
             if (req.user.group === userGroupEnum.admin) {
@@ -75,13 +75,13 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
             }
 
             res.status(200).json(collection.map((item) => item.toJSSecure()));
-          } catch (error) {
-            res
-              .status(500)
-              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+          } else {
+            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
-        } else {
-          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
+        } catch (error) {
+          res
+            .status(500)
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
         }
       },
     );
@@ -149,18 +149,18 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (this.ACL.signUp.length === 0 || (req.user && this.ACL.signUp.includes(req.user.group))) {
-          try {
+        try {
+          if (this.ACL.signUp.length === 0 || (req.user && this.ACL.signUp.includes(req.user.group))) {
             const result: { token: string; user: object } = await this.model.signUp(req.body);
 
             res.status(200).json(result);
-          } catch (error) {
-            res
-              .status(500)
-              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+          } else {
+            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
-        } else {
-          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
+        } catch (error) {
+          res
+            .status(500)
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
         }
       },
     );
@@ -197,8 +197,8 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        if (this.ACL.updateLogin.length === 0 || (req.user && this.ACL.updateLogin.includes(req.user.group))) {
-          try {
+        try {
+          if (this.ACL.updateLogin.length === 0 || (req.user && this.ACL.updateLogin.includes(req.user.group))) {
             const { wsid, ...data } = req.body;
             const result: U & IPersist | null = await this.model.updateLogin(data, req.user.id, wsid);
 
@@ -209,13 +209,13 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
                 .status(404)
                 .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN: ${data.login} ]`);
             }
-          } catch (error) {
-            res
-              .status(500)
-              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+          } else {
+            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
-        } else {
-          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
+        } catch (error) {
+          res
+            .status(500)
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
         }
       },
     );
@@ -228,15 +228,15 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        const { wsid, ...data } = req.body;
-        const himSelfUpdate = data.id === req.user.id;
+        try {
+          const { wsid, ...data } = req.body;
+          const himSelfUpdate = data.id === req.user.id;
 
-        if (
-          himSelfUpdate ||
-          this.ACL.updatePassword.length === 0 ||
-          (req.user && this.ACL.updatePassword.includes(req.user.group))
-        ) {
-          try {
+          if (
+            himSelfUpdate ||
+            this.ACL.updatePassword.length === 0 ||
+            (req.user && this.ACL.updatePassword.includes(req.user.group))
+          ) {
             const result: U & IPersist | null = await this.model.updatePassword(data, req.user.id, wsid);
 
             if (result) {
@@ -244,13 +244,13 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
             } else {
               res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${data.id} ]`);
             }
-          } catch (error) {
-            res
-              .status(500)
-              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+          } else {
+            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
-        } else {
-          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
+        } catch (error) {
+          res
+            .status(500)
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
         }
       },
     );
@@ -263,12 +263,12 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
-        const { ids, group, wsid } = req.body;
-        const himSelfUpdate = ids.length === 1 && ids[0] === req.user.id;
+        try {
+          const { ids, group, wsid } = req.body;
+          const himSelfUpdate = ids.length === 1 && ids[0] === req.user.id;
 
-        if (req.user) {
-          if (this.ACL.updateGroup.length === 0 || himSelfUpdate || this.ACL.updateGroup.includes(req.user.group)) {
-            try {
+          if (req.user) {
+            if (this.ACL.updateGroup.length === 0 || himSelfUpdate || this.ACL.updateGroup.includes(req.user.group)) {
               const result: Array<U & IPersist> = await this.model.updateGroup(ids, group, req.user.id, wsid);
 
               if (result) {
@@ -276,14 +276,14 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
               } else {
                 res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`);
               }
-            } catch (error) {
-              res
-                .status(500)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            } else {
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
+        } catch (error) {
+          res
+            .status(500)
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
         }
       },
     );

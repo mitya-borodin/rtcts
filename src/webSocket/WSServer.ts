@@ -40,169 +40,182 @@ export class WSServer<U extends IUserModel<IUser & IPersist>> {
   }
 
   public run() {
-    if (!this.wasRun) {
-      console.log(
-        chalk.blueBright.bold(`[ WS ][ SERVER ][ RUN ][ ws://${this.config.ws.host}:${this.config.ws.port} ]`),
-      );
+    try {
+      if (!this.wasRun) {
+        console.log(
+          chalk.blueBright.bold(`[ WS ][ SERVER ][ RUN ][ ws://${this.config.ws.host}:${this.config.ws.port} ]`),
+        );
 
-      this.wasRun = true;
-      this.server.on("connection", this.connectionHandler);
-      this.server.on("error", (error) => {
-        console.error(error);
+        this.wasRun = true;
+        this.server.on("connection", this.connectionHandler);
+        this.server.on("error", (error) => {
+          console.error(error);
 
-        clearInterval(this.interval);
-        let connsectionToDelete: IConnection[] = [];
+          clearInterval(this.interval);
+          let connsectionToDelete: IConnection[] = [];
 
-        for (const connection of this.connections) {
-          this.channels.deleteConnection(connection);
-
-          connsectionToDelete.push(connection);
-        }
-
-        for (const id of connsectionToDelete) {
-          this.connections.delete(id);
-        }
-
-        connsectionToDelete = [];
-      });
-
-      this.interval = setInterval(() => {
-        for (const connection of this.connections) {
-          if (connection.wasTermintate()) {
+          for (const connection of this.connections) {
             this.channels.deleteConnection(connection);
-            this.connections.delete(connection);
-            this.server.clients.delete(connection.ws);
 
-            console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-            console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+            connsectionToDelete.push(connection);
           }
-        }
-      }, 1000);
+
+          for (const id of connsectionToDelete) {
+            this.connections.delete(id);
+          }
+
+          connsectionToDelete = [];
+        });
+
+        this.interval = setInterval(() => {
+          for (const connection of this.connections) {
+            if (connection.wasTermintate()) {
+              this.channels.deleteConnection(connection);
+              this.connections.delete(connection);
+              this.server.clients.delete(connection.ws);
+
+              console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
+              console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+            }
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
-  private connectionHandler(ws: WebSocket, req: express.Request) {
-    const connection = new this.Connection(ws);
-    const messageHandler = this.messageHandler.bind(this, connection);
+  private connectionHandler(ws: WebSocket, req: express.Request): void {
+    try {
+      const connection = new this.Connection(ws);
+      const messageHandler = this.messageHandler.bind(this, connection);
 
-    this.connections.add(connection);
-
-    console.log("");
-    console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-    console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
-
-    ws.on("message", messageHandler);
-
-    ws.on("close", (code, message) => {
-      ws.removeEventListener("message", messageHandler);
-      ws.removeAllListeners();
-      ws.terminate();
-      this.connections.delete(connection);
-      this.channels.deleteConnection(connection);
-      this.server.clients.delete(connection.ws);
+      this.connections.add(connection);
 
       console.log("");
-      console.log(chalk.grey.bold(`[ CLOSE ][ CODE ]: ${code}`));
-      console.log(chalk.grey.bold(`[ CLOSE ][ MESSAGE ]: ${message}`));
-      console.log(chalk.grey.bold(`[ CLOSE ]${connection.getConnectionID()}`));
-      console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-      console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
-    });
+      console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
+      console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
 
-    ws.on("error", (error) => {
-      ws.removeEventListener("message", messageHandler);
-      ws.removeAllListeners();
-      ws.terminate();
-      this.connections.delete(connection);
-      this.channels.deleteConnection(connection);
-      this.server.clients.delete(connection.ws);
+      ws.on("message", messageHandler);
 
-      console.log("");
-      console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-      console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
-      console.log(chalk.cyan.bold(`[ ERROR ]${connection.getConnectionID()}`));
+      ws.on("close", (code, message) => {
+        ws.removeEventListener("message", messageHandler);
+        ws.removeAllListeners();
+        ws.terminate();
+        this.connections.delete(connection);
+        this.channels.deleteConnection(connection);
+        this.server.clients.delete(connection.ws);
 
+        console.log("");
+        console.log(chalk.grey.bold(`[ CLOSE ][ CODE ]: ${code}`));
+        console.log(chalk.grey.bold(`[ CLOSE ][ MESSAGE ]: ${message}`));
+        console.log(chalk.grey.bold(`[ CLOSE ]${connection.getConnectionID()}`));
+        console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
+        console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+      });
+
+      ws.on("error", (error) => {
+        ws.removeEventListener("message", messageHandler);
+        ws.removeAllListeners();
+        ws.terminate();
+        this.connections.delete(connection);
+        this.channels.deleteConnection(connection);
+        this.server.clients.delete(connection.ws);
+
+        console.log("");
+        console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
+        console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+        console.log(chalk.cyan.bold(`[ ERROR ]${connection.getConnectionID()}`));
+
+        console.error(error);
+      });
+    } catch (error) {
       console.error(error);
-    });
+    }
   }
 
   private messageHandler(connection: IConnection, message: string | Buffer | ArrayBuffer | Buffer[]): void {
-    if (isString(message)) {
-      const recieveData = this.recognizeMessage(message);
+    try {
+      if (isString(message)) {
+        const recieveData = this.recognizeMessage(message);
 
-      if (isArray(recieveData)) {
-        const [channelName, payload] = recieveData;
+        if (isArray(recieveData)) {
+          const [channelName, payload] = recieveData;
 
-        if (channelName === PingChannel) {
-          connection.send(this.makeMessage(PongChannel, {}));
-        } else if (isString(payload.uid)) {
-          if (
-            channelName === assigment_to_user_of_the_connection_channel ||
-            channelName === cancel_assigment_to_user_of_the_connection_channel
-          ) {
-            this.user
-              .readById(payload.uid)
-              .then((user: IUser & IPersist | null) => {
-                if (user) {
-                  if (channelName === assigment_to_user_of_the_connection_channel) {
-                    connection.setUserID(user.id);
+          if (channelName === PingChannel) {
+            connection.send(this.makeMessage(PongChannel, {}));
+          } else if (isString(payload.uid)) {
+            if (
+              channelName === assigment_to_user_of_the_connection_channel ||
+              channelName === cancel_assigment_to_user_of_the_connection_channel
+            ) {
+              this.user
+                .readById(payload.uid)
+                .then((user: IUser & IPersist | null) => {
+                  if (user) {
+                    if (channelName === assigment_to_user_of_the_connection_channel) {
+                      connection.setUserID(user.id);
 
-                    this.channels.addConnection(connection);
+                      this.channels.addConnection(connection);
 
+                      connection.send(
+                        this.makeMessage(channelName, {
+                          message: "[ ASSIGMENT ][ DONE ]",
+                          uid: connection.uid,
+                          wsid: connection.wsid,
+                        }),
+                      );
+                    }
+
+                    if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
+                      this.channels.deleteConnection(connection);
+
+                      connection.send(
+                        this.makeMessage(channelName, {
+                          message: "[ CANCELING ][ ASSIGMENT ][ DONE ]",
+                          uid: connection.uid,
+                          wsid: connection.wsid,
+                        }),
+                      );
+                    }
+                  } else {
                     connection.send(
-                      this.makeMessage(channelName, {
-                        message: "[ ASSIGMENT ][ DONE ]",
-                        uid: connection.uid,
-                        wsid: connection.wsid,
+                      this.makeErrorMessage(`[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`, {
+                        channelName,
+                        payload,
                       }),
                     );
                   }
-
-                  if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
-                    this.channels.deleteConnection(connection);
-
-                    connection.send(
-                      this.makeMessage(channelName, {
-                        message: "[ CANCELING ][ ASSIGMENT ][ DONE ]",
-                        uid: connection.uid,
-                        wsid: connection.wsid,
-                      }),
-                    );
-                  }
-                } else {
-                  connection.send(
-                    this.makeErrorMessage(`[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`, {
-                      channelName,
-                      payload,
-                    }),
-                  );
-                }
-              })
-              .catch((error: any) => {
-                connection.send(this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${error.message}`, { error, payload }));
-              });
+                })
+                .catch((error: any) => {
+                  connection.send(this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${error.message}`, { error, payload }));
+                });
+            } else {
+              connection.send(
+                this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
+              );
+            }
           } else {
-            connection.send(
-              this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
-            );
+            console.log("");
+            console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`));
           }
         } else {
           console.log("");
-          console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`));
+          console.log(
+            chalk.redBright(`[ MESSAGE_HANDLING ][ RECIEVE_DATA ] must be [ String, { [ key: string ]: any } ]`),
+          );
         }
       } else {
         console.log("");
         console.log(
-          chalk.redBright(`[ MESSAGE_HANDLING ][ RECIEVE_DATA ] must be [ String, { [ key: string ]: any } ]`),
+          chalk.redBright(
+            `[ MESSAGE_HANDLING ] have NOT implement message hanler for other data types
+             Buffer | ArrayBuffer | Buffer[]`,
+          ),
         );
       }
-    } else {
-      console.log("");
-      console.log(
-        chalk.redBright(
-          `[ MESSAGE_HANDLING ] have NOT implement message hanler for other data types Buffer | ArrayBuffer | Buffer[]`,
-        ),
-      );
+    } catch (error) {
+      console.error(error);
     }
   }
 

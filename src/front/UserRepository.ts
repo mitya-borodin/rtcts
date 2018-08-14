@@ -86,12 +86,13 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
           });
         } else {
           this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
+
+          return Promise.reject();
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name}  ][ INIT ][ ERROR ]`);
-        console.error(error);
+        console.error(`[ ${this.constructor.name} ][ INIT ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-        return Promise.reject(error);
+        return Promise.reject();
       }
     }
   }
@@ -102,8 +103,6 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
   public async signIn(data: { [key: string]: any }): Promise<void> {
     if (!this.isAuthorized) {
       try {
-        console.time(`[ ${this.constructor.name} ][ SIGN_IN ]`);
-
         this.startLoad();
 
         if (isString(data.login) && isString(data.password)) {
@@ -115,19 +114,24 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
             await this.init();
           } else {
             this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
-          }
-        }
 
-        console.timeEnd(`[ ${this.constructor.name} ][ SIGN_IN ]`);
+            return Promise.reject();
+          }
+        } else {
+          console.error(
+            `[ ${this.constructor.name} ][ SIGN_IN ][ ARGS_ERROR ][ login: ${data.login}, password: ${data.password} ]`,
+          );
+
+          return Promise.reject();
+        }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ SIGN_IN ][ ERROR ]`);
-        console.error(error);
+        console.error(`[ ${this.constructor.name} ][ SIGN_IN ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
         this.destroy();
 
         this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
 
-        return Promise.reject(error);
+        return Promise.reject();
       } finally {
         this.endLoad();
       }
@@ -153,66 +157,54 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
               this.destroy();
               resolve();
-              console.timeEnd(`[ ${this.constructor.name} ][ SIGN_OUT ]`);
             }, 100);
           });
 
-          console.time(`[ ${this.constructor.name} ][ SIGN_OUT ]`);
           this.startLoad();
           this.mediator.emit(userRepositoryEventEnum.LOGOUT);
         } catch (error) {
-          console.error(`[ ${this.constructor.name} ][ LOGOUT ][ ERROR ]`);
-          console.error(error);
+          console.error(`[ ${this.constructor.name} ][ LOGOUT ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-          reject(error);
+          reject();
         }
       });
     } else {
       console.warn(`[ ${this.constructor.name} ][ LOGOUT ][ NOT_LOGIN ]`);
+
+      return Promise.reject();
     }
   }
 
   @action("[ USER_REPOSITORY ][ SIGN_UP ]")
   public async signUp(data: { [key: string]: any }): Promise<boolean> {
     try {
-      console.time(`[ ${this.constructor.name} ][ SIGN_UP ]`);
-
       this.startLoad();
 
       const result: { token: string; user: object } | void = await this.service.signUp(data);
-
-      console.timeEnd(`[ ${this.constructor.name}  ][ SIGN_UP ]`);
 
       if (result) {
         const user = new this.Persist(result.user);
 
         this.map.set(user.id, user);
 
-        this.endLoad();
-
         return true;
       } else {
-        this.endLoad();
+        return false;
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ SIGN_UP ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ SIGN_UP ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
       this.destroy();
 
-      return false;
+      return Promise.reject();
     } finally {
       this.endLoad();
     }
-
-    return false;
   }
 
   @action("[ USER_REPOSITORY ][ UPDATE_LOGIN ]")
   public async updateLogin(data: { [key: string]: any }): Promise<void> {
     try {
-      console.time(`[ ${this.constructor.name} ][ UPDATE_LOGIN ]`);
-
       this.startLoad();
 
       if (isString(data.id) && isString(data.login)) {
@@ -223,26 +215,31 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
           if (user instanceof this.Persist) {
             this.collection.set(user.id, user);
+          } else {
+            return Promise.reject();
           }
+        } else {
+          return Promise.reject();
         }
+      } else {
+        console.error(
+          `[ ${this.constructor.name} ][ UPDATE_LOGIN ][ ARGS_ERROR ][ id: ${data.id}, login: ${data.login} ]`,
+        );
+
+        return Promise.reject();
       }
-
-      this.endLoad();
-
-      console.timeEnd(`[ ${this.constructor.name} ][ UPDATE_LOGIN ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_LOGIN ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ UPDATE_LOGIN ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-      return Promise.reject(error);
+      return Promise.reject();
+    } finally {
+      this.endLoad();
     }
   }
 
   @action("[ USER_REPOSITORY ][ UPDATE_PASSWORD ]")
   public async updatePassword(data: { [key: string]: any }): Promise<void> {
     try {
-      console.time(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ]`);
-
       this.startLoad();
 
       if (isString(data.id) && isString(data.password) && isString(data.password_confirm)) {
@@ -250,31 +247,30 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
         if (user instanceof this.Persist) {
           this.collection.set(user.id, user);
+        } else {
+          return Promise.reject();
         }
       } else {
         console.warn(
-          `[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ WARN ][ id: ${data.id} ][ password: ${
+          `[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ARGS_ERROR ][ id: ${data.id} ][ password: ${
             data.password
           } ][ password_confirm: ${data.password_confirm} ]`,
         );
+
+        return Promise.reject();
       }
-
-      this.endLoad();
-
-      console.timeEnd(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-      return Promise.reject(error);
+      return Promise.reject();
+    } finally {
+      this.endLoad();
     }
   }
 
   @action("[ USER_REPOSITORY ][ UPDATE_GROUP ]")
   public async updateGroup(ids: string[], updateGroup: string): Promise<void> {
     try {
-      console.time(`[ ${this.constructor.name} ][ UPDATE_GROUP ]`);
-
       this.startLoad();
 
       const users: U[] | void = await this.service.updateGroup(ids, updateGroup);
@@ -287,39 +283,37 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
             throw new Error(`Service come back not user instance;`);
           }
         }
+      } else {
+        console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ RESPONSE_ERROR ][ users: ${users} ]`);
+
+        return Promise.reject();
       }
-
-      this.endLoad();
-
-      console.timeEnd(`[ ${this.constructor.name} ][ UPDATE_GROUP ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-      return Promise.reject(error);
+      return Promise.reject();
+    } finally {
+      this.endLoad();
     }
   }
 
   @action("[ USER_REPOSITORY ][ REMOVE ]")
   public async remove(id: string): Promise<void> {
     try {
-      console.time(`[ ${this.constructor.name} ][ REMOVE ]`);
-
       this.startLoad();
       const user: U | void = await this.service.remove(id);
 
       if (user instanceof this.Persist) {
         this.collection.delete(user.id);
+      } else {
+        throw new Error(`Service come back not user instance;`);
       }
-
-      this.endLoad();
-
-      console.timeEnd(`[ ${this.constructor.name} ][ REMOVE ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-      return Promise.reject(error);
+      return Promise.reject();
+    } finally {
+      this.endLoad();
     }
   }
 
@@ -340,10 +334,9 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
       console.log(`[ ${this.constructor.name} ][ DESTROY ][ SUCCESS ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ DESTROY ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ DESTROY ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-      return Promise.reject(error);
+      return Promise.reject();
     }
   }
 
@@ -393,12 +386,11 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
       this.destroy();
 
-      return Promise.reject(error);
+      return Promise.reject();
     } finally {
       this.endLoad();
     }

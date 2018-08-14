@@ -5,9 +5,9 @@ export interface IModel<P> {
 
   readOne(query: { [key: string]: any }, options?: FindOneOptions, uid?: string): Promise<P | null>;
 
-  getMap(): Promise<Map<string, P>>;
-
   readById(id: string): Promise<P | null>;
+
+  getMap(query?: { [key: string]: any }, options?: FindOneOptions): Promise<Map<string, P>>;
 
   create(
     data: { [key: string]: any },

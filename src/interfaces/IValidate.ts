@@ -1,9 +1,9 @@
-export interface IValidateResult {
+export interface IValidateResult<V extends IValidate = IValidate> {
   isValid: boolean;
   messages: string[];
-  results: IValidate[];
+  results: V[];
 
-  getFieldValidation(field: string): IValidate | void;
+  getFieldValidation(field: string): V | void;
 
   hasFieldError(field: string): boolean;
 }

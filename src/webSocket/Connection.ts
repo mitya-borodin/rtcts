@@ -30,14 +30,20 @@ export class Connection implements IConnection {
   }
 
   public getConnectionID(): string {
-    if (isString(this.uid) && this.uid.length > 0) {
-      return Connection.getConnectionID(this.uid, this.wsid);
+    try {
+      if (isString(this.uid) && this.uid.length > 0) {
+        return Connection.getConnectionID(this.uid, this.wsid);
+      }
+
+      console.log("");
+      console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ GET_CONNECTION_ID ][ UID_IS_NOT_DEFINED ]`));
+
+      return "";
+    } catch (error) {
+      console.error(error);
+
+      return "";
     }
-
-    console.log("");
-    console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ GET_CONNECTION_ID ][ UID_IS_NOT_DEFINED ]`));
-
-    return "";
   }
 
   public isOwner(uid: string): boolean {
@@ -72,48 +78,66 @@ export class Connection implements IConnection {
   }
 
   public send(data: any): void {
-    this.ws.send(data);
+    try {
+      this.ws.send(data);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   public wasTermintate(): boolean {
-    if (this.isAlive) {
-      this.isAlive = false;
+    try {
+      if (this.isAlive) {
+        this.isAlive = false;
 
-      // console.info("[ PING ][ HEARD_BEAT ]", this.isAlive);
+        // console.info("[ PING ][ HEARD_BEAT ]", this.isAlive);
 
-      this.ws.ping("", false, (error) => {
-        if (error) {
-          console.error(error);
-        }
-      });
+        this.ws.ping("", false, (error) => {
+          if (error) {
+            console.error(error);
+          }
+        });
+
+        return false;
+      } else {
+        this.terminate();
+
+        console.log("");
+        console.log(chalk.redBright(`[ CONNECTION ][ TERMINATE ][ CLIENT_DID_NOT_PONG ]`));
+
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
 
       return false;
-    } else {
-      this.terminate();
-
-      console.log("");
-      console.log(chalk.redBright(`[ CONNECTION ][ TERMINATE ][ CLIENT_DID_NOT_PONG ]`));
-
-      return true;
     }
   }
 
   public close(message?: string): void {
-    this.ws.removeEventListener("pong", this.heartbeat);
-    this.ws.removeAllListeners();
-    this.ws.close(1000, "[ CLOSE ] " + message);
+    try {
+      this.ws.removeEventListener("pong", this.heartbeat);
+      this.ws.removeAllListeners();
+      this.ws.close(1000, "[ CLOSE ] " + message);
 
-    console.log("");
-    console.log(chalk.blueBright(`[ CONNECTION ][ CLOSE ] ${message}`));
+      console.log("");
+      console.log(chalk.blueBright(`[ CONNECTION ][ CLOSE ] ${message}`));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   public terminate(message?: string): void {
-    this.isAlive = false;
-    this.ws.removeEventListener("pong", this.heartbeat);
-    this.ws.removeAllListeners();
-    this.ws.terminate();
+    try {
+      this.isAlive = false;
+      this.ws.removeEventListener("pong", this.heartbeat);
+      this.ws.removeAllListeners();
+      this.ws.terminate();
 
-    console.log("");
-    console.log(chalk.blueBright(`[ CONNECTION ][ TERMINATE ] ${message || ""}`));
+      console.log("");
+      console.log(chalk.blueBright(`[ CONNECTION ][ TERMINATE ] ${message || ""}`));
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

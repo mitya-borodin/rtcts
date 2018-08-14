@@ -1,9 +1,9 @@
 import { IValidate, IValidateResult } from "../interfaces/IValidate";
 
-export class ValidateResult implements IValidateResult {
-  public readonly results: IValidate[];
+export class ValidateResult<V extends IValidate = IValidate> implements IValidateResult<V> {
+  public readonly results: V[];
 
-  constructor(results: IValidate[]) {
+  constructor(results: V[]) {
     this.results = results;
   }
 
@@ -15,7 +15,7 @@ export class ValidateResult implements IValidateResult {
     return this.results.map(({ message }) => message);
   }
 
-  public getFieldValidation(a_field: string): IValidate | void {
+  public getFieldValidation(a_field: string): V | void {
     return this.results.find(({ field }) => a_field === field);
   }
 

@@ -3,10 +3,7 @@ export function isString(test: any): test is string {
 }
 
 export function isNumber(test: any): test is number {
-  return (
-    Object.prototype.toString.call(test) === "[object Number]" &&
-    !Number.isNaN(test)
-  );
+  return Object.prototype.toString.call(test) === "[object Number]" && !Number.isNaN(test);
 }
 
 export function isBoolean(test: any): test is boolean {
@@ -21,7 +18,8 @@ export function isObject(test: any): test is object {
   return Object.prototype.toString.call(test) === "[object Object]";
 }
 
-export function isFunction(test: any): boolean {
+// tslint:disable-next-line:ban-types
+export function isFunction(test: any): test is Function {
   return Object.prototype.toString.call(test) === "[object Function]";
 }
 
@@ -33,7 +31,6 @@ export function isDate(test: any): test is Date {
 
 export function isArray<T>(test: any): test is T[] {
   return (
-    Object.prototype.toString.call(test) === "[object Array]" ||
-    (test && isNumber(test.length) && isFunction(test.map))
+    Object.prototype.toString.call(test) === "[object Array]" || (test && isNumber(test.length) && isFunction(test.map))
   );
 }

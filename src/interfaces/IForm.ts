@@ -1,8 +1,8 @@
 import { IInsert } from "./IInsert";
 import { IValidateResult } from "./IValidate";
 
-export interface IForm extends IInsert {
+export interface IForm<VR extends IValidateResult = IValidateResult> extends IInsert {
   id: string | void;
 
-  validate(): IValidateResult;
+  validate(): VR;
 }

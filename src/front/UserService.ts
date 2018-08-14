@@ -46,56 +46,92 @@ export class UserService<U extends IUser & IPersist, WS extends IWSClient = IWSC
   }
 
   public async current(): Promise<U | void> {
-    const output: object | void = await this.get(`/${this.name}/current`);
+    try {
+      const output: object | void = await this.get(`/${this.name}/current`);
 
-    if (output) {
-      return new this.Class(output);
+      if (output) {
+        return new this.Class(output);
+      }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async signIn(data: object): Promise<string | void> {
-    const output: string | null = await this.post(`/${this.name}/signIn`, data);
+    try {
+      const output: string | null = await this.post(`/${this.name}/signIn`, data);
 
-    if (output) {
-      return output;
+      if (output) {
+        return output;
+      }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async signUp(data: object): Promise<{ token: string; user: object } | void> {
-    const output: { token: string; user: object } | void = await this.post(`/${this.name}/signUp`, data);
+    try {
+      const output: { token: string; user: object } | void = await this.post(`/${this.name}/signUp`, data);
 
-    if (output) {
-      return output;
+      if (output) {
+        return output;
+      }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async updateLogin(data: object): Promise<U | void> {
-    if (this.ACL.updateLogin.includes(this.group)) {
-      const output: object | void = await this.post(`/${this.name}/updateLogin`, data);
+    try {
+      if (this.ACL.updateLogin.includes(this.group)) {
+        const output: object | void = await this.post(`/${this.name}/updateLogin`, data);
 
-      if (output) {
-        return new this.Class(output);
+        if (output) {
+          return new this.Class(output);
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async updatePassword(data: object): Promise<U | void> {
-    if (this.ACL.updatePassword.includes(this.group)) {
-      const output: object | void = await this.post(`/${this.name}/updatePassword`, data);
+    try {
+      if (this.ACL.updatePassword.includes(this.group)) {
+        const output: object | void = await this.post(`/${this.name}/updatePassword`, data);
 
-      if (output) {
-        return new this.Class(output);
+        if (output) {
+          return new this.Class(output);
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 
   public async updateGroup(ids: string[], group: string): Promise<U[] | void> {
-    if (this.ACL.updateGroup.includes(this.group)) {
-      const output: object[] | void = await this.post(`/${this.name}/updateGroup`, { ids, group });
+    try {
+      if (this.ACL.updateGroup.includes(this.group)) {
+        const output: object[] | void = await this.post(`/${this.name}/updateGroup`, { ids, group });
 
-      if (output) {
-        return output.map((item) => new this.Class(item));
+        if (output) {
+          return output.map((item) => new this.Class(item));
+        }
       }
+    } catch (error) {
+      console.error(error);
+
+      return Promise.reject();
     }
   }
 }

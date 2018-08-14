@@ -7,6 +7,7 @@ export { IDBConnection } from "./back/interfaces/IDBConnection";
 export { IModel } from "./back/interfaces/IModel";
 export { IRepository } from "./back/interfaces/IRepository";
 export { IAuthStrategy } from "./back/interfaces/IAuthStrategy";
+export { IAPPServer } from "./back/interfaces/IAPPServer";
 
 // CLASSES
 export { toMongo } from "./back/toMongo";
