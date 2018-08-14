@@ -7,12 +7,12 @@ import { IChannels } from "./interfaces/IChannels";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";
 
-export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> extends Service<
-  M,
-  U & IPersist,
-  U,
-  IChannels
-> {
+export class UserService<
+  P extends IUser & IPersist = IUser & IPersist,
+  I extends IUser = IUser,
+  C extends IChannels = IChannels,
+  M extends IUserModel<P> = IUserModel<P>
+> extends Service<M, P, I, C> {
   protected model: M;
   protected readonly ACL: {
     readonly collection: string[];
@@ -30,10 +30,10 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
   constructor(
     name: string,
     router: express.Router,
-    Persist: { new (data: any): U & IPersist },
-    Insert: { new (data: any): U },
+    Persist: { new (data: any): P },
+    Insert: { new (data: any): I },
     model: M,
-    channels: IChannels,
+    channels: C,
     ACL: {
       collection: string[];
       model: string[];
@@ -66,7 +66,7 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
       async (req: express.Request, res: express.Response) => {
         try {
           if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
-            let collection: U[] = [];
+            let collection: P[] = [];
 
             if (req.user.group === userGroupEnum.admin) {
               collection = await this.model.readAll();
@@ -103,7 +103,7 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
             persist.id === req.user.id ||
             (req.user && this.ACL.update.includes(req.user.group))
           ) {
-            const result: U & IPersist | null = await this.model.update(persist.toJSSecure(), req.user.id, wsid);
+            const result: P | null = await this.model.update(persist.toJSSecure(), req.user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -200,7 +200,7 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
         try {
           if (this.ACL.updateLogin.length === 0 || (req.user && this.ACL.updateLogin.includes(req.user.group))) {
             const { wsid, ...data } = req.body;
-            const result: U & IPersist | null = await this.model.updateLogin(data, req.user.id, wsid);
+            const result: P | null = await this.model.updateLogin(data, req.user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJSSecure());
@@ -237,7 +237,7 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
             this.ACL.updatePassword.length === 0 ||
             (req.user && this.ACL.updatePassword.includes(req.user.group))
           ) {
-            const result: U & IPersist | null = await this.model.updatePassword(data, req.user.id, wsid);
+            const result: P | null = await this.model.updatePassword(data, req.user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJSSecure());
@@ -269,7 +269,7 @@ export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> ex
 
           if (req.user) {
             if (this.ACL.updateGroup.length === 0 || himSelfUpdate || this.ACL.updateGroup.includes(req.user.group)) {
-              const result: Array<U & IPersist> = await this.model.updateGroup(ids, group, req.user.id, wsid);
+              const result: P[] = await this.model.updateGroup(ids, group, req.user.id, wsid);
 
               if (result) {
                 res.status(200).json(result.map((r) => r.toJSSecure()));
