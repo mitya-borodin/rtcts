@@ -15,7 +15,7 @@ import { IRepository } from "./interfaces/IRepository";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Model } from "./Model";
 
-export class UserModel<P extends IUser & IPersist, I extends IUser> extends Model<P, I> implements IUserModel<P, I> {
+export class UserModel<P extends IUser & IPersist, I extends IUser> extends Model<P, I> implements IUserModel<P> {
   protected config: IAppConfig;
 
   constructor(
@@ -82,7 +82,7 @@ export class UserModel<P extends IUser & IPersist, I extends IUser> extends Mode
 
         return Promise.reject(isValidPassword);
       } else {
-        throw new Error(`Пользователь с таким: ${login} login уже зарегистрирован.`);
+        return Promise.reject(`Пользователь с таким: ${login} login уже зарегистрирован.`);
       }
     }
 

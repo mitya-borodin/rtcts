@@ -7,7 +7,7 @@ import { IChannels } from "./interfaces/IChannels";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";
 
-export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser> extends Service<
+export class UserService<M extends IUserModel<U & IPersist>, U extends IUser> extends Service<
   M,
   U & IPersist,
   U,
@@ -58,8 +58,10 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
   }
 
   protected collection(): void {
+    const URL = `/${this.name}/collection`;
+
     this.router.get(
-      `/${this.name}/collection`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
@@ -72,20 +74,24 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
               collection = await this.model.read({}, { projection: { login: 1, group: 1 } }, req.user.id);
             }
 
-            res.status(200).json(collection.map((item) => item.toJS()));
+            res.status(200).json(collection.map((item) => item.toJSSecure()));
           } catch (error) {
-            res.status(500).send(error.message);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected update(): void {
+    const URL = `/${this.name}/update`;
+
     this.router.post(
-      `/${this.name}/update`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
@@ -97,50 +103,50 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
             persist.id === req.user.id ||
             (req.user && this.ACL.update.includes(req.user.group))
           ) {
-            try {
-              const result: U & IPersist | null = await this.model.update(persist.toJS(), req.user.id, wsid);
+            const result: U & IPersist | null = await this.model.update(persist.toJSSecure(), req.user.id, wsid);
 
-              if (result) {
-                res.status(200).json(result.toJS());
-              } else {
-                res.status(404).send(`Model not found by id: ${req.body.id}`);
-              }
-            } catch (error) {
-              console.error(error);
-              res.status(500).send(error.message);
+            if (result) {
+              res.status(200).json(result.toJS());
+            } else {
+              res
+                .status(404)
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${req.body.id} ]`);
             }
           } else {
-            res.status(403).send();
+            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
-          console.error(error);
-          res.status(500).send(error.message);
+          res
+            .status(500)
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
         }
       },
     );
   }
 
   protected current(): void {
+    const URL = `/${this.name}/current`;
+
     this.router.get(
-      `/${this.name}/current`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          try {
-            res.status(200).json(new this.Persist(req.user).toJSSecure());
-          } catch (error) {
-            res.status(500).send(error.message);
-          }
+          res.status(200).json(new this.Persist(req.user).toJSSecure());
         } catch (error) {
-          res.status(500).send(error.message);
+          res
+            .status(500)
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
         }
       },
     );
   }
 
   protected signUp(): void {
+    const URL = `/${this.name}/signUp`;
+
     this.router.post(
-      `/${this.name}/signUp`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.signUp.length === 0 || (req.user && this.ACL.signUp.includes(req.user.group))) {
@@ -149,17 +155,21 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
 
             res.status(200).json(result);
           } catch (error) {
-            res.status(500).send(error.message);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected signIn(): void {
-    this.router.post(`/${this.name}/signIn`, async (req: express.Request, res: express.Response) => {
+    const URL = `/${this.name}/signIn`;
+
+    this.router.post(URL, async (req: express.Request, res: express.Response) => {
       try {
         const result: string | null = await this.model.signIn(req.body);
 
@@ -169,20 +179,22 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
           res
             .status(404)
             .send(
-              `User by login: ${req.body.login}, password: ${
-                req.body.password
-              }. Not found, or pair login-password incorrect;`,
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN_AND_PASSWORD: { login: ${
+                req.body.login
+              }, password: ${req.body.password} } ]`,
             );
         }
       } catch (error) {
-        res.status(500).send(error.message);
+        res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
       }
     });
   }
 
   protected updateLogin(): void {
+    const URL = `/${this.name}/updateLogin`;
+
     this.router.post(
-      `/${this.name}/updateLogin`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         if (this.ACL.updateLogin.length === 0 || (req.user && this.ACL.updateLogin.includes(req.user.group))) {
@@ -191,23 +203,29 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
             const result: U & IPersist | null = await this.model.updateLogin(data, req.user.id, wsid);
 
             if (result) {
-              res.status(200).json(result.toJS());
+              res.status(200).json(result.toJSSecure());
             } else {
-              res.status(404).send(`User with login: ${data.login}, not found.`);
+              res
+                .status(404)
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN: ${data.login} ]`);
             }
           } catch (error) {
-            res.status(500).send(error.message);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected updatePassword(): void {
+    const URL = `/${this.name}/updatePassword`;
+
     this.router.post(
-      `/${this.name}/updatePassword`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         const { wsid, ...data } = req.body;
@@ -222,23 +240,27 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
             const result: U & IPersist | null = await this.model.updatePassword(data, req.user.id, wsid);
 
             if (result) {
-              res.status(200).json(result.toJS());
+              res.status(200).json(result.toJSSecure());
             } else {
-              res.status(404).send(`User not found.`);
+              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${data.id} ]`);
             }
           } catch (error) {
-            res.status(500).send(error.message || error);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
-          res.status(403).send();
+          res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
         }
       },
     );
   }
 
   protected updateGroup(): void {
+    const URL = `/${this.name}/updateGroup`;
+
     this.router.post(
-      `/${this.name}/updateGroup`,
+      URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         const { ids, group, wsid } = req.body;
@@ -250,12 +272,14 @@ export class UserService<M extends IUserModel<U & IPersist, U>, U extends IUser>
               const result: Array<U & IPersist> = await this.model.updateGroup(ids, group, req.user.id, wsid);
 
               if (result) {
-                res.status(200).json(result.map((r) => r.toJS()));
+                res.status(200).json(result.map((r) => r.toJSSecure()));
               } else {
                 res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`);
               }
             } catch (error) {
-              res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
+              res
+                .status(500)
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);

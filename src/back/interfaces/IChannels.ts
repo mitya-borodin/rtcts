@@ -1,9 +1,9 @@
 import { IConnection } from "./IConnection";
 
-export interface IChannels {
-  addConnection(a_connection: IConnection): void;
+export interface IChannels<C extends IConnection = IConnection> {
+  addConnection(a_connection: C): void;
 
-  deleteConnection(a_connection: IConnection): void;
+  deleteConnection(a_connection: C): void;
 
   on(chName: string, uid: string, wsid: string): void;
 

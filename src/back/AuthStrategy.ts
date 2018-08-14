@@ -12,10 +12,11 @@ import { IUserModel } from "./interfaces/IUserModel";
  * то выполняется этот callBack и проиходит запрос в БД на предмет посика пользователя по ObjectId.
  * */
 
-export class AuthStrategy<P extends IUser & IPersist, I extends IUser> implements IAuthStrategy {
+export class AuthStrategy<P extends IUser & IPersist, M extends IUserModel<P>, AC extends IAppConfig>
+  implements IAuthStrategy {
   protected readonly strategy: PassportStrategy;
 
-  constructor(config: IAppConfig, userModel: IUserModel<P, I>) {
+  constructor(config: AC, userModel: M) {
     this.strategy = new Strategy(
       {
         jwtFromRequest: config.jwt.form_request,

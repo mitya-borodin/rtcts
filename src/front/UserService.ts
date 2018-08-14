@@ -5,7 +5,9 @@ import { IUserService } from "./interfaces/IUserService";
 import { IWSClient } from "./interfaces/IWSClient";
 import { Service } from "./Service";
 
-export class UserService<U extends IUser & IPersist> extends Service<U> implements IUserService<U> {
+export class UserService<U extends IUser & IPersist, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
+  extends Service<U, WS>
+  implements IUserService<U> {
   protected ACL: {
     collection: string[];
     model: string[];
@@ -23,7 +25,7 @@ export class UserService<U extends IUser & IPersist> extends Service<U> implemen
   constructor(
     name: string,
     Class: { new (data?: any): U },
-    ws: IWSClient,
+    ws: WS,
     channelName: string,
     ACL: {
       collection: string[];
@@ -37,13 +39,13 @@ export class UserService<U extends IUser & IPersist> extends Service<U> implemen
       updatePassword: string[];
       updateGroup: string[];
     },
-    mediator: IMediator,
+    mediator: ME,
     root = "/service",
   ) {
     super(name, Class, ws, channelName, ACL, mediator, root);
   }
 
-  public async current(): Promise<U & IPersist | void> {
+  public async current(): Promise<U | void> {
     const output: object | void = await this.get(`/${this.name}/current`);
 
     if (output) {
@@ -67,7 +69,7 @@ export class UserService<U extends IUser & IPersist> extends Service<U> implemen
     }
   }
 
-  public async updateLogin(data: object): Promise<U & IPersist | void> {
+  public async updateLogin(data: object): Promise<U | void> {
     if (this.ACL.updateLogin.includes(this.group)) {
       const output: object | void = await this.post(`/${this.name}/updateLogin`, data);
 
@@ -77,7 +79,7 @@ export class UserService<U extends IUser & IPersist> extends Service<U> implemen
     }
   }
 
-  public async updatePassword(data: object): Promise<U & IPersist | void> {
+  public async updatePassword(data: object): Promise<U | void> {
     if (this.ACL.updatePassword.includes(this.group)) {
       const output: object | void = await this.post(`/${this.name}/updatePassword`, data);
 
@@ -87,7 +89,7 @@ export class UserService<U extends IUser & IPersist> extends Service<U> implemen
     }
   }
 
-  public async updateGroup(ids: string[], group: string): Promise<Array<U & IPersist> | void> {
+  public async updateGroup(ids: string[], group: string): Promise<U[] | void> {
     if (this.ACL.updateGroup.includes(this.group)) {
       const output: object[] | void = await this.post(`/${this.name}/updateGroup`, { ids, group });
 

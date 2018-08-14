@@ -1,8 +1,7 @@
-import { IInsert } from "../../interfaces/IInsert";
 import { IPersist } from "../../interfaces/IPersist";
 import { IModel } from "./IModel";
 
-export interface IUserModel<P extends IPersist, I extends IInsert> extends IModel<P, I> {
+export interface IUserModel<P extends IPersist> extends IModel<P> {
   readAll(): Promise<P[]>;
 
   signUp(data: { [key: string]: any }): Promise<{ token: string; user: object }>;

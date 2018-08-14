@@ -19,7 +19,7 @@ import { isString } from "../utils/isType";
 import { IDBConnection } from "./interfaces/IDBConnection";
 import { IRepository } from "./interfaces/IRepository";
 
-export class MongoDBRepository<D> implements IRepository<D> {
+export class MongoDBRepository<T> implements IRepository<T> {
   private readonly name: string;
   private readonly db: IDBConnection;
   private readonly options?: CollectionCreateOptions;
@@ -31,11 +31,11 @@ export class MongoDBRepository<D> implements IRepository<D> {
     this.db = db;
   }
 
-  public async getCollection(): Promise<Collection<D>> {
+  public async getCollection(): Promise<Collection<T>> {
     const db: Db = await this.db.getDB();
 
     if (!this.collection) {
-      this.collection = await db.createCollection<D>(this.name, this.options);
+      this.collection = await db.createCollection<T>(this.name, this.options);
 
       await this.onValidation();
     }
@@ -64,7 +64,7 @@ export class MongoDBRepository<D> implements IRepository<D> {
     await db.command({ collMod: this.name, validationLevel: "off" });
   }
 
-  public prepareId(data: any): D {
+  public prepareId(data: any): T {
     if (data._id) {
       return { ...data, id: data._id.toHexString() };
     }
@@ -72,22 +72,22 @@ export class MongoDBRepository<D> implements IRepository<D> {
     return data;
   }
 
-  public async insertMany(docs: object[], options?: CollectionInsertManyOptions): Promise<D[]> {
-    const collection: Collection<D> = await this.getCollection();
+  public async insertMany(docs: object[], options?: CollectionInsertManyOptions): Promise<T[]> {
+    const collection: Collection<T> = await this.getCollection();
     const insert: InsertWriteOpResult = await collection.insertMany(docs, options);
 
     return insert.ops.map((data: any) => this.prepareId(data));
   }
 
-  public async insertOne(doc: object, options?: CollectionInsertOneOptions): Promise<D> {
-    const collection: Collection<D> = await this.getCollection();
+  public async insertOne(doc: object, options?: CollectionInsertOneOptions): Promise<T> {
+    const collection: Collection<T> = await this.getCollection();
     const insert: InsertOneWriteOpResult = await collection.insertOne(doc, options);
 
     return insert.ops.map((data: any) => this.prepareId(data))[0];
   }
 
-  public async find(query: object, options?: FindOneOptions): Promise<D[]> {
-    const collection: Collection<D> = await this.getCollection();
+  public async find(query: object, options?: FindOneOptions): Promise<T[]> {
+    const collection: Collection<T> = await this.getCollection();
 
     if (options) {
       const $project = { _id: true, ...options.projection };
@@ -104,7 +104,7 @@ export class MongoDBRepository<D> implements IRepository<D> {
     }
   }
 
-  public async findOne(query: object, options?: FindOneOptions): Promise<D | null> {
+  public async findOne(query: object, options?: FindOneOptions): Promise<T | null> {
     const collection: Collection = await this.getCollection();
     const item = await collection.findOne(this.prepareObjectId(query), options);
 
@@ -115,12 +115,12 @@ export class MongoDBRepository<D> implements IRepository<D> {
     return null;
   }
 
-  public async findById(id: string, options?: FindOneOptions): Promise<D | null> {
+  public async findById(id: string, options?: FindOneOptions): Promise<T | null> {
     return await this.findOne({ _id: new ObjectId(id) }, options);
   }
 
-  public async findOneAndUpdate(query: object, update: object, options?: FindOneAndReplaceOption): Promise<D | null> {
-    const collection: Collection<D> = await this.getCollection();
+  public async findOneAndUpdate(query: object, update: object, options?: FindOneAndReplaceOption): Promise<T | null> {
+    const collection: Collection<T> = await this.getCollection();
     const result: FindAndModifyWriteOpResultObject = await collection.findOneAndUpdate(
       this.prepareObjectId(query),
       update,
@@ -134,8 +134,8 @@ export class MongoDBRepository<D> implements IRepository<D> {
     return null;
   }
 
-  public async findOneAndRemove(query: object, options?: { projection?: object; sort?: object }): Promise<D | null> {
-    const collection: Collection<D> = await this.getCollection();
+  public async findOneAndRemove(query: object, options?: { projection?: object; sort?: object }): Promise<T | null> {
+    const collection: Collection<T> = await this.getCollection();
     const result: FindAndModifyWriteOpResultObject = await collection.findOneAndDelete(
       this.prepareObjectId(query),
       options,
@@ -148,30 +148,30 @@ export class MongoDBRepository<D> implements IRepository<D> {
     return null;
   }
 
-  public async findByIdAndRemove(id: string, options?: { projection?: object; sort?: object }): Promise<D | null> {
+  public async findByIdAndRemove(id: string, options?: { projection?: object; sort?: object }): Promise<T | null> {
     return await this.findOneAndRemove({ _id: new ObjectId(id) }, options);
   }
 
   public async updateOne(query: object, update: object, options?: ReplaceOneOptions): Promise<void> {
-    const collection: Collection<D> = await this.getCollection();
+    const collection: Collection<T> = await this.getCollection();
 
     await collection.updateOne(this.prepareObjectId(query), update, options);
   }
 
   public async updateMany(query: object, update: object, options?: ReplaceOneOptions): Promise<void> {
-    const collection: Collection<D> = await this.getCollection();
+    const collection: Collection<T> = await this.getCollection();
 
     await collection.updateMany(this.prepareObjectId(query), update, options);
   }
 
   public async deleteOne(query: object, options?: CommonOptions): Promise<void> {
-    const collection: Collection<D> = await this.getCollection();
+    const collection: Collection<T> = await this.getCollection();
 
     await collection.deleteOne(this.prepareObjectId(query), options);
   }
 
   public async deleteMany(query: object, options?: CommonOptions): Promise<void> {
-    const collection: Collection<D> = await this.getCollection();
+    const collection: Collection<T> = await this.getCollection();
 
     await collection.deleteMany(this.prepareObjectId(query), options);
   }

@@ -50,7 +50,7 @@ export class APPServer {
       this.services(this.app);
 
       this.app.use((req: express.Request, res: express.Response) => {
-        res.status(404).send("Not found.");
+        res.status(404).send("Route Not found.");
       });
 
       this.server.listen(this.config.server.port, this.config.server.host, () => {

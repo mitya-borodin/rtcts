@@ -4,8 +4,10 @@ export class EventEmitter implements IEventEmitter {
   private subscriptions: Map<string, Set<(payload: any) => void>>;
 
   constructor() {
+    // INIT
     this.subscriptions = new Map();
 
+    // BINDINGS
     this.emit = this.emit.bind(this);
     this.once = this.once.bind(this);
     this.on = this.on.bind(this);
@@ -52,7 +54,7 @@ export class EventEmitter implements IEventEmitter {
       if (!listeners.has(callBack)) {
         listeners.add(callBack);
       } else {
-        console.warn(`[ EVENT_EMITTER ][ ${this.constructor.name} ][ ON ][ ${name} ][ ALREADY_EXIST ]`);
+        console.warn(`[ ${this.constructor.name} ][ ON ][ ${name} ][ ALREADY_EXIST ]`);
       }
     } else {
       this.subscriptions.set(name, new Set([callBack]));
@@ -66,10 +68,10 @@ export class EventEmitter implements IEventEmitter {
       if (listeners.has(callBack)) {
         listeners.delete(callBack);
       } else {
-        console.warn(`[ EVENT_EMITTER ][ ${this.constructor.name} ][ OFF ][ ${name} ][ NOT_EXIST ]`);
+        console.warn(`[ ${this.constructor.name} ][ OFF ][ ${name} ][ NOT_EXIST ]`);
       }
     } else {
-      console.error(`[ EVENT_EMITTER ][ ${this.constructor.name} ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`);
+      console.error(`[ ${this.constructor.name} ][ OFF ][ SUBSCRIPTION ][ ${name} ][ NOT_EXIST ]`);
     }
   }
 

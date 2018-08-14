@@ -6,7 +6,7 @@ import { IModel } from "./interfaces/IModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";
 
-export class Model<P extends IPersist, I extends IInsert> implements IModel<P, I> {
+export class Model<P extends IPersist, I extends IInsert> implements IModel<P> {
   protected readonly repository: IRepository<P>;
   protected readonly Persist: { new (data?: any): P };
   protected readonly Insert: { new (data?: any): I };

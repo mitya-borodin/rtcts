@@ -16,7 +16,7 @@ import {
 } from "./const";
 import { makeErrorMessage, makeMessage, recognizeMessage } from "./helpers";
 
-export class WSServer<U extends IUserModel<IUser & IPersist, IUser>> {
+export class WSServer<U extends IUserModel<IUser & IPersist>> {
   private config: IAppConfig;
   private server: WebSocket.Server;
   private connections: Set<IConnection>;
@@ -178,7 +178,7 @@ export class WSServer<U extends IUserModel<IUser & IPersist, IUser>> {
                   );
                 }
               })
-              .catch((error) => {
+              .catch((error: any) => {
                 connection.send(this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${error.message}`, { error, payload }));
               });
           } else {

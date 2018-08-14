@@ -13,12 +13,12 @@ export class AppConfig implements IAppConfig {
     readonly url: string;
   };
   public readonly server: {
-    host: string;
-    port: number;
+    readonly host: string;
+    readonly port: number;
   };
   public readonly ws: {
-    host: string;
-    port: number;
+    readonly host: string;
+    readonly port: number;
   };
   public production: boolean;
 

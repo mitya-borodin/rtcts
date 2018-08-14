@@ -12,7 +12,7 @@ export interface IWSClient extends IEventEmitter {
 
   reconnect(): Promise<void>;
 
-  disconnect(reason?: string): void;
+  disconnect(reason?: string): Promise<void>;
 
   send(
     channelName: string,

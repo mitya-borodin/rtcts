@@ -4,10 +4,10 @@ import { IMediator } from "./interfaces/IMediator";
 import { IService } from "./interfaces/IService";
 import { IWSClient } from "./interfaces/IWSClient";
 
-export class Service<T> implements IService<T> {
+export class Service<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator> implements IService<T> {
   protected name: string;
   protected Class: { new (data?: any): T };
-  protected ws: IWSClient;
+  protected ws: WS;
   protected root: string;
   protected channelName: string;
   protected group: string;
@@ -20,12 +20,12 @@ export class Service<T> implements IService<T> {
     onChannel: string[];
     offChannel: string[];
   };
-  protected mediator: IMediator;
+  protected mediator: ME;
 
   constructor(
     name: string,
     Class: { new (data?: any): T },
-    ws: IWSClient,
+    ws: WS,
     channelName: string,
     ACL: {
       collection: string[];
@@ -36,7 +36,7 @@ export class Service<T> implements IService<T> {
       onChannel: string[];
       offChannel: string[];
     },
-    mediator: IMediator,
+    mediator: ME,
     root = "/service",
   ) {
     // DEPS
@@ -47,6 +47,17 @@ export class Service<T> implements IService<T> {
     this.root = root;
     this.ACL = ACL;
     this.mediator = mediator;
+
+    // SUBSCRIPTIONS
+    this.mediator.on(userRepositoryEventEnum.SET_USER_GROUP, (group: string) => {
+      if (isString(group)) {
+        this.group = group;
+      }
+    });
+
+    this.mediator.on(userRepositoryEventEnum.CLEAR_USER_GROUP, () => {
+      this.group = "";
+    });
 
     // BINDINGS
     this.collection = this.collection.bind(this);
@@ -61,17 +72,6 @@ export class Service<T> implements IService<T> {
     this.put = this.put.bind(this);
     this.del = this.del.bind(this);
     this.fetch = this.fetch.bind(this);
-
-    // SUBSCRIPTIONS
-    this.mediator.on(userRepositoryEventEnum.SET_USER_GROUP, (group: string) => {
-      if (isString(group)) {
-        this.group = group;
-      }
-    });
-
-    this.mediator.on(userRepositoryEventEnum.CLEAR_USER_GROUP, () => {
-      this.group = "";
-    });
   }
 
   public async collection(): Promise<T[] | void> {
@@ -185,7 +185,8 @@ export class Service<T> implements IService<T> {
         })
         .catch((error) => {
           console.error(error);
-          reject(error);
+
+          reject();
         });
     });
   }

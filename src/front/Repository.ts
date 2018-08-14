@@ -1,43 +1,43 @@
 import { computed, observable, ObservableMap, runInAction } from "mobx";
 import { wsEventEnum } from "../enums/wsEventEnum";
+import { IPersist } from "../interface";
 import { EventEmitter } from "../isomorphic/EventEmitter";
-import { isArray, isString } from "../utils/isType";
+import { isArray, isObject } from "../utils/isType";
 import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
 import { IService } from "./interfaces/IService";
 import { IWSClient } from "./interfaces/IWSClient";
 
-export class Repository<T extends { id: string | void }, S extends IService<T>> extends EventEmitter
-  implements IRepository<T> {
-  @observable protected loading: boolean;
-  @observable protected wasInit: boolean;
+export class Repository<
+  T extends IPersist,
+  S extends IService<T>,
+  WS extends IWSClient = IWSClient,
+  ME extends IMediator = IMediator
+> extends EventEmitter implements IRepository<T> {
+  @observable public isInit: boolean;
+  @observable public isLoading: boolean;
+
   @observable protected collection: ObservableMap<string, T>;
 
   protected Persist: { new (data?: any): T };
   protected service: S;
-  protected wsClient: IWSClient;
+  protected ws: WS;
   protected channelName: string;
-  protected mediator: IMediator;
+  protected mediator: ME;
 
-  constructor(
-    Persist: { new (data?: any): T },
-    service: S,
-    wsClient: IWSClient,
-    channelName: string,
-    mediator: IMediator,
-  ) {
+  constructor(Persist: { new (data?: any): T }, service: S, ws: WS, channelName: string, mediator: ME) {
     super();
 
     // DEPS
     this.Persist = Persist;
     this.service = service;
-    this.wsClient = wsClient;
+    this.ws = ws;
     this.channelName = channelName;
     this.mediator = mediator;
 
     // INIT
-    this.wasInit = false;
-    this.loading = false;
+    this.isInit = false;
+    this.isLoading = false;
     this.collection = observable.map();
 
     // BINDINGS
@@ -51,18 +51,8 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
     this.handleCancelAssigment = this.handleCancelAssigment.bind(this);
 
     // SUBSCRIPTIONS
-    this.wsClient.on(wsEventEnum.ASSIGMENT, this.handleAssigment);
-    this.wsClient.on(wsEventEnum.CANCEL_ASSIGMENT, this.handleCancelAssigment);
-  }
-
-  @computed({ name: "[ REPOSITORY ][ IS_INIT ]" })
-  get isInit(): boolean {
-    return this.wasInit;
-  }
-
-  @computed({ name: "[ REPOSITORY ][ IS_LOADING ]" })
-  get isLoading(): boolean {
-    return this.loading;
+    this.ws.on(wsEventEnum.ASSIGMENT, this.handleAssigment);
+    this.ws.on(wsEventEnum.CANCEL_ASSIGMENT, this.handleCancelAssigment);
   }
 
   @computed({ name: "[ REPOSITORY ][ MAP ]" })
@@ -93,32 +83,26 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
   public async init(): Promise<void> {
     if (!this.isInit) {
       try {
-        console.time(`[ ${this.constructor.name}  ][ INIT ]`);
-
         this.startLoad();
 
         const collection: T[] | void = await this.service.collection();
 
         if (isArray(collection)) {
-          runInAction(`[ REPOSITORY ][ INIT ][ ${this.constructor.name} ][ SUCCESS ]`, () => {
-            this.collection = collection.reduce<ObservableMap<string, T>>((preValue, item: T) => {
-              if (isString(item.id)) {
-                preValue.set(item.id, item);
-              }
+          runInAction(`[ ${this.constructor.name} ][ INIT ][ SUCCESS ]`, () => {
+            this.collection = collection.reduce<ObservableMap<string, T>>(
+              (preValue, item: T) => preValue.set(item.id, item),
+              observable.map(),
+            );
 
-              return preValue;
-            }, observable.map());
-
-            this.wasInit = true;
+            this.isInit = true;
           });
+        } else {
+          throw new Error(`collection: ${Object.prototype.toString.call(collection)}`);
         }
-
-        console.timeEnd(`[ ${this.constructor.name}  ][ INIT ]`);
       } catch (error) {
-        console.error(`[ REPOSITORY ][ INIT ][ ${this.constructor.name} ][ ERROR ]`);
-        console.error(error);
+        console.error(`[ ${this.constructor.name} ][ INIT ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-        return Promise.reject(error);
+        return Promise.reject();
       } finally {
         this.endLoad();
       }
@@ -128,108 +112,90 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
   public async create(data: object): Promise<T | void> {
     if (this.isInit) {
       try {
-        console.time(`[ ${this.constructor.name} ][ CREATE ]`);
-
         this.startLoad();
 
         const item: T | void = await this.service.create(data);
 
         if (item) {
           runInAction(`[ ${this.constructor.name} ][ CREATE ][ SUCCESS ]`, () => {
-            if (isString(item.id)) {
-              this.collection.set(item.id, item);
-            } else {
-              console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR ]`);
-              console.error(item);
-            }
+            this.collection.set(item.id, item);
           });
+        } else {
+          throw new Error(`item: ${Object.prototype.toString.call(item)}`);
         }
-
-        console.timeEnd(`[ ${this.constructor.name}  ][ CREATE ]`);
 
         return item;
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR ]`);
-        console.error(error);
+        console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-        return Promise.reject(error);
+        return Promise.reject();
       } finally {
         this.endLoad();
       }
     } else {
-      throw new Error(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ create ]`);
+      console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+
+      return Promise.reject();
     }
   }
 
   public async update(data: object): Promise<T | void> {
     if (this.isInit) {
       try {
-        console.time(`[ ${this.constructor.name}  ][ UPDATE ]`);
-
         this.startLoad();
 
         const item: T | void = await this.service.update(data);
 
         if (item) {
           runInAction(`[ ${this.constructor.name} ][ UPDATE ][ SUCCESS ]`, () => {
-            if (isString(item.id)) {
-              this.collection.set(item.id, item);
-            } else {
-              console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR ]`);
-              console.error(item);
-            }
+            this.collection.set(item.id, item);
           });
+        } else {
+          throw new Error(`item: ${Object.prototype.toString.call(item)}`);
         }
-
-        console.timeEnd(`[ ${this.constructor.name}  ][ UPDATE ]`);
 
         return item;
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR ]`);
-        console.error(error);
+        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-        return Promise.reject(error);
+        return Promise.reject();
       } finally {
         this.endLoad();
       }
     } else {
-      throw new Error(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ update ]`);
+      console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+
+      return Promise.reject();
     }
   }
 
   public async remove(id: string): Promise<T | void> {
     if (this.isInit) {
       try {
-        console.time(`[ ${this.constructor.name}  ][ REMOVE ]`);
-
         this.startLoad();
 
         const item: T | void = await this.service.remove(id);
 
         if (item) {
           runInAction(`[ ${this.constructor.name} ][ REMOVE ][ SUCCESS ]`, () => {
-            if (isString(item.id)) {
-              this.collection.delete(item.id);
-            } else {
-              console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR ]`);
-              console.error(item);
-            }
+            this.collection.delete(item.id);
           });
+        } else {
+          throw new Error(`item: ${Object.prototype.toString.call(item)}`);
         }
-
-        console.timeEnd(`[ ${this.constructor.name}  ][ REMOVE ]`);
 
         return item;
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR ]`);
-        console.error(error);
+        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-        return Promise.reject(error);
+        return Promise.reject();
       } finally {
         this.endLoad();
       }
     } else {
-      throw new Error(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ remove ]`);
+      console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+
+      return Promise.reject();
     }
   }
 
@@ -239,63 +205,69 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
         console.log(`[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]`, [channelName, payload]);
 
         if (this.channelName === channelName) {
-          if (payload.create) {
+          if (isObject(payload.create)) {
             const item: T = new this.Persist(payload.create);
 
-            if (isString(item.id)) {
-              this.collection.set(item.id, item);
-            } else {
-              console.error(`[ ${this.constructor.name} ][ CREATE_MESSAGE ][ ERROR ]`, item);
-            }
-
-            return item;
+            this.collection.set(item.id, item);
           }
 
-          if (payload.update) {
+          if (isArray(payload.bulkCreate)) {
+            for (const create of payload.bulkCreate) {
+              const item: T = new this.Persist(create);
+
+              this.collection.set(item.id, item);
+            }
+          }
+
+          if (isObject(payload.update)) {
             const item: T = new this.Persist(payload.update);
 
-            if (isString(item.id)) {
-              this.collection.set(item.id, item);
-            } else {
-              console.error(`[ ${this.constructor.name} ][ UPDATE_MESSAGE ][ ERROR ]`, item);
-            }
-
-            return item;
+            this.collection.set(item.id, item);
           }
 
-          if (payload.remove) {
-            const item: T | void = this.collection.get(payload.remove.id);
+          if (isArray(payload.bulkUpdate)) {
+            for (const update of payload.bulkUpdate) {
+              const item: T = new this.Persist(update);
 
+              this.collection.set(item.id, item);
+            }
+          }
+
+          if (isObject(payload.remove)) {
             this.collection.delete(payload.remove.id);
-
-            return item;
           }
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ERROR ]`, [channelName, payload]);
-        console.error(error);
+        console.error(
+          `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ERROR_MESSAGE: ${error.message ||
+            error} ][ PAYLOAD: ${JSON.stringify([channelName, payload])} ]`,
+        );
+
+        return Promise.reject();
       }
     } else {
-      console.warn(`[ ${this.constructor.name} ][ IS_NOT_INIT ][ receiveMessage ]`);
+      console.error(`[ ${this.constructor.name} ][ RESEIVE_MESSAGE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+
+      return Promise.reject();
     }
   }
 
   protected startLoad() {
     runInAction(`[ ${this.constructor.name} ][ START_LODING ]`, () => {
-      this.loading = true;
+      this.isLoading = true;
     });
   }
 
   protected endLoad() {
     runInAction(`[ ${this.constructor.name} ][ END_LODING ]`, () => {
-      this.loading = false;
+      this.isLoading = false;
     });
   }
 
   protected destroy(): void {
     runInAction(`[ ${this.constructor.name} ][ DESTROY ]`, () => {
-      this.wasInit = false;
-      this.loading = false;
+      this.isInit = false;
+      this.isLoading = false;
       this.collection.clear();
     });
   }
@@ -304,33 +276,31 @@ export class Repository<T extends { id: string | void }, S extends IService<T>> 
     try {
       this.service.onChannel();
 
-      if (!this.wsClient.has(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage)) {
-        this.wsClient.on(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage);
+      if (!this.ws.has(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage)) {
+        this.ws.on(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage);
       }
 
       console.log(`[ ${this.constructor.name} ][ ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-      return Promise.reject(error);
+      return Promise.reject();
     }
   }
 
   private handleCancelAssigment() {
     try {
-      if (this.wsClient.has(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage)) {
-        this.wsClient.off(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage);
+      if (this.ws.has(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage)) {
+        this.ws.off(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage);
       }
 
       this.destroy();
 
       console.log(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR ]`);
-      console.error(error);
+      console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR_MESSAGE: ${error.message || error} ]`);
 
-      return Promise.reject(error);
+      return Promise.reject();
     }
   }
 }

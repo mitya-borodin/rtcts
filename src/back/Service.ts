@@ -5,7 +5,7 @@ import { IPersist } from "../interfaces/IPersist";
 import { IChannels } from "./interfaces/IChannels";
 import { IModel } from "./interfaces/IModel";
 
-export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInsert, C extends IChannels> {
+export class Service<M extends IModel<P>, P extends IPersist, I extends IInsert, C extends IChannels> {
   protected readonly name: string;
   protected readonly router: express.Router;
   protected readonly Insert: { new (data: any): I };
@@ -66,7 +66,9 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
 
             res.status(200).json(collection.map((item) => item.toJS()));
           } catch (error) {
-            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
           res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -94,7 +96,9 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
                 .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.query.id} ]`);
             }
           } catch (error) {
-            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
           res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -123,7 +127,9 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             }
           } catch (error) {
             console.error(error);
-            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
           res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -154,7 +160,9 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
             }
           } catch (error) {
             console.error(error);
-            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
           res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -183,7 +191,9 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
                 .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
             }
           } catch (error) {
-            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
           res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -215,7 +225,9 @@ export class Service<M extends IModel<P, I>, P extends IPersist, I extends IInse
               res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ UNEXPECTED_ACTION: ${action} ]`);
             }
           } catch (error) {
-            res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR: ${error.message || error} ]`);
+            res
+              .status(500)
+              .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
           }
         } else {
           res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);

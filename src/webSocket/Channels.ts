@@ -4,18 +4,19 @@ import { IConnection } from "../back/interfaces/IConnection";
 import { Connection } from "./Connection";
 import { makeMessage } from "./helpers";
 
-export class Channels implements IChannels {
+export class Channels<C extends IConnection = IConnection> implements IChannels<C> {
   // Map<connectionID: string, Connection>
-  private connections: Map<string, IConnection>;
+  private connections: Map<string, C>;
   // Map<channelName: string, Map<connectionID: string, Connection>>
-  private channels: Map<string, Map<string, IConnection>>;
+  private channels: Map<string, Map<string, C>>;
 
   constructor() {
+    // INIT
     this.connections = new Map();
     this.channels = new Map();
   }
 
-  public addConnection(a_connection: IConnection): void {
+  public addConnection(a_connection: C): void {
     const id = a_connection.getConnectionID();
     const connection = this.connections.get(id);
 
@@ -31,7 +32,7 @@ export class Channels implements IChannels {
     }
   }
 
-  public deleteConnection(a_connection: IConnection): void {
+  public deleteConnection(a_connection: C): void {
     const id = a_connection.getConnectionID();
     const connection = this.connections.get(id);
 

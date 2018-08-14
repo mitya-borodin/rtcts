@@ -75,13 +75,14 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
   @action("[ USER_REPOSITORY ][ INIT ]")
   public async init(): Promise<void> {
-    if (!this.wasInit) {
+    if (!this.isInit) {
       try {
         if (this.isToken) {
           await this.getCurrentUser(); // Загрузка текущего пользователя;
           await super.init(); // Загрузка коллекции;
+
           runInAction("[ USER_REPOSITORY ][ WAS_INIT ]", () => {
-            this.wasInit = true;
+            this.isInit = true;
           });
         } else {
           this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
@@ -146,8 +147,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         try {
           this.mediator.once(userRepositoryEventEnum.LOGOUT, () => {
             setTimeout(async () => {
-              if (this.wsClient.isAssigment) {
-                await this.wsClient.cancelAssigmentToUserOfTheConnection();
+              if (this.ws.isAssigment) {
+                await this.ws.cancelAssigmentToUserOfTheConnection();
               }
 
               this.destroy();
@@ -364,14 +365,14 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
               this.mediator.emit(userRepositoryEventEnum.SET_USER_GROUP, observableUser.group);
             }
 
-            this.wsClient.setUserID(this.currentUserID);
+            this.ws.setUserID(this.currentUserID);
 
-            if (!this.wsClient.isOpen) {
-              await this.wsClient.connect();
+            if (!this.ws.isOpen) {
+              await this.ws.connect();
             }
 
-            if (!this.wsClient.isAssigment) {
-              await this.wsClient.assigmentToUserOfTheConnection();
+            if (!this.ws.isAssigment) {
+              await this.ws.assigmentToUserOfTheConnection();
             }
 
             this.mediator.emit(userRepositoryEventEnum.LOGIN);
