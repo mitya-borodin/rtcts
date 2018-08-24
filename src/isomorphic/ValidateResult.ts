@@ -1,4 +1,5 @@
 import { ILog } from "../interfaces/ILog";
+import { ILogType } from "../interfaces/ILogType";
 import { IValidate, IValidateResult } from "../interfaces/IValidate";
 import { Log } from "./Log";
 
@@ -35,7 +36,7 @@ export class Validate extends Log implements IValidate {
   public readonly field: string;
   public readonly title?: string;
 
-  constructor(data: IValidate) {
+  constructor(data: { field: string; title?: string; type: ILogType; message: string }) {
     super(data);
 
     this.field = data.field;
