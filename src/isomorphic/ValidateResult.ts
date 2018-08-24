@@ -1,6 +1,6 @@
 import { ILog } from "../interfaces/ILog";
-import { ILogType } from "../interfaces/ILogType";
 import { IValidate, IValidateResult } from "../interfaces/IValidate";
+import { Log } from "./Log";
 
 export class ValidateResult<V extends IValidate = IValidate> implements IValidateResult<V> {
   public readonly results: V[];
@@ -27,17 +27,6 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
 
   public hasFieldError(a_field: string): boolean {
     return !!this.getFieldValidation(a_field);
-  }
-}
-
-// tslint:disable-next-line:max-classes-per-file
-export class Log implements ILog {
-  public readonly type: ILogType;
-  public readonly message: string;
-
-  constructor(data: ILog) {
-    this.type = data.type;
-    this.message = data.message;
   }
 }
 
