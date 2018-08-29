@@ -42,12 +42,15 @@
   "devDependencies": {
     "@types/bson": "1.0.10",
     "@types/chai": "4.1.4",
+    "@types/history": "4.6.2",
+    "@types/hoist-non-react-statics": "3.0.1",
     "@types/mocha": "5.2.4",
     "@types/mongodb": "3.1.1",
     "@types/node": "10.5.2",
     "@types/passport": "0.4.1",
     "@types/passport-jwt": "3.0.1",
     "@types/prop-types": "15.5.3",
+    "@types/querystringify": "2.0.0",
     "@types/react": "16.4.6",
     "@types/uuid": "3.4.3",
     "@types/ws": "5.1.2",
@@ -93,7 +96,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@types/history": "4.6.2",
-    "history": "4.7.2"
+    "history": "4.7.2",
+    "hoist-non-react-statics": "3.0.1",
+    "mobx-react": "5.2.5",
+    "querystringify": "2.0.0"
   }
 }
