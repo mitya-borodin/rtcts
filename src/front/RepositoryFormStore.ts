@@ -12,25 +12,25 @@ import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
 
 export class RepositoryFormStore<
-  P extends IPersist,
-  I extends IInsert,
-  F extends IForm,
-  C,
-  REP extends IRepository<P> = IRepository<P>,
+  PERSIST extends IPersist,
+  INSERT extends IInsert,
+  FORM extends IForm,
+  CHANGE,
+  REP extends IRepository<PERSIST> = IRepository<PERSIST>,
   ME extends IMediator = IMediator,
   USER extends IUser & IPersist = IUser & IPersist
-> implements IRepositoryFormStore<F, C> {
+> implements IRepositoryFormStore<FORM, CHANGE> {
   // PUBLIC_PROPS
-  @observable public form: F | void;
+  @observable public form: FORM | void;
   @observable public isNew: boolean;
   @observable public isEdit: boolean;
   @observable public showAlerts: boolean;
   @observable public isValid: boolean;
 
   // DEPS
-  protected readonly Persist: { new (...args: any[]): P };
-  protected readonly Insert: { new (...args: any[]): I };
-  protected readonly Form: { new (...args: any[]): F };
+  protected readonly Persist: { new (...args: any[]): PERSIST };
+  protected readonly Insert: { new (...args: any[]): INSERT };
+  protected readonly Form: { new (...args: any[]): FORM };
   protected readonly repository: REP;
   protected readonly ACL: {
     save: string[];
@@ -40,12 +40,12 @@ export class RepositoryFormStore<
 
   // PROPS
   protected user: USER | void;
-  private group: string;
+  protected group: string;
 
   constructor(
-    Persist: { new (...args: any[]): P },
-    Insert: { new (...args: any[]): I },
-    Form: { new (...args: any[]): F },
+    Persist: { new (...args: any[]): PERSIST },
+    Insert: { new (...args: any[]): INSERT },
+    Form: { new (...args: any[]): FORM },
     repository: REP,
     ACL: {
       save: string[];
@@ -132,7 +132,7 @@ export class RepositoryFormStore<
     }
   }
 
-  public async change(change: C): Promise<void> {
+  public async change(change: CHANGE): Promise<void> {
     if (this.form instanceof this.Form) {
       this.form = this.changeAssign(this.form, change);
 
@@ -147,6 +147,7 @@ export class RepositoryFormStore<
   public async save(): Promise<void> {
     if (this.ACL.save.includes(this.group)) {
       if (this.isValid) {
+        this.showAlerts = false;
         if (this.form instanceof this.Form) {
           if (isString(this.form.id)) {
             const persist = new this.Persist(this.form.toJS());
@@ -161,6 +162,8 @@ export class RepositoryFormStore<
           console.error(`[ ${this.constructor.name} ][ FORM IS NOT INSTANCEOF ${this.Form.name} ]`);
         }
       } else {
+        this.showAlerts = true;
+
         console.error(`[ ${this.constructor.name} ][ FORM IS NOT CORRECTLY FILLED IN ]`);
       }
     } else {
@@ -172,11 +175,11 @@ export class RepositoryFormStore<
     this.form = undefined;
     this.isNew = false;
     this.isEdit = false;
-    this.isEdit = false;
+    this.showAlerts = false;
     this.isValid = false;
   }
 
-  protected openAssign(persist?: P): F {
+  protected openAssign(persist?: PERSIST): FORM {
     if (persist instanceof this.Persist) {
       return new this.Form(persist.toJS());
     }
@@ -184,7 +187,7 @@ export class RepositoryFormStore<
     return new this.Form();
   }
 
-  protected changeAssign(form: F, change: C): F {
+  protected changeAssign(form: FORM, change: CHANGE): FORM {
     console.log(change);
     return form;
   }
