@@ -1,29 +1,29 @@
-export function isString(test: any): test is string {
+export function isString<T = string>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object String]";
 }
 
-export function isNumber(test: any): test is number {
+export function isNumber<T = number>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Number]" && !Number.isNaN(test);
 }
 
-export function isBoolean(test: any): test is boolean {
+export function isBoolean<T = boolean>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Boolean]";
 }
 
-export function isUndefined(test: any): test is undefined | void {
+export function isUndefined<T = undefined | void>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Undefined]";
 }
 
-export function isObject(test: any): test is object {
+export function isObject<T = object>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Object]";
 }
 
 // tslint:disable-next-line:ban-types
-export function isFunction(test: any): test is Function {
+export function isFunction<T = Function>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Function]";
 }
 
-export function isDate(test: any): test is Date {
+export function isDate<T = Date>(test: any): test is T {
   const date = new Date(test);
 
   return date.toString() !== "Invalid Date" && test !== null;
