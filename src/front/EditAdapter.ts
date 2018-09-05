@@ -5,7 +5,7 @@ import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
 import { IValidateResult } from "../interfaces/IValidate";
 import { ValidateResult } from "../isomorphic/ValidateResult";
-import { isString } from "../utils/isType";
+import { isString, isUndefined } from "../utils/isType";
 import { IEditAdapter } from "./interfaces/IEditAdapter";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
@@ -14,26 +14,26 @@ import { IUIStore } from "./interfaces/IUIStore";
 export class EditAdapter<
   P extends IPersist,
   F extends IForm,
-  C,
-  FS extends IRepositoryFormStore<F, C>,
+  CHANGE,
+  FS extends IRepositoryFormStore<F, CHANGE>,
   UIS extends IUIStore<U>,
-  R extends IRepository<P>,
+  REP extends IRepository<P>,
   U extends IForm,
   H extends History = History
-> implements IEditAdapter<U, C> {
+> implements IEditAdapter<U, CHANGE> {
   // PROPS
   @observable public isLoading: boolean = false;
   @observable public showAlerts: boolean = false;
   public shockDelay: number;
 
   // DEPS
-  protected repository: R;
+  protected repository: REP;
   protected formStore: FS;
   protected UIStore: UIS;
   protected UIClass: { new (data?: any): U };
   protected history: H;
 
-  constructor(repository: R, formStore: FS, UIStore: UIS, UIClass: { new (data: any): U }, history: H) {
+  constructor(repository: REP, formStore: FS, UIStore: UIS, UIClass: { new (data: any): U }, history: H) {
     // DEPS
     this.repository = repository;
     this.formStore = formStore;
@@ -55,6 +55,11 @@ export class EditAdapter<
   @computed
   get isInit(): boolean {
     return this.repository.isInit;
+  }
+
+  @computed
+  get isOpen(): boolean {
+    return !isUndefined(this.formStore.form);
   }
 
   @computed
@@ -98,7 +103,7 @@ export class EditAdapter<
     }
   }
 
-  public onChange(change: C): void {
+  public onChange(change: CHANGE): void {
     this.formStore.change(change);
   }
 
