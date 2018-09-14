@@ -26,6 +26,16 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
     return this.results.find(({ field }) => a_field === field);
   }
 
+  public getFieldMessage(a_field: string): string {
+    const v = this.getFieldValidation(a_field);
+
+    if (v instanceof Validate) {
+      return v.message;
+    }
+
+    return "";
+  }
+
   public hasFieldError(a_field: string): boolean {
     return !!this.getFieldValidation(a_field);
   }

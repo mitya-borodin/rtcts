@@ -5,13 +5,7 @@ import { IService } from "./interfaces/IService";
 import { IWSClient } from "./interfaces/IWSClient";
 
 export class Service<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator> implements IService<T> {
-  protected name: string;
-  protected Class: { new (data?: any): T };
-  protected ws: WS;
-  protected root: string;
-  protected channelName: string;
-  protected group: string;
-  protected ACL: {
+  public readonly ACL: {
     collection: string[];
     model: string[];
     create: string[];
@@ -20,6 +14,13 @@ export class Service<T, WS extends IWSClient = IWSClient, ME extends IMediator =
     onChannel: string[];
     offChannel: string[];
   };
+  public group: string;
+
+  protected name: string;
+  protected Class: { new (data?: any): T };
+  protected ws: WS;
+  protected root: string;
+  protected channelName: string;
   protected mediator: ME;
 
   constructor(

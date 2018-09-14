@@ -8,7 +8,7 @@ import { Service } from "./Service";
 export class UserService<U extends IUser & IPersist, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
   extends Service<U, WS>
   implements IUserService<U> {
-  protected ACL: {
+  public ACL: {
     collection: string[];
     model: string[];
     create: string[];
