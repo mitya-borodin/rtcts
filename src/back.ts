@@ -8,6 +8,8 @@ export { IModel } from "./back/interfaces/IModel";
 export { IRepository } from "./back/interfaces/IRepository";
 export { IAuthStrategy } from "./back/interfaces/IAuthStrategy";
 export { IAPPServer } from "./back/interfaces/IAPPServer";
+export { IMigrationController } from "./back/interfaces/IMigrationController";
+export { IMigration } from "./back/interfaces/IMigration";
 
 // CLASSES
 export { toMongo } from "./back/toMongo";
@@ -20,3 +22,4 @@ export { MongoDBRepository } from "./back/MongoDBRepository";
 export { UserModel } from "./back/UserModel";
 export { Service } from "./back/Service";
 export { UserService } from "./back/UserService";
+export { MigrationController } from "./back/MigrationController";
