@@ -23,3 +23,4 @@ export { UserModel } from "./back/UserModel";
 export { Service } from "./back/Service";
 export { UserService } from "./back/UserService";
 export { MigrationController } from "./back/MigrationController";
+export { Migration } from "./back/Migration";

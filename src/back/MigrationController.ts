@@ -71,10 +71,6 @@ export class MigrationController implements IMigrationController {
 
     const version = Number(req.body.version);
 
-    console.log(this.secret);
-    console.log(this.secret === secret);
-    console.log({ name, version, secret });
-
     if (isNumber(version)) {
       if (this.secret === secret) {
         try {
@@ -90,7 +86,7 @@ export class MigrationController implements IMigrationController {
             }
 
             if (version > curVersion) {
-              list = list.filter((m) => m.version > version);
+              list = list.filter((m) => m.version >= version);
 
               if (list.length > 0) {
                 try {
@@ -98,7 +94,20 @@ export class MigrationController implements IMigrationController {
                     await m.forward();
                   }
 
-                  collection.findOneAndUpdate({ name }, { name, version, date: new Date() });
+                  await collection.findOneAndUpdate(
+                    { name },
+                    { $set: { name, version, date: new Date() } },
+                    { upsert: true },
+                  );
+
+                  res
+                    .status(200)
+                    .send(
+                      `[ MIGRATION_DONE ] \n` +
+                        `[ NAME: ${name} ] \n` +
+                        `[ TARGET_VERSION: ${version}, CURRENT_VERSION: ${curVersion} ] \n` +
+                        `[ DATE: ${moment().format("YYYY-MM-DD HH:mm:ss ZZ")} ]`,
+                    );
                 } catch (error) {
                   res
                     .status(500)
@@ -123,7 +132,7 @@ export class MigrationController implements IMigrationController {
             }
 
             if (version < curVersion) {
-              list = list.filter((m) => m.version < version);
+              list = list.filter((m) => m.version - 1 <= version);
 
               if (list.length > 0) {
                 try {
@@ -131,7 +140,20 @@ export class MigrationController implements IMigrationController {
                     await m.rollBack();
                   }
 
-                  collection.findOneAndUpdate({ name }, { name, version, date: new Date() });
+                  await collection.findOneAndUpdate(
+                    { name },
+                    { $set: { name, version, date: new Date() } },
+                    { upsert: true },
+                  );
+
+                  res
+                    .status(200)
+                    .send(
+                      `[ ROLLBACK_DONE ] \n` +
+                        `[ NAME: ${name} ] \n` +
+                        `[ TARGET_VERSION: ${version}, CURRENT_VERSION: ${curVersion} ] \n` +
+                        `[ DATE: ${moment().format("YYYY-MM-DD HH:mm:ss ZZ")} ]`,
+                    );
                 } catch (error) {
                   res
                     .status(500)
@@ -154,8 +176,6 @@ export class MigrationController implements IMigrationController {
                   );
               }
             }
-
-            console.log({ version, curVersion }, version === curVersion);
 
             if (version === curVersion) {
               res
