@@ -4,23 +4,19 @@ import * as qs from "querystringify";
 import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
 import { IValidateResult } from "../interfaces/IValidate";
-import { ValidateResult } from "../isomorphic/ValidateResult";
 import { isString, isUndefined } from "../utils/isType";
 import { IEditAdapter } from "./interfaces/IEditAdapter";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
-import { IUIStore } from "./interfaces/IUIStore";
 
 export class EditAdapter<
   P extends IPersist,
   F extends IForm,
   CHANGE,
   FS extends IRepositoryFormStore<F, CHANGE>,
-  UIS extends IUIStore<U>,
   REP extends IRepository<P>,
-  U extends IForm,
   H extends History = History
-> implements IEditAdapter<U, CHANGE> {
+> implements IEditAdapter<CHANGE> {
   // PROPS
   @observable public isLoading: boolean = false;
   @observable public showAlerts: boolean = false;
@@ -29,16 +25,12 @@ export class EditAdapter<
   // DEPS
   protected repository: REP;
   protected formStore: FS;
-  protected UIStore: UIS;
-  protected UIClass: { new (data?: any): U };
   protected history: H;
 
-  constructor(repository: REP, formStore: FS, UIStore: UIS, UIClass: { new (data: any): U }, history: H) {
+  constructor(repository: REP, formStore: FS, history: H) {
     // DEPS
     this.repository = repository;
     this.formStore = formStore;
-    this.UIStore = UIStore;
-    this.UIClass = UIClass;
     this.history = history;
 
     // PROPS
@@ -46,7 +38,7 @@ export class EditAdapter<
 
     // BINDS
     this.onDidMount = this.onDidMount.bind(this);
-    this.onChange = this.onChange.bind(this);
+    this.change = this.change.bind(this);
     this.save = this.save.bind(this);
     this.remove = this.remove.bind(this);
     this.cancel = this.cancel.bind(this);
@@ -70,25 +62,8 @@ export class EditAdapter<
   }
 
   @computed
-  get UI(): U {
-    const UI = this.UIStore.UI;
-
-    if (UI instanceof this.UIClass) {
-      return UI;
-    }
-
-    return new this.UIClass();
-  }
-
-  @computed
   get validate(): IValidateResult {
-    const UI = this.UIStore.UI;
-
-    if (UI instanceof this.UIClass) {
-      return UI.validate();
-    }
-
-    return new ValidateResult([]);
+    return this.formStore.validate;
   }
 
   public async onDidMount() {
@@ -103,7 +78,7 @@ export class EditAdapter<
     }
   }
 
-  public onChange(change: CHANGE): void {
+  public change(change: CHANGE): void {
     this.formStore.change(change);
   }
 
