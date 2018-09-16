@@ -1,4 +1,4 @@
-export interface IAdapter {
+export interface IComposition {
   isInit: boolean;
   isLoading: boolean;
 }

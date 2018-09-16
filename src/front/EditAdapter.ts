@@ -5,7 +5,7 @@ import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
 import { IValidateResult } from "../interfaces/IValidate";
 import { isString, isUndefined } from "../utils/isType";
-import { IEditAdapter } from "./interfaces/IEditAdapter";
+import { IEditComposition } from "./interfaces/IEditComposition";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
 
@@ -16,7 +16,7 @@ export class EditAdapter<
   FS extends IRepositoryFormStore<F, CHANGE>,
   REP extends IRepository<P>,
   H extends History = History
-> implements IEditAdapter<CHANGE> {
+> implements IEditComposition<CHANGE> {
   // PROPS
   @observable public isLoading: boolean = false;
   @observable public showAlerts: boolean = false;
@@ -68,14 +68,6 @@ export class EditAdapter<
 
   public async onDidMount() {
     await this.repository.init();
-
-    const { id }: any = qs.parse(this.history.location.search);
-
-    if (isString(id)) {
-      this.formStore.open(id);
-    } else {
-      this.formStore.open();
-    }
   }
 
   public change(change: CHANGE): void {

@@ -1,8 +1,8 @@
 import { computed } from "mobx";
-import { IListAdapter } from "./interfaces/IListAdapter";
+import { IListComposition } from "./interfaces/IListComposition";
 import { IRepository } from "./interfaces/IRepository";
 
-export class ListAdapter<T, R extends IRepository<T> = IRepository<T>> implements IListAdapter<T> {
+export class ListAdapter<T, R extends IRepository<T> = IRepository<T>> implements IListComposition<T> {
   protected repository: R;
 
   constructor(repository: R) {
