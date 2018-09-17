@@ -4,5 +4,5 @@ import { IValidateResult } from "./IValidate";
 export interface IForm<VR extends IValidateResult = IValidateResult> extends IInsert {
   id: string | void;
 
-  validate(): VR;
+  validate(a_status?: string): VR;
 }

@@ -27,9 +27,9 @@ import { IValidateResult } from "../../interfaces/IValidate";
  */
 
 export interface IFormStore<F, C> {
-  form: F | void;
   isValid: boolean;
   showAlerts: boolean;
+  form: F | void;
 
   validate: IValidateResult;
 

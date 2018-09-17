@@ -21,11 +21,9 @@ export class RepositoryFormStore<
   USER extends IUser & IPersist = IUser & IPersist
 > implements IRepositoryFormStore<FORM, CHANGE> {
   // PUBLIC_PROPS
+  @observable public isValid: boolean = false;
+  @observable public showAlerts: boolean = false;
   @observable public form: FORM | void;
-  @observable public isNew: boolean;
-  @observable public isEdit: boolean;
-  @observable public showAlerts: boolean;
-  @observable public isValid: boolean;
 
   // DEPS
   protected readonly Persist: { new (...args: any[]): PERSIST };
@@ -172,11 +170,9 @@ export class RepositoryFormStore<
   }
 
   public cancel(): void {
-    this.form = undefined;
-    this.isNew = false;
-    this.isEdit = false;
-    this.showAlerts = false;
     this.isValid = false;
+    this.showAlerts = false;
+    this.form = undefined;
   }
 
   protected openAssign(persist?: PERSIST): FORM {
