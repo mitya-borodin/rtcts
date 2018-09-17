@@ -4,7 +4,7 @@ import { IForm } from "../interfaces/IForm";
 import { IInsert } from "../interfaces/IInsert";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
-import { IValidateResult } from "../interfaces/IValidate";
+import { IValidateResult } from "../interfaces/IValidateResult";
 import { ValidateResult } from "../isomorphic/ValidateResult";
 import { isString } from "../utils/isType";
 import { IMediator } from "./interfaces/IMediator";

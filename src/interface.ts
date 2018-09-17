@@ -3,6 +3,7 @@ export { IInsert } from "./interfaces/IInsert";
 export { IForm } from "./interfaces/IForm";
 export { IUser } from "./interfaces/IUser";
 export { IUserGroup } from "./interfaces/IUserGroup";
-export { IValidateResult, IValidate } from "./interfaces/IValidate";
+export { IValidate } from "./interfaces/IValidate";
+export { IValidateResult } from "./interfaces/IValidateResult";
 export { ILog } from "./interfaces/ILog";
 export { ILogType } from "./interfaces/ILogType";

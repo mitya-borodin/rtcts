@@ -1,4 +1,4 @@
-import { IValidateResult } from "../../interfaces/IValidate";
+import { IValidateResult } from "../../interfaces/IValidateResult";
 import { IComposition } from "./IComposition";
 
 export interface IEditComposition<CHANGE> extends IComposition {

@@ -3,7 +3,7 @@ import { action, computed, observable } from "mobx";
 import * as qs from "querystringify";
 import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
-import { IValidateResult } from "../interfaces/IValidate";
+import { IValidateResult } from "../interfaces/IValidateResult";
 import { isString, isUndefined } from "../utils/isType";
 import { IEditComposition } from "./interfaces/IEditComposition";
 import { IRepository } from "./interfaces/IRepository";
