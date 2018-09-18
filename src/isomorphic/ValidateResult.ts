@@ -74,6 +74,8 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
         value: log,
       },
     });
+
+    Object.freeze(this);
   }
 
   public getFieldValidation(a_field: string): V | void {

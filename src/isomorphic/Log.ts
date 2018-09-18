@@ -20,8 +20,6 @@ export class Log implements ILog {
         throw new Error(`[ ${this.constructor.name} ][ message ][ MUST_BE_A_STRING ]`);
       }
     }
-
-    Object.freeze(this);
   }
 
   public toJS(): { [key: string]: any } {
