@@ -109,11 +109,12 @@ export class RepositoryFormStore<
     return new ValidateResult([]);
   }
 
-  @action
+  @action("[ REPOSITORY_FORM_STORE ][ SET_IS_VALID ]")
   public setIsValid(isValid: boolean): void {
     this.isValid = isValid;
   }
 
+  @action("[ REPOSITORY_FORM_STORE ][ OPEN ]")
   public open(id?: string): void {
     if (isString(id)) {
       const persist = this.repository.map.get(id);
@@ -121,28 +122,32 @@ export class RepositoryFormStore<
       if (persist instanceof this.Persist) {
         this.form = this.openAssign(persist);
 
-        this.setIsValid(this.form.validate().isValid);
+        this.setIsValid(this.validate.isValid);
       } else {
         console.error(`[ ${this.constructor.name} ][ open ][ ${this.Persist.name} ][ NOT_FOUND ]`);
       }
     } else {
       this.form = this.openAssign();
+
+      this.setIsValid(false);
     }
   }
 
+  @action("[ REPOSITORY_FORM_STORE ][ CHANGE ]")
   public async change(change: CHANGE): Promise<void> {
     if (this.form instanceof this.Form) {
       this.form = this.changeAssign(this.form, change);
 
-      const { isValid }: IValidateResult = this.form.validate();
-
-      this.setIsValid(isValid);
+      this.setIsValid(this.validate.isValid);
     } else {
       console.error(`[ ${this.constructor.name} ][ try change on closed form ]`, this.form, change);
     }
   }
 
+  @action("[ REPOSITORY_FORM_STORE ][ SAVE ]")
   public async save(): Promise<void> {
+    this.setIsValid(this.validate.isValid);
+
     if (this.ACL.save.includes(this.group)) {
       if (this.isValid) {
         this.showAlerts = false;
@@ -169,12 +174,14 @@ export class RepositoryFormStore<
     }
   }
 
+  @action("[ REPOSITORY_FORM_STORE ][ CANCEL ]")
   public cancel(): void {
     this.isValid = false;
     this.showAlerts = false;
     this.form = undefined;
   }
 
+  @action("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ]")
   protected openAssign(persist?: PERSIST): FORM {
     if (persist instanceof this.Persist) {
       return new this.Form(persist.toJS());
@@ -183,6 +190,7 @@ export class RepositoryFormStore<
     return new this.Form();
   }
 
+  @action("[ REPOSITORY_FORM_STORE ][ CHANGE_ASSIGN ]")
   protected changeAssign(form: FORM, change: CHANGE): FORM {
     console.log(change);
     return form;

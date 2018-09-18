@@ -1,29 +1,93 @@
+import { logTypeEnum } from "../enums/logTypeEnum";
 import { ILog } from "../interfaces/ILog";
 import { IValidate } from "../interfaces/IValidate";
 import { IValidateResult } from "../interfaces/IValidateResult";
 import { Validate } from "./Validate";
 
+// tslint:disable:object-literal-sort-keys
 export class ValidateResult<V extends IValidate = IValidate> implements IValidateResult<V> {
   public readonly results: V[];
+  public readonly isValid: boolean;
+  public readonly hasError: boolean;
+  public readonly hasWarn: boolean;
+  public readonly hasLog: boolean;
+  public readonly hasInfo: boolean;
+
+  public readonly messages: string[];
+  public readonly log: ILog[];
+
+  private readonly __CACHE__: { [key: string]: any } = {};
 
   constructor(results: V[]) {
-    this.results = results;
-  }
+    let hasError = false;
+    let hasWarn = false;
+    let hasLog = false;
+    let hasInfo = false;
 
-  get isValid(): boolean {
-    return this.results.length === 0;
-  }
+    const messages: string[] = [];
+    const log: ILog[] = [];
 
-  get messages(): string[] {
-    return this.results.map(({ message }) => message);
-  }
+    for (const r of results) {
+      if (r.type === logTypeEnum.error) {
+        hasError = true;
+      }
 
-  get log(): ILog[] {
-    return this.results.map((v) => v.log);
+      if (r.type === logTypeEnum.warn) {
+        hasWarn = true;
+      }
+
+      if (r.type === logTypeEnum.log) {
+        hasLog = true;
+      }
+
+      if (r.type === logTypeEnum.info) {
+        hasInfo = true;
+      }
+
+      messages.push(r.message);
+      log.push(Object.freeze(r.log));
+    }
+
+    Object.defineProperties(this, {
+      results: {
+        value: results.map((r) => Object.freeze(r)),
+      },
+      isValid: {
+        value: results.length === 0,
+      },
+      hasError: {
+        value: hasError,
+      },
+      hasWarn: {
+        value: hasWarn,
+      },
+      hasLog: {
+        value: hasLog,
+      },
+      hasInfo: {
+        value: hasInfo,
+      },
+      messages: {
+        value: messages,
+      },
+      log: {
+        value: log,
+      },
+    });
   }
 
   public getFieldValidation(a_field: string): V | void {
-    return this.results.find(({ field }) => a_field === field);
+    let result = this.__CACHE__[a_field];
+
+    if (result) {
+      return result;
+    }
+
+    result = this.results.find(({ field }) => a_field === field);
+
+    this.__CACHE__[a_field] = result;
+
+    return result;
   }
 
   public getFieldMessage(a_field: string): string {
@@ -38,5 +102,13 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
 
   public hasFieldError(a_field: string): boolean {
     return !!this.getFieldValidation(a_field);
+  }
+
+  public toValidate(): V[] {
+    return this.results.map((r) => r);
+  }
+
+  public toJS(): { [key: string]: any } {
+    return this.results.map((r) => r.toJS());
   }
 }
