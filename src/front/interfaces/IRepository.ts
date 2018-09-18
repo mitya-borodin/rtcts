@@ -16,5 +16,5 @@ export interface IRepository<T> extends IEventEmitter {
 
   remove(id: string): Promise<T | void>;
 
-  receiveMessage(message: [string, any]): T | void | Promise<void>;
+  receiveMessage(message: [string, any]): void;
 }

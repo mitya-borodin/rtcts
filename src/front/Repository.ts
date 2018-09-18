@@ -207,7 +207,7 @@ export class Repository<
     }
   }
 
-  public receiveMessage([channelName, payload]: [string, any]): T | void | Promise<void> {
+  public receiveMessage([channelName, payload]: [string, any]): void {
     if (this.isInit) {
       try {
         console.log(`[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]`, [channelName, payload]);
@@ -247,16 +247,13 @@ export class Repository<
         }
       } catch (error) {
         console.error(
-          `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ERROR_MESSAGE: ${error.message ||
-            error} ][ PAYLOAD: ${JSON.stringify([channelName, payload])} ]`,
+          `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ERROR_MESSAGE: ${
+            error ? error.message || error : error
+          } ][ PAYLOAD: ${JSON.stringify([channelName, payload])} ]`,
         );
-
-        return Promise.reject();
       }
     } else {
       console.error(`[ ${this.constructor.name} ][ RESEIVE_MESSAGE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
-
-      return Promise.reject();
     }
   }
 
