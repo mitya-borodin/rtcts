@@ -167,7 +167,7 @@ export class RepositoryFormStore<
       } else {
         this.showAlerts = true;
 
-        console.error(`[ ${this.constructor.name} ][ FORM IS NOT CORRECTLY FILLED IN ]`);
+        console.error(`[ ${this.constructor.name} ][ FORM ][ IS_NOT_VALID ]`);
       }
     } else {
       console.error(`[ ${this.constructor.name} ][ ACCESS_DENIED ]`);

@@ -22,3 +22,7 @@ export { Mediator } from "./front/Mediator";
 export { EditAdapter } from "./front/EditAdapter";
 export { ListAdapter } from "./front/ListAdapter";
 export { RepositoryFormStore } from "./front/RepositoryFormStore";
+
+// COMPONENTS
+
+export { Link } from "./front/components/Link";

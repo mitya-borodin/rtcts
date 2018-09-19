@@ -23,9 +23,9 @@ export class EditAdapter<
   public shockDelay: number;
 
   // DEPS
+  public history: H;
   protected repository: REP;
   protected formStore: FS;
-  protected history: H;
 
   constructor(repository: REP, formStore: FS, history: H) {
     // DEPS
@@ -120,7 +120,7 @@ export class EditAdapter<
   public cancel(): void {
     this.history.goBack();
 
-    this.show();
+    this.hide();
     this.end();
 
     setTimeout(this.formStore.cancel, 100);
