@@ -54,7 +54,6 @@ export class EditAdapter<
     return !isUndefined(this.formStore.form);
   }
 
-  @computed
   get isEdit(): boolean {
     const { id }: any = qs.parse(this.history.location.search);
 
