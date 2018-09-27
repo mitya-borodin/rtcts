@@ -1,17 +1,31 @@
+import { History } from "history";
 import { IValidateResult } from "../../interfaces/IValidateResult";
 import { IComposition } from "./IComposition";
 
-export interface IEditComposition<CHANGE> extends IComposition {
+export interface IEditCompositionAdapter extends IComposition {
+  // FORM_FLAGS
   isOpen: boolean;
   isEdit: boolean;
 
+  // SOURCE
+  history: History;
+
+  // VALIDATE
   showAlerts: boolean;
   validate: IValidateResult;
+}
 
-  onDidMount(): Promise<void>;
-
+export interface IEditCompositionActions<CHANGE> {
   change(chage: CHANGE): void;
   save(): Promise<void>;
   remove(): Promise<void>;
   cancel(): void;
+
+  // HOOKS
+  onDidMount(): Promise<void>;
+}
+
+export interface IEditComposition<CHANGE> {
+  adapter: IEditCompositionAdapter;
+  actions: IEditCompositionActions<CHANGE>;
 }

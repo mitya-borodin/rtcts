@@ -29,9 +29,9 @@
     "url": "http://borodin.site"
   },
   "scripts": {
+    "start": "npm run build && tsc --watch",
     "build": " npm run lint && tsc",
     "build:relink": "del lib && npm run build && npm link",
-    "build:watch": "npm run build && tsc --watch",
     "lint": "tslint -c tslint.json src/**/*.ts --fix",
     "test": "mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
     "test:coverage": "nyc --extension .ts --reporter=html mocha --require ./tests/setup.js tests/unit/**/*.spec.ts",
