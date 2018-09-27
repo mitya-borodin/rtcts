@@ -26,12 +26,14 @@ export class UnionAdapter<
     const self = this;
 
     this.adapter = Object.assign(
-      self.adapter,
-      observable.object({
-        get list(): P[] {
-          return self.repository.list;
-        },
-      }),
+      super.adapter,
+      Object.assign(
+        observable.object({
+          get list(): P[] {
+            return self.repository.list;
+          },
+        }),
+      ),
     );
   }
 }
