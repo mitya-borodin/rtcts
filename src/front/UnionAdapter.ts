@@ -1,5 +1,5 @@
 import { History } from "history";
-import { observable } from "mobx";
+import { extendObservable } from "mobx";
 import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
 import { EditAdapter } from "./EditAdapter";
@@ -23,17 +23,10 @@ export class UnionAdapter<
     super(repository, formStore, history);
 
     // API
-    const self = this;
-
-    this.adapter = Object.assign(
-      super.adapter,
-      Object.assign(
-        observable.object({
-          get list(): P[] {
-            return self.repository.list;
-          },
-        }),
-      ),
-    );
+    this.adapter = extendObservable(this.adapter, {
+      get list(): P[] {
+        return repository.list;
+      },
+    });
   }
 }

@@ -46,35 +46,31 @@ export class EditAdapter<
     const self = this;
 
     // API
-    this.adapter = Object.assign(
-      {
-        get isEdit(): boolean {
-          const { id }: any = qs.parse(self.history.location.search);
+    this.adapter = observable({
+      get isEdit(): boolean {
+        const { id }: any = qs.parse(self.history.location.search);
 
-          return isString(id);
-        },
+        return isString(id);
       },
-      observable.object({
-        get history(): H {
-          return self.history;
-        },
-        get isInit(): boolean {
-          return self.repository.isInit;
-        },
-        get isLoading(): boolean {
-          return self.repository.isLoading || self.isLoading;
-        },
-        get isOpen(): boolean {
-          return !isUndefined(self.formStore.form);
-        },
-        get showAlerts(): boolean {
-          return self.formStore.showAlerts || self.showAlerts;
-        },
-        get validate(): IValidateResult {
-          return self.formStore.validate;
-        },
-      }),
-    );
+      get history(): H {
+        return self.history;
+      },
+      get isInit(): boolean {
+        return self.repository.isInit;
+      },
+      get isLoading(): boolean {
+        return self.repository.isLoading || self.isLoading;
+      },
+      get isOpen(): boolean {
+        return !isUndefined(self.formStore.form);
+      },
+      get showAlerts(): boolean {
+        return self.formStore.showAlerts || self.showAlerts;
+      },
+      get validate(): IValidateResult {
+        return self.formStore.validate;
+      },
+    });
 
     // API
     this.actions = {
