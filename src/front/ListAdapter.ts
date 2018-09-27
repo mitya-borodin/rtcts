@@ -1,3 +1,4 @@
+import { History } from "history";
 import { observable } from "mobx";
 import { IListComposition, IListCompositionActions, IListCompositionAdapter } from "./interfaces/IListComposition";
 import { IRepository } from "./interfaces/IRepository";

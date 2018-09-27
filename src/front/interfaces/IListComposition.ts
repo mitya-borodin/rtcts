@@ -1,3 +1,4 @@
+import { History } from "history";
 import { IComposition } from "./IComposition";
 
 export interface IListCompositionAdapter<T> extends IComposition {

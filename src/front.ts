@@ -6,8 +6,21 @@ export { IUserService } from "./front/interfaces/IUserService";
 export { IRepository } from "./front/interfaces/IRepository";
 export { IMediator } from "./front/interfaces/IMediator";
 export { IComposition } from "./front/interfaces/IComposition";
-export { IListComposition } from "./front/interfaces/IListComposition";
-export { IEditComposition } from "./front/interfaces/IEditComposition";
+export {
+  IListComposition,
+  IListCompositionAdapter,
+  IListCompositionActions,
+} from "./front/interfaces/IListComposition";
+export {
+  IEditComposition,
+  IEditCompositionAdapter,
+  IEditCompositionActions,
+} from "./front/interfaces/IEditComposition";
+export {
+  IUnionComposition,
+  IUnionCompositionActions,
+  IUnionCompositionAdapter,
+} from "./front/interfaces/IUnionComposition";
 export { IFormStore } from "./front/interfaces/IFormStore";
 export { IRepositoryFormStore } from "./front/interfaces/IRepositoryFormStore";
 export { IUIStore } from "./front/interfaces/IUIStore";
@@ -19,8 +32,9 @@ export { Service } from "./front/Service";
 export { WSClient } from "./front/WSClient";
 export { Repository } from "./front/Repository";
 export { Mediator } from "./front/Mediator";
-export { EditAdapter } from "./front/EditAdapter";
 export { ListAdapter } from "./front/ListAdapter";
+export { EditAdapter } from "./front/EditAdapter";
+export { UnionAdapter } from "./front/UnionAdapter";
 export { RepositoryFormStore } from "./front/RepositoryFormStore";
 
 // COMPONENTS

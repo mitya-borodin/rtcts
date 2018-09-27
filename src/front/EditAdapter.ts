@@ -24,13 +24,11 @@ export class EditAdapter<
   // DEPS
   protected repository: REP;
   protected formStore: FS;
+  protected history: H;
 
   // RIVATE_OBSERVABLE_PROPS
-  @observable private isLoading: boolean = false;
-  @observable private showAlerts: boolean = false;
-
-  // PRIVATE_DEPS
-  private history: H;
+  @observable protected isLoading: boolean = false;
+  @observable protected showAlerts: boolean = false;
 
   constructor(repository: REP, formStore: FS, history: H) {
     // DEPS
@@ -47,32 +45,38 @@ export class EditAdapter<
 
     const self = this;
 
-    this.adapter = observable.object({
-      get history(): H {
-        return self.history;
-      },
-      get isInit(): boolean {
-        return self.repository.isInit;
-      },
-      get isLoading(): boolean {
-        return self.repository.isLoading || self.isLoading;
-      },
-      get isOpen(): boolean {
-        return !isUndefined(self.formStore.form);
-      },
-      get isEdit(): boolean {
-        const { id }: any = qs.parse(self.history.location.search);
+    // API
+    this.adapter = Object.assign(
+      {
+        get isEdit(): boolean {
+          const { id }: any = qs.parse(self.history.location.search);
 
-        return isString(id);
+          return isString(id);
+        },
       },
-      get showAlerts(): boolean {
-        return self.formStore.showAlerts || self.showAlerts;
-      },
-      get validate(): IValidateResult {
-        return self.formStore.validate;
-      },
-    });
+      observable.object({
+        get history(): H {
+          return self.history;
+        },
+        get isInit(): boolean {
+          return self.repository.isInit;
+        },
+        get isLoading(): boolean {
+          return self.repository.isLoading || self.isLoading;
+        },
+        get isOpen(): boolean {
+          return !isUndefined(self.formStore.form);
+        },
+        get showAlerts(): boolean {
+          return self.formStore.showAlerts || self.showAlerts;
+        },
+        get validate(): IValidateResult {
+          return self.formStore.validate;
+        },
+      }),
+    );
 
+    // API
     this.actions = {
       change: this.change,
       save: this.save,
@@ -85,6 +89,7 @@ export class EditAdapter<
     };
   }
 
+  // HELPERS
   @action
   protected start(): void {
     this.isLoading = true;
@@ -105,16 +110,18 @@ export class EditAdapter<
     this.showAlerts = false;
   }
 
-  private async onDidMount() {
+  // HOOKS
+  protected async onDidMount() {
     await this.repository.init();
   }
 
-  private change(change: CHANGE): void {
+  // FORM
+  protected change(change: CHANGE): void {
     this.formStore.change(change);
   }
 
   @action
-  private async save(): Promise<void> {
+  protected async save(): Promise<void> {
     try {
       this.start();
 
@@ -135,7 +142,7 @@ export class EditAdapter<
   }
 
   @action
-  private async remove(): Promise<void> {
+  protected async remove(): Promise<void> {
     try {
       this.start();
 
@@ -156,7 +163,7 @@ export class EditAdapter<
   }
 
   @action
-  private cancel(): void {
+  protected cancel(): void {
     this.history.goBack();
 
     this.hide();
