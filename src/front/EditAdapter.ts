@@ -1,5 +1,5 @@
 import { History } from "history";
-import { action, observable } from "mobx";
+import { action, extendObservable, observable } from "mobx";
 import * as qs from "querystringify";
 import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
@@ -45,13 +45,16 @@ export class EditAdapter<
 
     const self = this;
 
-    // API
-    this.adapter = observable({
+    this.adapter = {
       get isEdit(): boolean {
         const { id }: any = qs.parse(self.history.location.search);
 
         return isString(id);
       },
+    } as IEditCompositionAdapter;
+
+    // API
+    extendObservable(this.adapter, {
       get history(): H {
         return self.history;
       },

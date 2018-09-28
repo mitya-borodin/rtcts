@@ -96,6 +96,7 @@ export class Repository<
               );
 
               this.isInit = true;
+              console.log(`[ ${this.constructor.name} ][ INIT ][ SUCCESS ]`);
             });
           } else {
             throw new Error(`collection: ${Object.prototype.toString.call(collection)}`);
