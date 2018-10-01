@@ -41,7 +41,7 @@ export class ListAdapter<T, R extends IRepository<T> = IRepository<T>, H extends
     };
   }
 
-  private async onDidMount() {
+  protected async onDidMount() {
     await this.repository.init();
   }
 }

@@ -127,7 +127,7 @@ export class EditAdapter<
       if (this.formStore.isValid) {
         this.hide();
 
-        await this.formStore.save();
+        await this.formStore.submit();
       } else {
         this.show();
       }

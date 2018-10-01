@@ -35,6 +35,6 @@ export interface IFormStore<F, C> {
 
   open(id?: string): void;
   change(change: C): Promise<void>;
-  save(): Promise<void>;
+  submit(): Promise<void>;
   cancel(): void;
 }

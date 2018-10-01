@@ -89,7 +89,7 @@ export class RepositoryFormStore<
     this.setIsValid = this.setIsValid.bind(this);
     this.open = this.open.bind(this);
     this.change = this.change.bind(this);
-    this.save = this.save.bind(this);
+    this.submit = this.submit.bind(this);
     this.cancel = this.cancel.bind(this);
   }
 
@@ -144,8 +144,8 @@ export class RepositoryFormStore<
     }
   }
 
-  @action("[ REPOSITORY_FORM_STORE ][ SAVE ]")
-  public async save(): Promise<void> {
+  @action("[ REPOSITORY_FORM_STORE ][ SUBMIT ]")
+  public async submit(): Promise<void> {
     this.setIsValid(this.validate.isValid);
 
     if (this.ACL.save.includes(this.group)) {
