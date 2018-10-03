@@ -3,6 +3,7 @@ import { extendObservable } from "mobx";
 import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
 import { EditAdapter } from "./EditAdapter";
+import { IEditCompositionActions, IEditCompositionAdapter } from "./interfaces/IEditComposition";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
 import { IUnionComposition, IUnionCompositionActions, IUnionCompositionAdapter } from "./interfaces/IUnionComposition";
@@ -23,10 +24,17 @@ export class UnionAdapter<
     super(repository, formStore, history);
 
     // API
-    this.adapter = extendObservable(this.adapter, {
+    this.adapter = extendObservable<
+      IEditCompositionAdapter,
+      {
+        list: P[];
+      }
+    >(this.adapter, {
       get list(): P[] {
         return repository.list;
       },
     });
+
+    this.actions = Object.assign<IEditCompositionActions<CHANGE>, {}>(this.actions, {});
   }
 }
