@@ -1,5 +1,5 @@
 import { History } from "history";
-import { action, observable } from "mobx";
+import { action, extendObservable, observable } from "mobx";
 import * as qs from "querystringify";
 import { IForm } from "../interfaces/IForm";
 import { IPersist } from "../interfaces/IPersist";
@@ -26,9 +26,9 @@ export class EditAdapter<
   protected formStore: FS;
   protected history: H;
 
-  // PROTECTED_OBSERVABLE_PROPS
-  @observable protected isLoading: boolean;
-  @observable protected showAlerts: boolean;
+  // OBSERVABLE_PROPS
+  @observable protected isLoading: boolean = false;
+  @observable protected showAlerts: boolean = false;
 
   constructor(repository: REP, formStore: FS, history: H) {
     // DEPS
@@ -54,7 +54,7 @@ export class EditAdapter<
     } as IEditCompositionAdapter;
 
     // API
-    this.adapter = observable.object({
+    this.adapter = extendObservable<IEditCompositionAdapter, {}>(this.adapter, {
       get history(): H {
         return self.history;
       },
@@ -66,15 +66,6 @@ export class EditAdapter<
       },
       get isOpen(): boolean {
         return !isUndefined(self.formStore.form);
-      },
-      get isEdit(): boolean {
-        const { form } = self.formStore;
-
-        if (form) {
-          return isString(form.id) && form.id.length > 0;
-        }
-
-        return false;
       },
       get showAlerts(): boolean {
         return self.formStore.showAlerts || self.showAlerts;
