@@ -151,6 +151,7 @@ export class RepositoryFormStore<
     if (this.ACL.save.includes(this.group)) {
       if (this.isValid) {
         this.showAlerts = false;
+
         if (this.form instanceof this.Form) {
           if (isString(this.form.id)) {
             const persist = new this.Persist(this.form.toJS());
@@ -162,7 +163,7 @@ export class RepositoryFormStore<
             await this.repository.create(insert.toJS());
           }
         } else {
-          console.error(`[ ${this.constructor.name} ][ FORM IS NOT INSTANCEOF ${this.Form.name} ]`);
+          console.error(`[ ${this.constructor.name} ][ FORM IS NOT INSTANCE_OF ${this.Form.name} ]`);
         }
       } else {
         this.showAlerts = true;
