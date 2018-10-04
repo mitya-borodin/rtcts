@@ -21,3 +21,4 @@ export { intersection } from "./utils/intersection";
 export { yearOnly } from "./utils/yearOnly";
 export { checkPassword } from "./utils/checkPassword";
 export { getAttribute } from "./utils/getAttribute";
+export { getErrorMessage } from "./utils/getErrorMessage";

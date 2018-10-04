@@ -2,6 +2,7 @@ import * as express from "express";
 import * as passport from "passport";
 import { IInsert } from "../interfaces/IInsert";
 import { IPersist } from "../interfaces/IPersist";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { IChannels } from "./interfaces/IChannels";
 import { IModel } from "./interfaces/IModel";
 
@@ -77,7 +78,7 @@ export class Service<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -107,7 +108,7 @@ export class Service<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -138,7 +139,7 @@ export class Service<
           console.error(error);
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -171,7 +172,7 @@ export class Service<
           console.error(error);
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -202,7 +203,7 @@ export class Service<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -236,7 +237,7 @@ export class Service<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );

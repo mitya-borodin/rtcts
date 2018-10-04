@@ -3,6 +3,7 @@ import { userGroupEnum } from "../enums/userGroupEnum";
 import { userRepositoryEventEnum } from "../enums/userRepositoryEventEnum";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { isString } from "../utils/isType";
 import { IMediator } from "./interfaces/IMediator";
 import { IUserRepository } from "./interfaces/IUserRepository";
@@ -14,7 +15,8 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
   implements IUserRepository<U> {
   protected Persist: { new (data: any): U };
 
-  @observable private currentUserID: string | void;
+  @observable
+  private currentUserID: string | void;
 
   constructor(
     Persist: { new (data: any): U },
@@ -90,7 +92,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
           return Promise.reject();
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ INIT ][ ERROR_MESSAGE: ${error.message || error} ]`);
+        console.error(`[ ${this.constructor.name} ][ INIT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
         return Promise.reject();
       }
@@ -125,7 +127,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
           return Promise.reject();
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ SIGN_IN ][ ERROR_MESSAGE: ${error.message || error} ]`);
+        console.error(`[ ${this.constructor.name} ][ SIGN_IN ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
         this.destroy();
 
@@ -163,7 +165,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
           this.startLoad();
           this.mediator.emit(userRepositoryEventEnum.LOGOUT);
         } catch (error) {
-          console.error(`[ ${this.constructor.name} ][ LOGOUT ][ ERROR_MESSAGE: ${error.message || error} ]`);
+          console.error(`[ ${this.constructor.name} ][ LOGOUT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
           reject();
         }
@@ -192,7 +194,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         return false;
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ SIGN_UP ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ SIGN_UP ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       this.destroy();
 
@@ -229,7 +231,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         return Promise.reject();
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_LOGIN ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ UPDATE_LOGIN ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
     } finally {
@@ -260,7 +262,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         return Promise.reject();
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
     } finally {
@@ -289,7 +291,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         return Promise.reject();
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
     } finally {
@@ -309,7 +311,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         throw new Error(`Service come back not user instance;`);
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
     } finally {
@@ -334,7 +336,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
       console.log(`[ ${this.constructor.name} ][ DESTROY ][ SUCCESS ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ DESTROY ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ DESTROY ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
     }
@@ -386,7 +388,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       this.destroy();
 

@@ -2,6 +2,7 @@ import { computed, observable, ObservableMap, runInAction } from "mobx";
 import { wsEventEnum } from "../enums/wsEventEnum";
 import { IPersist } from "../interface";
 import { EventEmitter } from "../isomorphic/EventEmitter";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { isArray, isObject } from "../utils/isType";
 import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
@@ -14,10 +15,13 @@ export class Repository<
   WS extends IWSClient = IWSClient,
   ME extends IMediator = IMediator
 > extends EventEmitter implements IRepository<T> {
-  @observable public isInit: boolean;
-  @observable public isLoading: boolean;
+  @observable
+  public isInit: boolean;
+  @observable
+  public isLoading: boolean;
 
-  @observable protected collection: ObservableMap<string, T>;
+  @observable
+  protected collection: ObservableMap<string, T>;
 
   protected Persist: { new (data?: any): T };
   protected service: S;
@@ -103,7 +107,7 @@ export class Repository<
           }
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ INIT ][ ERROR_MESSAGE: ${error.message || error} ]`);
+        console.error(`[ ${this.constructor.name} ][ INIT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
         return Promise.reject();
       } finally {
@@ -131,7 +135,7 @@ export class Repository<
           return item;
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR_MESSAGE: ${error.message || error} ]`);
+        console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
         return Promise.reject();
       } finally {
@@ -163,7 +167,7 @@ export class Repository<
           return item;
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${error.message || error} ]`);
+        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
         return Promise.reject();
       } finally {
@@ -195,7 +199,7 @@ export class Repository<
           return item;
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${error.message || error} ]`);
+        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
         return Promise.reject();
       } finally {
@@ -249,7 +253,7 @@ export class Repository<
       } catch (error) {
         console.error(
           `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ERROR_MESSAGE: ${
-            error ? error.message || error : error
+            error ? getErrorMessage(error) : error
           } ][ PAYLOAD: ${JSON.stringify([channelName, payload])} ]`,
         );
       }
@@ -288,7 +292,7 @@ export class Repository<
 
       console.log(`[ ${this.constructor.name} ][ ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
     }
@@ -304,7 +308,7 @@ export class Repository<
 
       console.log(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR_MESSAGE: ${error.message || error} ]`);
+      console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
     }

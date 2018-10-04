@@ -2,6 +2,7 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as moment from "moment";
 import { Collection, Db } from "mongodb";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { isNumber } from "../utils/isType";
 import { IDBConnection } from "./interfaces/IDBConnection";
 import { IMigration } from "./interfaces/IMigration";
@@ -116,7 +117,7 @@ export class MigrationController implements IMigrationController {
                         `[ NAME: ${name} ] \n` +
                         `[ TARGET_VERSION: ${version}, CURRENT_VERSION: ${curVersion} ] \n` +
                         `[ DATE: ${moment().format("YYYY-MM-DD HH:mm:ss ZZ")} ] \n` +
-                        `[ ERROR: ${error.message || error} ]`,
+                        `[ ERROR: ${getErrorMessage(error)} ]`,
                     );
                 }
               } else {
@@ -162,7 +163,7 @@ export class MigrationController implements IMigrationController {
                         `[ NAME: ${name} ] \n` +
                         `[ TARGET_VERSION: ${version}, CURRENT_VERSION: ${curVersion} ] \n` +
                         `[ DATE: ${moment().format("YYYY-MM-DD HH:mm:ss ZZ")} ] \n` +
-                        `[ ERROR: ${error.message || error} ]`,
+                        `[ ERROR: ${getErrorMessage(error)} ]`,
                     );
                 }
               } else {
@@ -196,7 +197,7 @@ export class MigrationController implements IMigrationController {
                 `[ NAME: ${name} ] \n` +
                 `[ TARGET_VERSION: ${version} ] \n` +
                 `[ DATE: ${moment().format("YYYY-MM-DD HH:mm:ss ZZ")} ] \n` +
-                `[ ERROR: ${error.message || error} ]`,
+                `[ ERROR: ${getErrorMessage(error)} ]`,
             );
         }
       } else {

@@ -1,3 +1,4 @@
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { isObject, isString } from "../utils/isType";
 import { ErrorChannel } from "./const";
 
@@ -20,7 +21,7 @@ export const recognizeMessage = (message: string): [string, { [key: string]: any
       throw new Error("Message should include Array [channelName: string, payload: { [key: string]: any }]");
     }
   } catch (error) {
-    return makeErrorMessage(error.message, { error, receive_message: message });
+    return makeErrorMessage(getErrorMessage(error), { error, receive_message: message });
   }
 };
 

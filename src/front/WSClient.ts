@@ -1,6 +1,7 @@
 import { action, computed, observable, runInAction } from "mobx";
 import { wsEventEnum } from "../enums/wsEventEnum";
 import { EventEmitter } from "../isomorphic/EventEmitter";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import {
   assigment_to_user_of_the_connection_channel,
   cancel_assigment_to_user_of_the_connection_channel,
@@ -12,8 +13,10 @@ import { makeMessage, recognizeMessage } from "../webSocket/helpers";
 import { IWSClient } from "./interfaces/IWSClient";
 
 export class WSClient extends EventEmitter implements IWSClient {
-  @observable public readyState = WebSocket.CLOSED;
-  @observable public isAssigment = false;
+  @observable
+  public readyState = WebSocket.CLOSED;
+  @observable
+  public isAssigment = false;
   public wsid: string;
 
   protected uid: string;
@@ -156,7 +159,7 @@ export class WSClient extends EventEmitter implements IWSClient {
 
               resolve();
             } catch (error) {
-              console.error(`[ ${this.constructor.name} ][ RECONNECT ][ ERROR ][ MESSAGE: ${error.message || error} ]`);
+              console.error(`[ ${this.constructor.name} ][ RECONNECT ][ ERROR ][ MESSAGE: ${getErrorMessage(error)} ]`);
 
               reject();
             } finally {
@@ -204,7 +207,7 @@ export class WSClient extends EventEmitter implements IWSClient {
 
           console.log(`[ ${this.constructor.name} ][ DISCONNECT ][ SUCCESS ]`);
         } catch (error) {
-          console.error(`[ ${this.constructor.name} ][ DISCONNECT ][ ERROR ][ MESSAGE: ${error.message || error} ]`);
+          console.error(`[ ${this.constructor.name} ][ DISCONNECT ][ ERROR ][ MESSAGE: ${getErrorMessage(error)} ]`);
 
           reject();
         } finally {

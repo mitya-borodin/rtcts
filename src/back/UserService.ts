@@ -3,6 +3,7 @@ import * as passport from "passport";
 import { userGroupEnum } from "../enums/userGroupEnum";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { IChannels } from "./interfaces/IChannels";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";
@@ -81,7 +82,7 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -118,7 +119,7 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -136,7 +137,7 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -160,7 +161,7 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -185,7 +186,7 @@ export class UserService<
             );
         }
       } catch (error) {
-        res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+        res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
       }
     });
   }
@@ -215,7 +216,7 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -250,7 +251,7 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );
@@ -283,7 +284,7 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${error.message || error} ]`);
+            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
         }
       },
     );

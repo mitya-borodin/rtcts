@@ -7,6 +7,7 @@ import { IConnection } from "../back/interfaces/IConnection";
 import { IUserModel } from "../back/interfaces/IUserModel";
 import { IPersist } from "../interfaces/IPersist";
 import { IUser } from "../interfaces/IUser";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { isArray, isString } from "../utils/isType";
 import {
   assigment_to_user_of_the_connection_channel,
@@ -188,7 +189,9 @@ export class WSServer<U extends IUserModel<IUser & IPersist>> {
                   }
                 })
                 .catch((error: any) => {
-                  connection.send(this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${error.message}`, { error, payload }));
+                  connection.send(
+                    this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${getErrorMessage(error)}`, { error, payload }),
+                  );
                 });
             } else {
               connection.send(
