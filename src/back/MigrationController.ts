@@ -69,7 +69,6 @@ export class MigrationController implements IMigrationController {
 
   private async run(req: express.Request, res: express.Response): Promise<void> {
     const { name, secret } = req.body;
-
     const version = Number(req.body.version);
 
     if (isNumber(version)) {
@@ -87,7 +86,7 @@ export class MigrationController implements IMigrationController {
             }
 
             if (version > curVersion) {
-              list = list.filter((m) => m.version >= version);
+              list = list.filter((m) => m.version > curVersion && m.version <= version);
 
               if (list.length > 0) {
                 try {
@@ -133,7 +132,7 @@ export class MigrationController implements IMigrationController {
             }
 
             if (version < curVersion) {
-              list = list.filter((m) => m.version - 1 <= version);
+              list = list.filter((m) => m.version <= curVersion && m.version >= version + 1);
 
               if (list.length > 0) {
                 try {
