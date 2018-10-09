@@ -62,7 +62,7 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
 
         // Запускаем таймер который будет проверять имеется ли соединение с БД или нет.
         this.pingTimer = setInterval(async () => {
-          console.log("PING ", new Date());
+          // console.log("PING ", new Date());
           if (this.client && !this.client.isConnected()) {
             clearInterval(this.pingTimer);
 
