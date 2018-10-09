@@ -1,5 +1,5 @@
 export interface IDBConnection<Db> {
-  connection(): Promise<Db>;
+  connect(): Promise<void>;
   disconnect(): Promise<void>;
   getDB(): Promise<Db>;
 }
