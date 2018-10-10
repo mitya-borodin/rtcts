@@ -64,7 +64,9 @@ export class APPServer<C extends IAppConfig = IAppConfig, STR extends IAuthStrat
 
                 if (!isString(addressInfo)) {
                   console.log(
-                    chalk.blueBright.bold(`[ APP ][ SERVER ][ RUN ][ http://localhost:${addressInfo.port} ]`),
+                    chalk.blueBright.bold(
+                      `[ APP ][ SERVER ][ RUN ][ http://${addressInfo.address}:${addressInfo.port} ]`,
+                    ),
                   );
                 }
 
