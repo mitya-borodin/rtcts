@@ -28,7 +28,7 @@ export class WSClient extends EventEmitter implements IWSClient {
   protected reconnectTimeOut: number;
   protected headrBeatInterval: number;
 
-  constructor(host = window.location.host, path = "ws", TLS = true, pingPongDelay = 1000, reconnectionDelay = 5000) {
+  constructor(host = window.location.host, path = "ws", TLS = true, pingPongDelay = 3000, reconnectionDelay = 5000) {
     super();
 
     // PROPS

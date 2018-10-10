@@ -79,7 +79,7 @@ export class WSServer<U extends IUserModel<IUser & IPersist>> {
               console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
             }
           }
-        }, 1000);
+        }, 2000);
       }
     } catch (error) {
       console.error(error);
