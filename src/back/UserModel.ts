@@ -45,16 +45,15 @@ export class UserModel<
     }
   }
 
-  public async read(query: { [key: string]: any } = {}, options?: FindOneOptions, uid = ""): Promise<P[]> {
+  public async read(a_query: { [key: string]: any } = {}, options?: FindOneOptions, uid = ""): Promise<P[]> {
     try {
+      const query = Object.assign({}, a_query);
+
       if (isString(uid) && uid.length > 0) {
-        return await super.read(
-          { _id: new ObjectId(uid) },
-          { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } },
-        );
+        Object.assign(query, { _id: new ObjectId(uid) });
       }
 
-      return [];
+      return await super.read(query, { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } });
     } catch (error) {
       console.error(error);
 
