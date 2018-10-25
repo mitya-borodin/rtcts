@@ -1,6 +1,5 @@
-import { ILog } from "../interfaces/ILog";
-import { ILogType } from "../interfaces/ILogType";
-import { isString } from "../utils/isType";
+import { ILog, ILogType } from "@borodindmitriy/interfaces";
+import { isString } from "@borodindmitriy/utils";
 
 export class Log implements ILog {
   public readonly type: ILogType;

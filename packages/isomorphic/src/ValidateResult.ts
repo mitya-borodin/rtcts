@@ -1,7 +1,4 @@
-import { logTypeEnum } from "../enums/logTypeEnum";
-import { ILog } from "../interfaces/ILog";
-import { IValidate } from "../interfaces/IValidate";
-import { IValidateResult } from "../interfaces/IValidateResult";
+import { ILog, IValidate, IValidateResult, logTypeEnum } from "@borodindmitriy/interfaces";
 import { Validate } from "./Validate";
 
 // tslint:disable:object-literal-sort-keys

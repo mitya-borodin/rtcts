@@ -1,0 +1,45 @@
+// INTERFACES
+export { IUserModel } from "./interfaces/IUserModel";
+export { IAppConfig } from "./interfaces/IAppConfig";
+export { IChannels } from "./interfaces/IChannels";
+export { IConnection } from "./interfaces/IConnection";
+export { IDBConnection } from "./interfaces/IDBConnection";
+export { IModel } from "./interfaces/IModel";
+export { IRepository } from "./interfaces/IRepository";
+export { IAuthStrategy } from "./interfaces/IAuthStrategy";
+export { IAPPServer } from "./interfaces/IAPPServer";
+export { IMigrationController } from "./interfaces/IMigrationController";
+export { IMigration } from "./interfaces/IMigration";
+
+// CLASSES
+export { toMongo } from "./toMongo";
+export { DBConnection } from "./DBConnection";
+export { AuthStrategy } from "./AuthStrategy";
+export { APPServer } from "./APPServer";
+export { AppConfig } from "./AppConfig";
+export { Model } from "./Model";
+export { MongoDBRepository } from "./MongoDBRepository";
+export { UserModel } from "./UserModel";
+export { Service } from "./Service";
+export { UserService } from "./UserService";
+export { MigrationController } from "./MigrationController";
+export { Migration } from "./Migration";
+
+// WEB_SOCKET_CLASSES
+export {
+  cancel_assigment_to_user_of_the_connection_channel,
+  assigment_to_user_of_the_connection_channel,
+  ErrorChannel,
+  PingChannel,
+  PongChannel,
+} from "./webSocket/const";
+export { recognizeMessage, makeMessage, makeErrorMessage } from "./webSocket/helpers";
+export { WSServer } from "./webSocket/WSServer";
+export { Connection } from "./webSocket/Connection";
+export { Channels } from "./webSocket/Channels";
+export { WSMiddelware } from "./webSocket/WSMiddelware";
+
+// UTILS
+export { authenticate } from "./utils/authenticate";
+export { encryptPassword } from "./utils/encryptPassword";
+export { getSalt } from "./utils/getSalt";

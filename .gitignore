@@ -1,0 +1,14 @@
+.cache
+node_modules
+dll_bundle
+lib_bundle
+lib
+socket.config.json
+tsconfig.json
+tslint.json
+!packages/interfaces/tsconfig.json
+!packages/interfaces/tslint.json
+.DS_Store
+*.zip
+*.tar
+*.gz

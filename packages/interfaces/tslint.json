@@ -1,14 +1,9 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint:recommended",
-    "tslint-no-circular-imports"
-  ],
+  "extends": ["tslint:recommended"],
   "jsRules": {},
   "rules": {
-    "max-classes-per-file": [
-      false
-    ],
+    "max-classes-per-file": [false],
     "member-access": true,
     "no-console": false,
     "no-var-requires": false,

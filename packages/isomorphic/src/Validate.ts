@@ -1,8 +1,6 @@
-import { ILog } from "../interfaces/ILog";
-import { ILogType } from "../interfaces/ILogType";
-import { IValidate } from "../interfaces/IValidate";
-import { isString, isUndefined } from "../utils/isType";
 import { Log } from "./Log";
+import { ILog, ILogType, IValidate } from "@borodindmitriy/interfaces";
+import { isString, isUndefined } from "@borodindmitriy/utils";
 
 // tslint:disable-next-line:max-classes-per-file
 export class Validate extends Log implements IValidate {

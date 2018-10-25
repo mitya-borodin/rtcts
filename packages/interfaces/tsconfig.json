@@ -6,12 +6,7 @@
     "target": "es6",
     "module": "commonjs",
     "pretty": true,
-    "lib": [
-      "es6",
-      "es7",
-      "dom"
-    ],
-    "jsx": "react",
+    "lib": ["es6"],
     "declaration": true,
     "importHelpers": true,
     "downlevelIteration": false,
@@ -20,7 +15,6 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "noEmit": false,
-    "rootDir": "src",
     "charset": "utf8",
     "noErrorTruncation": true,
     "diagnostics": false,
@@ -37,22 +31,14 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "moduleResolution": "node",
-    "baseUrl": "/Users/borodin_dmitriy/programming/base-code/packages/utils/src",
     "rootDirs": [],
     "paths": {},
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "typeRoots": [],
     "types": [],
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
+    "baseUrl": "./src",
+    "rootDir": "src",
     "outDir": "lib"
   },
-  "exclude": [
-    "node_modules",
-    "node_modules/.cache"
-  ],
-  "include": [
-    "/Users/borodin_dmitriy/programming/base-code/packages/utils/src"
-  ]
+  "exclude": ["node_modules"]
 }

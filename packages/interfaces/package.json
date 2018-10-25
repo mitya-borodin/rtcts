@@ -1,6 +1,6 @@
 {
-  "name": "@borodindmitriy/isomorphic",
-  "description": "Isomorphic common classes's library.",
+  "name": "@borodindmitriy/interfaces",
+  "description": "Common interface's library.",
   "version": "1.0.0",
   "engines": {
     "node": ">=8",
@@ -29,12 +29,11 @@
     "url": "http://borodin.site"
   },
   "scripts": {
-    "build": "rearguard build --lib && rearguard build --lib -r",
-    "sync": "rearguard sync_deps"
+    "build": "tsc"
   },
-  "dependencies": {
-    "@borodindmitriy/interfaces": "1.0.0",
-    "@borodindmitriy/utils": "1.0.0"
-  },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "tslint": "5.11.0",
+    "typescript": "3.1.3"
+  }
 }

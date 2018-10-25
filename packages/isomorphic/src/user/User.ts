@@ -1,6 +1,5 @@
-import { IPersist } from "../../interfaces/IPersist";
-import { IUser } from "../../interfaces/IUser";
-import { detectID } from "../../utils/detectID";
+import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import { detectID } from "@borodindmitriy/utils";
 import { UserInsert } from "./UserInsert";
 
 export class User extends UserInsert implements IUser, IPersist {

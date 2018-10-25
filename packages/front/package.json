@@ -39,7 +39,7 @@
     "prepush": "sh ./prepublish.sh"
   },
   "devDependencies": {
-    "@types/bson": "1.0.11",
+    "@borodindmitriy/vendors-dll": "1.0.0",
     "@types/chai": "4.1.6",
     "@types/history": "4.7.0",
     "@types/hoist-non-react-statics": "3.0.1",

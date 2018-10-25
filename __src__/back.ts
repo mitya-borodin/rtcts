@@ -24,3 +24,17 @@ export { Service } from "./back/Service";
 export { UserService } from "./back/UserService";
 export { MigrationController } from "./back/MigrationController";
 export { Migration } from "./back/Migration";
+
+// WEB_SOCKET_CLASSES
+export {
+  cancel_assigment_to_user_of_the_connection_channel,
+  assigment_to_user_of_the_connection_channel,
+  ErrorChannel,
+  PingChannel,
+  PongChannel,
+} from "./webSocket/const";
+export { recognizeMessage, makeMessage, makeErrorMessage } from "./webSocket/helpers";
+export { WSServer } from "./webSocket/WSServer";
+export { Connection } from "./webSocket/Connection";
+export { Channels } from "./webSocket/Channels";
+export { WSMiddelware } from "./webSocket/WSMiddelware";

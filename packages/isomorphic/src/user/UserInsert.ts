@@ -1,5 +1,5 @@
-import { IUser } from "../../interfaces/IUser";
-import { isString } from "../../utils/isType";
+import { IUser } from "@borodindmitriy/interfaces";
+import { isString } from "@borodindmitriy/utils";
 
 export class UserInsert implements IUser {
   public readonly login: string;
