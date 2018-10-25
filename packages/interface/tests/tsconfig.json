@@ -1,0 +1,54 @@
+{
+  "version": "2.8.3",
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "target": "es6",
+    "module": "commonjs",
+    "lib": [
+      "es6",
+      "es7",
+      "dom"
+    ],
+    "diagnostics": true,
+    "allowJs": true,
+    "checkJs": false,
+    "sourceMap": false,
+    "removeComments": true,
+    "importHelpers": true,
+    "downlevelIteration": false,
+    "isolatedModules": false,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
+    "noEmit": true,
+    "noImplicitAny": false,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictPropertyInitialization": false,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {},
+    "rootDirs": [
+      "./unit"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [
+      "node",
+      "mocha",
+      "chai"
+    ],
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "unit/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
