@@ -20,7 +20,7 @@
   "isProject": false,
   "scripts": {
     "build": "rearguard build --dll && rearguard build --dll -r",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@types/history": "4.7.2",

@@ -6,7 +6,12 @@
     "target": "es6",
     "module": "commonjs",
     "pretty": true,
-    "lib": ["es6"],
+    "lib": [
+      "es6",
+      "es7",
+      "dom"
+    ],
+    "jsx": "react",
     "declaration": true,
     "importHelpers": true,
     "downlevelIteration": false,
@@ -15,6 +20,7 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "noEmit": false,
+    "rootDir": "src",
     "charset": "utf8",
     "noErrorTruncation": true,
     "diagnostics": false,
@@ -29,16 +35,24 @@
     "noImplicitReturns": false,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "moduleResolution": "node",
+    "baseUrl": "/Users/borodin_dmitriy/programming/base-code/packages/interfaces/src",
     "rootDirs": [],
     "paths": {},
-    "typeRoots": [],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "types": [],
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./src",
-    "rootDir": "src",
+    "experimentalDecorators": true,
     "outDir": "lib"
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "node_modules/.cache"
+  ],
+  "include": [
+    "/Users/borodin_dmitriy/programming/base-code/packages/interfaces/src"
+  ]
 }

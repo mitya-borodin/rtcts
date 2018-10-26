@@ -35,7 +35,7 @@
     "noImplicitReturns": false,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "moduleResolution": "node",
     "baseUrl": "/Users/borodin_dmitriy/programming/base-code/packages/utils/src",
     "rootDirs": [],

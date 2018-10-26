@@ -8,6 +8,7 @@ export { IValidate } from "./IValidate";
 export { IValidateResult } from "./IValidateResult";
 export { ILog } from "./ILog";
 export { ILogType } from "./ILogType";
+export { IEventEmitter } from "./IEventEmitter";
 
 // ENUMS
 export { userGroupEnum } from "./enums/userGroupEnum";
