@@ -1,7 +1,6 @@
 import { Strategy } from "passport-jwt";
 import { Strategy as PassportStrategy } from "passport-strategy";
-import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
+import { IPersist, IUser } from "@borodindmitriy/interfaces";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
 import { IUserModel } from "./interfaces/IUserModel";

@@ -1,21 +1,21 @@
 import chalk from "chalk";
 import * as express from "express";
 import * as WebSocket from "ws";
-import { IAppConfig } from "../back/interfaces/IAppConfig";
-import { IChannels } from "../back/interfaces/IChannels";
-import { IConnection } from "../back/interfaces/IConnection";
-import { IUserModel } from "../back/interfaces/IUserModel";
-import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
-import { getErrorMessage } from "../utils/getErrorMessage";
-import { isArray, isString } from "../utils/isType";
+import { IAppConfig } from "../interfaces/IAppConfig";
+import { IChannels } from "../interfaces/IChannels";
+import { IConnection } from "../interfaces/IConnection";
+import { IUserModel } from "../interfaces/IUserModel";
+import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import { getErrorMessage, isArray, isString } from "@borodindmitriy/utils";
 import {
   assigment_to_user_of_the_connection_channel,
   cancel_assigment_to_user_of_the_connection_channel,
   PingChannel,
   PongChannel,
-} from "./const";
-import { makeErrorMessage, makeMessage, recognizeMessage } from "./helpers";
+  makeErrorMessage,
+  makeMessage,
+  recognizeMessage,
+} from "@borodindmitriy/isomorphic";
 
 export class WSServer<U extends IUserModel<IUser & IPersist>> {
   private config: IAppConfig;

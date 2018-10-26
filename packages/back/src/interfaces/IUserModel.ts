@@ -1,4 +1,4 @@
-import { IPersist } from "../../interfaces/IPersist";
+import { IPersist } from "@borodindmitriy/interfaces";
 import { IModel } from "./IModel";
 
 export interface IUserModel<P extends IPersist> extends IModel<P> {

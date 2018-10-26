@@ -1,5 +1,4 @@
-import { IPersist } from "../../interfaces/IPersist";
-import { IUser } from "../../interfaces/IUser";
+import { IUser, IPersist } from "@borodindmitriy/interfaces";
 import { IRepository } from "./IRepository";
 
 export interface IUserRepository<U extends IUser & IPersist> extends IRepository<U> {

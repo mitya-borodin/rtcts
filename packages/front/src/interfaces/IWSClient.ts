@@ -1,4 +1,4 @@
-import { IEventEmitter } from "../../interfaces/IEventEmitter";
+import { IEventEmitter } from "@borodindmitriy/interfaces";
 
 export interface IWSClient extends IEventEmitter {
   isOpen: boolean;

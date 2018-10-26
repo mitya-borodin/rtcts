@@ -1,12 +1,7 @@
+import { IForm, IInsert, IPersist, IUser, IValidateResult, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { ValidateResult } from "@borodindmitriy/isomorphic";
+import { isString } from "@borodindmitriy/utils";
 import { action, computed, observable } from "mobx";
-import { userRepositoryEventEnum } from "../enums/userRepositoryEventEnum";
-import { IForm } from "../interfaces/IForm";
-import { IInsert } from "../interfaces/IInsert";
-import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
-import { IValidateResult } from "../interfaces/IValidateResult";
-import { ValidateResult } from "../isomorphic/ValidateResult";
-import { isString } from "../utils/isType";
 import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
@@ -21,9 +16,12 @@ export class RepositoryFormStore<
   USER extends IUser & IPersist = IUser & IPersist
 > implements IRepositoryFormStore<FORM, CHANGE> {
   // PUBLIC_PROPS
-  @observable public isValid: boolean = false;
-  @observable public showAlerts: boolean = false;
-  @observable public form: FORM | void;
+  @observable
+  public isValid: boolean = false;
+  @observable
+  public showAlerts: boolean = false;
+  @observable
+  public form: FORM | void;
 
   // DEPS
   protected readonly Persist: { new (...args: any[]): PERSIST };

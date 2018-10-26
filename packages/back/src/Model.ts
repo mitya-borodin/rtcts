@@ -1,7 +1,6 @@
 import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
-import { IInsert } from "../interfaces/IInsert";
-import { IPersist } from "../interfaces/IPersist";
-import { isObject, isString } from "../utils/isType";
+import { IPersist, IInsert } from "@borodindmitriy/interfaces";
+import { isObject, isString } from "@borodindmitriy/utils";
 import { IModel } from "./interfaces/IModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";

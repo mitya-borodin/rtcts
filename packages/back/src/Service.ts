@@ -1,8 +1,7 @@
 import * as express from "express";
 import * as passport from "passport";
-import { IInsert } from "../interfaces/IInsert";
-import { IPersist } from "../interfaces/IPersist";
-import { getErrorMessage } from "../utils/getErrorMessage";
+import { IInsert, IPersist } from "@borodindmitriy/interfaces";
+import { getErrorMessage } from "@borodindmitriy/utils";
 import { IChannels } from "./interfaces/IChannels";
 import { IModel } from "./interfaces/IModel";
 

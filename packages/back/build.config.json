@@ -1,9 +1,11 @@
 {
   "context": "src",
   "entry": "index.tsx",
-  "dll_entry": "vendors.ts",
   "lib_entry": "lib_exports.ts",
-  "modules": ["src"],
+  "dll_entry": "vendors.ts",
+  "modules": [
+    "src"
+  ],
   "output": {
     "path": "dist",
     "publicPath": "/"
@@ -26,10 +28,5 @@
       "ws": true
     }
   },
-  "sync_npm_deps": [
-    "@borodindmitriy/vendors-dll",
-    "@borodindmitriy/interfaces",
-    "@borodindmitriy/utils",
-    "@borodindmitriy/isomorphic"
-  ]
+  "sync_npm_deps": []
 }

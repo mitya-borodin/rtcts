@@ -29,10 +29,10 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@borodindmitriy/vendors-dll": "1.0.0"
+    "@borodindmitriy/vendors-dll": "1.0.1"
   },
   "devDependencies": {
-    "@borodindmitriy/vendors-dll": "1.0.0"
+    "@borodindmitriy/vendors-dll": "1.0.1"
   },
   "engines": {
     "node": ">=8",

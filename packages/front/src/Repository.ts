@@ -1,9 +1,7 @@
+import { IPersist, wsEventEnum } from "@borodindmitriy/interfaces";
+import { EventEmitter } from "@borodindmitriy/isomorphic";
+import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
 import { computed, observable, ObservableMap, runInAction } from "mobx";
-import { wsEventEnum } from "../enums/wsEventEnum";
-import { IPersist } from "../interface";
-import { EventEmitter } from "../isomorphic/EventEmitter";
-import { getErrorMessage } from "../utils/getErrorMessage";
-import { isArray, isObject } from "../utils/isType";
 import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
 import { IService } from "./interfaces/IService";

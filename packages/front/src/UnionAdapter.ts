@@ -1,7 +1,6 @@
+import { IForm, IPersist } from "@borodindmitriy/interfaces";
 import { History } from "history";
 import { extendObservable } from "mobx";
-import { IForm } from "../interfaces/IForm";
-import { IPersist } from "../interfaces/IPersist";
 import { EditAdapter } from "./EditAdapter";
 import { IEditCompositionActions, IEditCompositionAdapter } from "./interfaces/IEditComposition";
 import { IRepository } from "./interfaces/IRepository";

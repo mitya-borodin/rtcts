@@ -1,15 +1,16 @@
-import { action, computed, observable, runInAction } from "mobx";
-import { wsEventEnum } from "../enums/wsEventEnum";
-import { EventEmitter } from "../isomorphic/EventEmitter";
-import { getErrorMessage } from "../utils/getErrorMessage";
+import { wsEventEnum } from "@borodindmitriy/interfaces";
 import {
   assigment_to_user_of_the_connection_channel,
   cancel_assigment_to_user_of_the_connection_channel,
   ErrorChannel,
+  EventEmitter,
+  makeMessage,
   PingChannel,
   PongChannel,
-} from "../webSocket/const";
-import { makeMessage, recognizeMessage } from "../webSocket/helpers";
+  recognizeMessage,
+} from "@borodindmitriy/isomorphic";
+import { getErrorMessage } from "@borodindmitriy/utils";
+import { action, computed, observable, runInAction } from "mobx";
 import { IWSClient } from "./interfaces/IWSClient";
 
 export class WSClient extends EventEmitter implements IWSClient {

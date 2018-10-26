@@ -24,7 +24,8 @@
   "isProject": false,
   "scripts": {
     "build": "rearguard tsc --lib",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "sync": "rearguard sync_deps"
   },
   "engines": {
     "node": ">=8",

@@ -1,5 +1,5 @@
-import { userRepositoryEventEnum } from "../enums/userRepositoryEventEnum";
-import { isString } from "../utils/isType";
+import { userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { isString } from "@borodindmitriy/utils";
 import { IMediator } from "./interfaces/IMediator";
 import { IService } from "./interfaces/IService";
 import { IWSClient } from "./interfaces/IWSClient";

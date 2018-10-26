@@ -15,7 +15,7 @@ import {
   InsertWriteOpResult,
   ReplaceOneOptions,
 } from "mongodb";
-import { isString } from "../utils/isType";
+import { isString } from "@borodindmitriy/utils";
 import { IDBConnection } from "./interfaces/IDBConnection";
 import { IRepository } from "./interfaces/IRepository";
 
@@ -99,7 +99,7 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
   public async insertMany(docs: object[], options?: CollectionInsertManyOptions): Promise<T[]> {
     try {
       const collection: Collection<T> = await this.getCollection();
-      const insert: InsertWriteOpResult = await collection.insertMany(docs, options);
+      const insert: InsertWriteOpResult = await collection.insertMany(docs as any, options);
 
       return insert.ops.map((data: any) => this.prepareId(data));
     } catch (error) {
@@ -112,7 +112,7 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
   public async insertOne(doc: object, options?: CollectionInsertOneOptions): Promise<T> {
     try {
       const collection: Collection<T> = await this.getCollection();
-      const insert: InsertOneWriteOpResult = await collection.insertOne(doc, options);
+      const insert: InsertOneWriteOpResult = await collection.insertOne(doc as any, options);
 
       return insert.ops.map((data: any) => this.prepareId(data))[0];
     } catch (error) {

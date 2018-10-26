@@ -1,5 +1,5 @@
 import { History } from "history";
-import { IValidateResult } from "../../interfaces/IValidateResult";
+import { IValidateResult } from "@borodindmitriy/interfaces";
 import { IComposition } from "./IComposition";
 
 export interface IEditCompositionAdapter extends IComposition {

@@ -1,10 +1,8 @@
+import { IForm, IPersist, IValidateResult } from "@borodindmitriy/interfaces";
+import { isString, isUndefined } from "@borodindmitriy/utils";
 import { History } from "history";
 import { action, extendObservable, observable } from "mobx";
 import * as qs from "querystringify";
-import { IForm } from "../interfaces/IForm";
-import { IPersist } from "../interfaces/IPersist";
-import { IValidateResult } from "../interfaces/IValidateResult";
-import { isString, isUndefined } from "../utils/isType";
 import { IEditComposition, IEditCompositionActions, IEditCompositionAdapter } from "./interfaces/IEditComposition";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
@@ -27,8 +25,10 @@ export class EditAdapter<
   protected history: H;
 
   // OBSERVABLE_PROPS
-  @observable protected isLoading: boolean = false;
-  @observable protected showAlerts: boolean = false;
+  @observable
+  protected isLoading: boolean = false;
+  @observable
+  protected showAlerts: boolean = false;
 
   constructor(repository: REP, formStore: FS, history: H) {
     // DEPS

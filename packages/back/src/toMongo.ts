@@ -1,6 +1,6 @@
 import { ObjectId } from "bson";
-import { IPersist } from "../interfaces/IPersist";
-import { isUndefined } from "../utils/isType";
+import { IPersist } from "@borodindmitriy/interfaces";
+import { isUndefined } from "@borodindmitriy/utils";
 
 export function toMongo<T extends IPersist>(persist: T): { [key: string]: any } & { _id: ObjectId } {
   const { id, ...data }: any = persist.toJS();

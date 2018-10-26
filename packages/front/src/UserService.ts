@@ -1,5 +1,4 @@
-import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
+import { IPersist, IUser } from "@borodindmitriy/interfaces";
 import { IMediator } from "./interfaces/IMediator";
 import { IUserService } from "./interfaces/IUserService";
 import { IWSClient } from "./interfaces/IWSClient";

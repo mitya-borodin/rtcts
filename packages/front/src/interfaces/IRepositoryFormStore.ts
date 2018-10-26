@@ -1,4 +1,4 @@
-import { IForm } from "../../interfaces/IForm";
+import { IForm } from "@borodindmitriy/interfaces";
 import { IFormStore } from "./IFormStore";
 
 /**

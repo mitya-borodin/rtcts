@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import * as uuid from "uuid/v1";
 import * as WebSocket from "ws";
-import { IConnection } from "../back/interfaces/IConnection";
-import { isString } from "../utils/isType";
+import { IConnection } from "../interfaces/IConnection";
+import { isString } from "@borodindmitriy/utils";
 
 export class Connection implements IConnection {
   public static getConnectionID(uid: string, wsid: string): string {

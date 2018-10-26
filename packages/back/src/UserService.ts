@@ -1,9 +1,7 @@
+import { IPersist, IUser, userGroupEnum } from "@borodindmitriy/interfaces";
+import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
-import { userGroupEnum } from "../enums/userGroupEnum";
-import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
-import { getErrorMessage } from "../utils/getErrorMessage";
 import { IChannels } from "./interfaces/IChannels";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";

@@ -1,5 +1,5 @@
 import { ObservableMap } from "mobx";
-import { IEventEmitter } from "../../interfaces/IEventEmitter";
+import { IEventEmitter } from "@borodindmitriy/interfaces";
 
 export interface IRepository<T> extends IEventEmitter {
   isInit: boolean;

@@ -1,8 +1,8 @@
 import chalk from "chalk";
-import { IChannels } from "../back/interfaces/IChannels";
-import { IConnection } from "../back/interfaces/IConnection";
+import { IChannels } from "../interfaces/IChannels";
+import { IConnection } from "../interfaces/IConnection";
 import { Connection } from "./Connection";
-import { makeMessage } from "./helpers";
+import { makeMessage } from "@borodindmitriy/isomorphic";
 
 export class Channels<C extends IConnection = IConnection> implements IChannels<C> {
   // Map<connectionID: string, Connection>

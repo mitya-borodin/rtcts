@@ -1,5 +1,4 @@
-import { IPersist } from "../../interfaces/IPersist";
-import { IUser } from "../../interfaces/IUser";
+import { IPersist, IUser } from "@borodindmitriy/interfaces";
 import { IService } from "./IService";
 
 export interface IUserService<U extends IUser & IPersist> extends IService<U> {

@@ -1,4 +1,4 @@
-import { IValidateResult } from "../../interfaces/IValidateResult";
+import { IValidateResult } from "@borodindmitriy/interfaces";
 
 /**
  * IFormStore - для данных которые не имеют сущностей в системе.

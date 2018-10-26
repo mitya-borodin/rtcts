@@ -1,10 +1,6 @@
+import { IPersist, IUser, userGroupEnum, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { getErrorMessage, isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
-import { userGroupEnum } from "../enums/userGroupEnum";
-import { userRepositoryEventEnum } from "../enums/userRepositoryEventEnum";
-import { IPersist } from "../interfaces/IPersist";
-import { IUser } from "../interfaces/IUser";
-import { getErrorMessage } from "../utils/getErrorMessage";
-import { isString } from "../utils/isType";
 import { IMediator } from "./interfaces/IMediator";
 import { IUserRepository } from "./interfaces/IUserRepository";
 import { IUserService } from "./interfaces/IUserService";
