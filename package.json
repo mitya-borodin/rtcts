@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "sh bootstrap.sh",
+    "re_build": "sh re_build.sh",
     "clear": "sh clear.sh"
   }
 }

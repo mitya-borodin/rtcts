@@ -12,8 +12,8 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "main": "lib/index.js",
-  "module": "lib/index.js",
+  "main": "lib/lib_exports.js",
+  "module": "lib/lib_exports.js",
   "files": [
     "dll_bundle",
     "lib",
@@ -23,9 +23,14 @@
   "isLibrary": true,
   "isProject": false,
   "scripts": {
-    "build": "rearguard tsc --lib",
+    "build": "rearguard build --lib",
     "prepublishOnly": "npm run build",
     "sync": "rearguard sync_deps"
+  },
+  "devDependencies": {
+    "tslint": "^5.11.0",
+    "tslint-no-circular-imports": "^0.6.1",
+    "typescript": "^3.1.3"
   },
   "engines": {
     "node": ">=8",
@@ -35,5 +40,5 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "types": "lib/index.d.ts"
+  "types": "lib/lib_exports.d.ts"
 }

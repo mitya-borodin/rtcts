@@ -7,7 +7,7 @@ rm -rf dll_bundle node_modules package-lock.json tsconfig.json socket.config.jso
 
 cd ../interfaces
 npm unlink
-rm -rf lib package-lock.json tsconfig.json socket.config.json tslint.json
+rm -rf dll_bundle lib lib_bundle node_modules package-lock.json tsconfig.json socket.config.json tslint.json
 
 cd ../utils
 npm unlink
@@ -24,5 +24,5 @@ rm -rf dll_bundle lib lib_bundle node_modules package-lock.json tsconfig.json so
 
 cd ../back
 npm unlink
-rm -rf lib  node_modules package-lock.json tsconfig.json socket.config.json tslint.json
+rm -rf lib node_modules package-lock.json tsconfig.json socket.config.json tslint.json
 
