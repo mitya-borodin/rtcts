@@ -3,6 +3,7 @@
  */
 
 import "antd";
+import "antd-mobile";
 import "antd-mobile/dist/antd-mobile.css";
 import "antd/dist/antd.css";
 import "antd/lib/locale-provider/en_US";

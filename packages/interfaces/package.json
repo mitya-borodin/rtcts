@@ -23,7 +23,7 @@
   "isLibrary": true,
   "isProject": false,
   "scripts": {
-    "build": "rearguard build --lib",
+    "build": "rearguard build --lib && rearguard build --lib -r",
     "prepublishOnly": "npm run build",
     "sync": "rearguard sync_deps"
   },
