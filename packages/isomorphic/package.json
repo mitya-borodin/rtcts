@@ -28,14 +28,14 @@
     "sync": "rearguard sync_deps"
   },
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "1.0.2",
-    "@borodindmitriy/utils": "1.3.0",
-    "@borodindmitriy/vendors-dll": "1.0.1"
+    "@borodindmitriy/interfaces": "1.0.3",
+    "@borodindmitriy/utils": "1.3.1",
+    "@borodindmitriy/vendors-dll": "1.0.2"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "1.0.2",
-    "@borodindmitriy/utils": "1.3.0",
-    "@borodindmitriy/vendors-dll": "1.0.1"
+    "@borodindmitriy/interfaces": "1.0.3",
+    "@borodindmitriy/utils": "1.3.1",
+    "@borodindmitriy/vendors-dll": "1.0.2"
   },
   "engines": {
     "node": ">=8",
