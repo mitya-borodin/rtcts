@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "@borodindmitriy/vendors-dll",
   "description": "This package is DLL bundle of verndors only;",
   "license": "MIT",
