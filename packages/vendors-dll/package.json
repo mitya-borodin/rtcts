@@ -1,5 +1,4 @@
 {
-  "version": "1.0.2",
   "name": "@borodindmitriy/vendors-dll",
   "description": "This package is DLL bundle of verndors only;",
   "license": "MIT",
@@ -12,15 +11,15 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
+  "version": "1.0.3",
   "files": [
+    "build.config.json",
     "dll_bundle"
   ],
-  "isDLL": true,
-  "isLibrary": false,
-  "isProject": false,
   "scripts": {
     "build": "rearguard build --dll && rearguard build --dll -r",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "sync": "echo 'do sync'"
   },
   "dependencies": {
     "@types/history": "4.7.2",
@@ -60,5 +59,8 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  }
+  },
+  "isDLL": true,
+  "isLibrary": false,
+  "isProject": false
 }

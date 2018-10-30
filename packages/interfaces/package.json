@@ -1,5 +1,4 @@
 {
-  "version": "1.0.3",
   "name": "@borodindmitriy/interfaces",
   "description": "Common interface's library.",
   "license": "MIT",
@@ -12,16 +11,15 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
+  "version": "1.0.4",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
+    "build.config.json",
     "dll_bundle",
     "lib",
     "lib_bundle"
   ],
-  "isDLL": false,
-  "isLibrary": true,
-  "isProject": false,
   "scripts": {
     "build": "rearguard build --lib && rearguard build --lib -r",
     "prepublishOnly": "npm run build",
@@ -40,5 +38,8 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "isDLL": false,
+  "isLibrary": true,
+  "isProject": false,
   "types": "lib/lib_exports.d.ts"
 }
