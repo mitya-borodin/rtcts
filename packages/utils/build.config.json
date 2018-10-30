@@ -3,7 +3,9 @@
   "entry": "index.tsx",
   "dll_entry": "vendors.ts",
   "lib_entry": "lib_exports.ts",
-  "modules": ["src"],
+  "modules": [
+    "src"
+  ],
   "output": {
     "path": "dist",
     "publicPath": "/"
@@ -26,5 +28,7 @@
       "ws": true
     }
   },
-  "sync_npm_deps": ["@borodindmitriy/vendors-dll"]
+  "sync_npm_deps": [
+    "@borodindmitriy/vendors-dll"
+  ]
 }

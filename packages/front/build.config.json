@@ -3,7 +3,9 @@
   "entry": "index.tsx",
   "dll_entry": "vendors.ts",
   "lib_entry": "lib_exports.ts",
-  "modules": ["src"],
+  "modules": [
+    "src"
+  ],
   "output": {
     "path": "dist",
     "publicPath": "/"
