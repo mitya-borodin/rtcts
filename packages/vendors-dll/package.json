@@ -11,15 +11,18 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.5",
+  "version": "1.0.6",
   "files": [
     "build.config.json",
     "dll_bundle"
   ],
   "scripts": {
     "build": "rearguard build --dll && rearguard build --dll -r",
+    "lint": "echo 'do lint'",
     "prepublishOnly": "npm run build",
-    "sync": "echo 'do sync'"
+    "prepush": "sh ./pre_publish.sh",
+    "sync": "echo 'do sync'",
+    "test": "echo 'do test'"
   },
   "dependencies": {
     "@types/history": "4.7.2",

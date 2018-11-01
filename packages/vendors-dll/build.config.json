@@ -13,7 +13,9 @@
   "typescript": {
     "config": {
       "compileOnSave": false,
-      "compilerOptions": {}
+      "compilerOptions": {},
+      "exclude": [],
+      "include": []
     },
     "configPath": "tsconfig.json"
   },
