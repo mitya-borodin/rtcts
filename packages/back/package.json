@@ -22,8 +22,11 @@
   ],
   "scripts": {
     "build": "rearguard tsc --lib",
+    "lint": "echo 'do lint'",
     "prepublishOnly": "npm run build",
-    "sync": "rearguard sync_deps --lib"
+    "prepush": "sh ./pre_publish.sh",
+    "sync": "rearguard sync_deps --lib",
+    "test": "echo 'do test'"
   },
   "dependencies": {},
   "peerDependencies": {

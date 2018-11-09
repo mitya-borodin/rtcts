@@ -22,21 +22,24 @@
   ],
   "scripts": {
     "build": "rearguard build --lib && rearguard build --lib -r",
+    "lint": "echo 'do lint'",
     "prepublishOnly": "npm run build",
-    "sync": "rearguard sync_deps --lib"
+    "prepush": "sh ./pre_publish.sh",
+    "sync": "rearguard sync_deps --lib",
+    "test": "echo 'do test'"
   },
   "dependencies": {},
   "peerDependencies": {
     "@borodindmitriy/interfaces": "1.0.6",
     "@borodindmitriy/isomorphic": "1.0.5",
     "@borodindmitriy/utils": "1.3.4",
-    "@borodindmitriy/vendors-dll": "1.0.5"
+    "@borodindmitriy/vendors-dll": "1.0.9"
   },
   "devDependencies": {
     "@borodindmitriy/interfaces": "1.0.6",
     "@borodindmitriy/isomorphic": "1.0.5",
     "@borodindmitriy/utils": "1.3.4",
-    "@borodindmitriy/vendors-dll": "1.0.5"
+    "@borodindmitriy/vendors-dll": "1.0.9"
   },
   "engines": {
     "node": ">=8",
