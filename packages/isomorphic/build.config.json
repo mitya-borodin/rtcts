@@ -3,9 +3,7 @@
   "entry": "index.tsx",
   "lib_entry": "lib_exports.ts",
   "dll_entry": "vendors.ts",
-  "modules": [
-    "src"
-  ],
+  "modules": ["src"],
   "output": {
     "path": "dist",
     "publicPath": "/"
@@ -13,7 +11,9 @@
   "typescript": {
     "config": {
       "compileOnSave": false,
-      "compilerOptions": {}
+      "compilerOptions": {},
+      "exclude": [],
+      "include": []
     },
     "configPath": "tsconfig.json"
   },
@@ -28,9 +28,5 @@
       "ws": true
     }
   },
-  "sync_npm_deps": [
-    "@borodindmitriy/vendors-dll",
-    "@borodindmitriy/interfaces",
-    "@borodindmitriy/utils"
-  ]
+  "sync_npm_deps": ["@borodindmitriy/vendors-dll", "@borodindmitriy/interfaces", "@borodindmitriy/utils"]
 }

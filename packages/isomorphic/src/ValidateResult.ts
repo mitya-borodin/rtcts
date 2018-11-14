@@ -2,8 +2,8 @@ import { ILog, IValidate, IValidateResult, logTypeEnum } from "@borodindmitriy/i
 import { Validate } from "./Validate";
 
 // tslint:disable:object-literal-sort-keys
-export class ValidateResult<V extends IValidate = IValidate> implements IValidateResult<V> {
-  public readonly results: V[];
+export class ValidateResult implements IValidateResult<IValidate> {
+  public readonly results: IValidate[];
   public readonly isValid: boolean;
   public readonly hasError: boolean;
   public readonly hasWarn: boolean;
@@ -15,7 +15,7 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
 
   private readonly __CACHE__: { [key: string]: any } = {};
 
-  constructor(results: V[]) {
+  constructor(items: Array<IValidate | IValidateResult<IValidate>>) {
     let hasError = false;
     let hasWarn = false;
     let hasLog = false;
@@ -23,6 +23,19 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
 
     const messages: string[] = [];
     const log: ILog[] = [];
+    const results: IValidate[] = [];
+
+    for (const item of items) {
+      if (item instanceof Validate) {
+        results.push(item);
+      }
+
+      if (item instanceof ValidateResult) {
+        for (const validate_item of item.toValidate()) {
+          results.push(validate_item);
+        }
+      }
+    }
 
     for (const r of results) {
       if (r.type === logTypeEnum.error) {
@@ -42,6 +55,7 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
       }
 
       messages.push(r.message);
+
       log.push(Object.freeze(r.log));
     }
 
@@ -75,7 +89,7 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
     Object.freeze(this);
   }
 
-  public getFieldValidation(a_field: string): V | void {
+  public getFieldValidation(a_field: string): IValidate | void {
     let result = this.__CACHE__[a_field];
 
     if (result) {
@@ -103,7 +117,7 @@ export class ValidateResult<V extends IValidate = IValidate> implements IValidat
     return !!this.getFieldValidation(a_field);
   }
 
-  public toValidate(): V[] {
+  public toValidate(): IValidate[] {
     return this.results.map((r) => r);
   }
 
