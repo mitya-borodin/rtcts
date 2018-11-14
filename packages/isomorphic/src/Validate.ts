@@ -1,4 +1,4 @@
-import { ILog, ILogType, IValidate } from "@borodindmitriy/interfaces";
+import { ILog, IValidate } from "@borodindmitriy/interfaces";
 import { isString, isUndefined } from "@borodindmitriy/utils";
 import { Log } from "./Log";
 
@@ -7,7 +7,7 @@ export class Validate extends Log implements IValidate {
   public readonly field: string;
   public readonly title?: string;
 
-  constructor(data?: { field?: string; title?: string; type?: ILogType; message?: string }) {
+  constructor(data?: any) {
     super(data);
 
     if (data) {
