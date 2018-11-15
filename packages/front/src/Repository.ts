@@ -1,7 +1,7 @@
 import { IPersist, wsEventEnum } from "@borodindmitriy/interfaces";
 import { EventEmitter } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
-import { computed, observable, ObservableMap, runInAction } from "mobx";
+import { action, computed, observable, ObservableMap, runInAction } from "mobx";
 import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
 import { IService } from "./interfaces/IService";
@@ -82,6 +82,7 @@ export class Repository<
     return list;
   }
 
+  @action("[ REPOSITORY ][ INIT ]")
   public async init(): Promise<void> {
     if (!this.isInit) {
       try {
@@ -114,6 +115,7 @@ export class Repository<
     }
   }
 
+  @action("[ REPOSITORY ][ CREATE ]")
   public async create(data: object): Promise<T | void> {
     if (this.isInit) {
       try {
@@ -146,6 +148,7 @@ export class Repository<
     }
   }
 
+  @action("[ REPOSITORY ][ UPDATE ]")
   public async update(data: object): Promise<T | void> {
     if (this.isInit) {
       try {
@@ -178,6 +181,7 @@ export class Repository<
     }
   }
 
+  @action("[ REPOSITORY ][ REMOVE ]")
   public async remove(id: string): Promise<T | void> {
     if (this.isInit) {
       try {
@@ -210,6 +214,7 @@ export class Repository<
     }
   }
 
+  @action("[ REPOSITORY ][ RECEIVE_MESSAGE ]")
   public receiveMessage([channelName, payload]: [string, any]): void {
     if (this.isInit) {
       try {

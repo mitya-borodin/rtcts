@@ -33,7 +33,7 @@ export interface IFormStore<F, C> {
 
   validate: IValidateResult;
 
-  open(id?: string): void;
+  open(id?: string): Promise<void>;
   change(change: C): Promise<void>;
   submit(): Promise<void>;
   cancel(): void;

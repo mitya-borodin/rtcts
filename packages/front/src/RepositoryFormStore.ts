@@ -91,14 +91,14 @@ export class RepositoryFormStore<
     this.cancel = this.cancel.bind(this);
   }
 
-  @computed
+  @computed({ name: "[ REPOSITORY_FORM_STORE ][ ID ]" })
   get id(): string | void {
     if (this.form instanceof this.Form) {
       return this.form.id;
     }
   }
 
-  @computed
+  @computed({ name: "[ REPOSITORY_FORM_STORE ][ VALIDATE ]" })
   get validate(): IValidateResult {
     if (this.form instanceof this.Form) {
       return this.form.validate();
@@ -113,19 +113,19 @@ export class RepositoryFormStore<
   }
 
   @action("[ REPOSITORY_FORM_STORE ][ OPEN ]")
-  public open(id?: string): void {
+  public async open(id?: string): Promise<void> {
     if (isString(id)) {
       const persist = this.repository.map.get(id);
 
       if (persist instanceof this.Persist) {
-        this.form = this.openAssign(persist);
+        this.form = await this.openAssign(persist);
 
         this.setIsValid(this.validate.isValid);
       } else {
         console.error(`[ ${this.constructor.name} ][ open ][ ${this.Persist.name} ][ NOT_FOUND ]`);
       }
     } else {
-      this.form = this.openAssign();
+      this.form = await this.openAssign();
 
       this.setIsValid(false);
     }
@@ -181,7 +181,7 @@ export class RepositoryFormStore<
   }
 
   @action("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ]")
-  protected openAssign(persist?: PERSIST): FORM {
+  protected async openAssign(persist?: PERSIST): Promise<FORM> {
     if (persist instanceof this.Persist) {
       return new this.Form(persist.toJS());
     }
