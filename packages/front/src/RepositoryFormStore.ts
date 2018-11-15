@@ -134,7 +134,7 @@ export class RepositoryFormStore<
   @action("[ REPOSITORY_FORM_STORE ][ CHANGE ]")
   public async change(change: CHANGE): Promise<void> {
     if (this.form instanceof this.Form) {
-      this.form = this.changeAssign(this.form, change);
+      this.form = await this.changeAssign(this.form, change);
 
       this.setIsValid(this.validate.isValid);
     } else {
@@ -190,7 +190,7 @@ export class RepositoryFormStore<
   }
 
   @action("[ REPOSITORY_FORM_STORE ][ CHANGE_ASSIGN ]")
-  protected changeAssign(form: FORM, change: CHANGE): FORM {
+  protected async changeAssign(form: FORM, change: CHANGE): Promise<FORM> {
     console.log(change);
     return form;
   }
