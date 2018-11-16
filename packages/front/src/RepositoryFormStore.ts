@@ -120,7 +120,7 @@ export class RepositoryFormStore<
       if (persist instanceof this.Persist) {
         const form = await this.openAssign(persist);
 
-        runInAction("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ][ UPDATE ]", () => {
+        runInAction("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ][ UPDATE_MODE ]", () => {
           this.form = form;
         });
 
@@ -131,7 +131,7 @@ export class RepositoryFormStore<
     } else {
       const form = await this.openAssign();
 
-      runInAction("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ][ CREATE ]", () => {
+      runInAction("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ][ CREATE_MODE ]", () => {
         this.form = form;
       });
 
