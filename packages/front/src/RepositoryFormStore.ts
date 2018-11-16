@@ -1,7 +1,7 @@
 import { IForm, IInsert, IPersist, IUser, IValidateResult, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
 import { ValidateResult } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
-import { action, computed, observable } from "mobx";
+import { action, computed, observable, runInAction } from "mobx";
 import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
@@ -118,14 +118,22 @@ export class RepositoryFormStore<
       const persist = this.repository.map.get(id);
 
       if (persist instanceof this.Persist) {
-        this.form = await this.openAssign(persist);
+        const form = await this.openAssign(persist);
+
+        runInAction("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ][ UPDATE ]", () => {
+          this.form = form;
+        });
 
         this.setIsValid(this.validate.isValid);
       } else {
         console.error(`[ ${this.constructor.name} ][ open ][ ${this.Persist.name} ][ NOT_FOUND ]`);
       }
     } else {
-      this.form = await this.openAssign();
+      const form = await this.openAssign();
+
+      runInAction("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ][ CREATE ]", () => {
+        this.form = form;
+      });
 
       this.setIsValid(false);
     }
@@ -134,7 +142,11 @@ export class RepositoryFormStore<
   @action("[ REPOSITORY_FORM_STORE ][ CHANGE ]")
   public async change(change: CHANGE): Promise<void> {
     if (this.form instanceof this.Form) {
-      this.form = await this.changeAssign(this.form, change);
+      const form = await this.changeAssign(this.form, change);
+
+      runInAction("[ REPOSITORY_FORM_STORE ][ CHANGE_ASSIGN ]", () => {
+        this.form = form;
+      });
 
       this.setIsValid(this.validate.isValid);
     } else {

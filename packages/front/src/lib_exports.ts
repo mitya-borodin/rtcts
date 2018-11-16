@@ -4,23 +4,12 @@ export { IWSClient } from "./interfaces/IWSClient";
 export { IService } from "./interfaces/IService";
 export { IUserService } from "./interfaces/IUserService";
 export { IRepository } from "./interfaces/IRepository";
+export { ICacheRepository } from "./interfaces/ICacheRepository";
 export { IMediator } from "./interfaces/IMediator";
 export { IComposition } from "./interfaces/IComposition";
-export {
-  IListComposition,
-  IListCompositionAdapter,
-  IListCompositionActions,
-} from "./interfaces/IListComposition";
-export {
-  IEditComposition,
-  IEditCompositionAdapter,
-  IEditCompositionActions,
-} from "./interfaces/IEditComposition";
-export {
-  IUnionComposition,
-  IUnionCompositionActions,
-  IUnionCompositionAdapter,
-} from "./interfaces/IUnionComposition";
+export { IListComposition, IListCompositionAdapter, IListCompositionActions } from "./interfaces/IListComposition";
+export { IEditComposition, IEditCompositionAdapter, IEditCompositionActions } from "./interfaces/IEditComposition";
+export { IUnionComposition, IUnionCompositionActions, IUnionCompositionAdapter } from "./interfaces/IUnionComposition";
 export { IFormStore } from "./interfaces/IFormStore";
 export { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
 export { IUIStore } from "./interfaces/IUIStore";
