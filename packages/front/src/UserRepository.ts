@@ -173,7 +173,6 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     }
   }
 
-  @action("[ USER_REPOSITORY ][ SIGN_UP ]")
   public async signUp(data: { [key: string]: any }): Promise<boolean> {
     try {
       this.startLoad();
@@ -181,9 +180,11 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       const result: { token: string; user: object } | void = await this.service.signUp(data);
 
       if (result) {
-        const user = new this.Persist(result.user);
+        runInAction("[ USER_REPOSITORY ][ SIGN_UP ]", () => {
+          const user = new this.Persist(result.user);
 
-        this.map.set(user.id, user);
+          this.map.set(user.id, user);
+        });
 
         return true;
       } else {
@@ -200,7 +201,6 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     }
   }
 
-  @action("[ USER_REPOSITORY ][ UPDATE_LOGIN ]")
   public async updateLogin(data: { [key: string]: any }): Promise<void> {
     try {
       this.startLoad();
@@ -211,11 +211,15 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         if (user instanceof this.Persist) {
           user = await this.service.updateLogin({ ...user.toJS(), ...data });
 
-          if (user instanceof this.Persist) {
-            this.collection.set(user.id, user);
-          } else {
+          if (!user) {
             return Promise.reject();
           }
+
+          runInAction("[ USER_REPOSITORY ][ UPDATE_LOGIN ]", () => {
+            if (user instanceof this.Persist) {
+              this.collection.set(user.id, user);
+            }
+          });
         } else {
           return Promise.reject();
         }
@@ -235,7 +239,6 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     }
   }
 
-  @action("[ USER_REPOSITORY ][ UPDATE_PASSWORD ]")
   public async updatePassword(data: { [key: string]: any }): Promise<void> {
     try {
       this.startLoad();
@@ -244,7 +247,9 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         const user = await this.service.updatePassword(data);
 
         if (user instanceof this.Persist) {
-          this.collection.set(user.id, user);
+          runInAction("[ USER_REPOSITORY ][ UPDATE_PASSWORD ]", () => {
+            this.collection.set(user.id, user);
+          });
         } else {
           return Promise.reject();
         }
@@ -266,7 +271,6 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     }
   }
 
-  @action("[ USER_REPOSITORY ][ UPDATE_GROUP ]")
   public async updateGroup(ids: string[], updateGroup: string): Promise<void> {
     try {
       this.startLoad();
@@ -274,13 +278,15 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       const users: U[] | void = await this.service.updateGroup(ids, updateGroup);
 
       if (Array.isArray(users)) {
-        for (const user of users) {
-          if (user instanceof this.Persist) {
-            this.collection.set(user.id, user);
-          } else {
-            throw new Error(`Service come back not user instance;`);
+        runInAction("[ USER_REPOSITORY ][ UPDATE_GROUP ]", () => {
+          for (const user of users) {
+            if (user instanceof this.Persist) {
+              this.collection.set(user.id, user);
+            } else {
+              throw new Error(`Service come back not user instance;`);
+            }
           }
-        }
+        });
       } else {
         console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ RESPONSE_ERROR ][ users: ${users} ]`);
 
@@ -301,11 +307,13 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       this.startLoad();
       const user: U | void = await this.service.remove(id);
 
-      if (user instanceof this.Persist) {
-        this.collection.delete(user.id);
-      } else {
-        throw new Error(`Service come back not user instance;`);
-      }
+      runInAction("[ USER_REPOSITORY ][ UPDATE_GROUP ]", () => {
+        if (user instanceof this.Persist) {
+          this.collection.delete(user.id);
+        } else {
+          throw new Error(`Service come back not user instance;`);
+        }
+      });
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ REMOVE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
