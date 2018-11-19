@@ -92,7 +92,7 @@ export class Repository<
           const collection: T[] | void = await this.service.collection();
 
           if (isArray(collection)) {
-            runInAction(`[ ${this.constructor.name} ][ INIT ][ SUCCESS ]`, () => {
+            runInAction(`[ SUCCESS ]`, () => {
               this.collection = collection.reduce<ObservableMap<string, T>>(
                 (preValue, item: T) => preValue.set(item.id, item),
                 observable.map(),
@@ -125,9 +125,7 @@ export class Repository<
           const item: T | void = await this.service.create(data);
 
           if (item) {
-            runInAction(`[ ${this.constructor.name} ][ CREATE ][ SUCCESS ]`, () => {
-              this.collection.set(item.id, item);
-            });
+            runInAction(`[ SUCCESS ]`, () => this.collection.set(item.id, item));
           } else {
             throw new Error(`item: ${Object.prototype.toString.call(item)}`);
           }
@@ -158,9 +156,7 @@ export class Repository<
           const item: T | void = await this.service.update(data);
 
           if (item) {
-            runInAction(`[ ${this.constructor.name} ][ UPDATE ][ SUCCESS ]`, () => {
-              this.collection.set(item.id, item);
-            });
+            runInAction(`[ SUCCESS ]`, () => this.collection.set(item.id, item));
           } else {
             throw new Error(`item: ${Object.prototype.toString.call(item)}`);
           }
@@ -191,9 +187,7 @@ export class Repository<
           const item: T | void = await this.service.remove(id);
 
           if (item) {
-            runInAction(`[ ${this.constructor.name} ][ REMOVE ][ SUCCESS ]`, () => {
-              this.collection.delete(item.id);
-            });
+            runInAction(`[ SUCCESS ]`, () => this.collection.delete(item.id));
           } else {
             throw new Error(`item: ${Object.prototype.toString.call(item)}`);
           }
@@ -265,24 +259,21 @@ export class Repository<
     }
   }
 
+  @action("[ REPOSITORY ][ START_LODING ]")
   protected startLoad() {
-    runInAction(`[ ${this.constructor.name} ][ START_LODING ]`, () => {
-      this.isLoading = true;
-    });
+    this.isLoading = true;
   }
 
+  @action("[ REPOSITORY ][ STOP_LODING ]")
   protected endLoad() {
-    runInAction(`[ ${this.constructor.name} ][ END_LODING ]`, () => {
-      this.isLoading = false;
-    });
+    this.isLoading = false;
   }
 
+  @action("[ REPOSITORY ][ DESTROY ]")
   protected destroy(): void {
-    runInAction(`[ ${this.constructor.name} ][ DESTROY ]`, () => {
-      this.isInit = false;
-      this.isLoading = false;
-      this.collection.clear();
-    });
+    this.isInit = false;
+    this.isLoading = false;
+    this.collection.clear();
   }
 
   private handleAssigment() {

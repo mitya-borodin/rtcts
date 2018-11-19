@@ -79,9 +79,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
           await this.getCurrentUser(); // Загрузка текущего пользователя;
           await super.init(); // Загрузка коллекции;
 
-          runInAction("[ USER_REPOSITORY ][ WAS_INIT ]", () => {
-            this.isInit = true;
-          });
+          runInAction("[ SUCCESS ]", () => (this.isInit = true));
         } else {
           this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
 
@@ -206,20 +204,18 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       this.startLoad();
 
       if (isString(data.id) && isString(data.login)) {
-        let user: U | void = this.map.get(data.id);
+        const cur_user: U | void = this.map.get(data.id);
 
-        if (user instanceof this.Persist) {
-          user = await this.service.updateLogin({ ...user.toJS(), ...data });
+        if (cur_user instanceof this.Persist) {
+          const update = await this.service.updateLogin({ ...cur_user.toJS(), ...data });
 
-          if (!user) {
+          if (update instanceof this.Persist) {
+            runInAction("[ USER_REPOSITORY ][ UPDATE_LOGIN ]", () => {
+              this.collection.set(update.id, update);
+            });
+          } else {
             return Promise.reject();
           }
-
-          runInAction("[ USER_REPOSITORY ][ UPDATE_LOGIN ]", () => {
-            if (user instanceof this.Persist) {
-              this.collection.set(user.id, user);
-            }
-          });
         } else {
           return Promise.reject();
         }
@@ -307,7 +303,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       this.startLoad();
       const user: U | void = await this.service.remove(id);
 
-      runInAction("[ USER_REPOSITORY ][ UPDATE_GROUP ]", () => {
+      runInAction("SUCCESS", () => {
         if (user instanceof this.Persist) {
           this.collection.delete(user.id);
         } else {
@@ -353,7 +349,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
         const user: U | void = await this.service.current();
 
         if (user instanceof this.Persist) {
-          await runInAction(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ SUCCESS ]`, async () => {
+          await runInAction(`[ SUCCESS ]`, async () => {
             this.currentUserID = user.id;
             this.collection.set(this.currentUserID, user);
 

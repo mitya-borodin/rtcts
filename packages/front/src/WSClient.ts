@@ -393,6 +393,7 @@ export class WSClient extends EventEmitter implements IWSClient {
     this.isAlive = true;
   }
 
+  @action("[ WSClient ][ DROP_CONNECTION_DATA ]")
   protected dropConnectionData(): void {
     try {
       window.clearTimeout(this.reconnectTimeOut);

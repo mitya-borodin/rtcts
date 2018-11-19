@@ -89,22 +89,22 @@ export class EditAdapter<
   }
 
   // HELPERS
-  @action
+  @action("[ EDIT_ADAPTER ][ START_LOADING ]")
   protected start(): void {
     this.isLoading = true;
   }
 
-  @action
+  @action("[ EDIT_ADAPTER ][ STOP_LOADING ]")
   protected end(): void {
     this.isLoading = false;
   }
 
-  @action
+  @action("[ EDIT_ADAPTER ][ SHOW_ALERTS ]")
   protected show(): void {
     this.showAlerts = true;
   }
 
-  @action
+  @action("[ EDIT_ADAPTER ][ HIDE_ALERTS ]")
   protected hide(): void {
     this.showAlerts = false;
   }

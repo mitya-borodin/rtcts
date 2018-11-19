@@ -112,7 +112,6 @@ export class RepositoryFormStore<
     this.isValid = isValid;
   }
 
-  @action("[ REPOSITORY_FORM_STORE ][ OPEN ]")
   public async open(id?: string): Promise<void> {
     if (isString(id)) {
       const persist = this.repository.map.get(id);
@@ -139,7 +138,6 @@ export class RepositoryFormStore<
     }
   }
 
-  @action("[ REPOSITORY_FORM_STORE ][ CHANGE ]")
   public async change(change: CHANGE): Promise<void> {
     if (this.form instanceof this.Form) {
       const form = await this.changeAssign(this.form, change);
@@ -192,7 +190,6 @@ export class RepositoryFormStore<
     this.form = undefined;
   }
 
-  @action("[ REPOSITORY_FORM_STORE ][ OPEN_ASSIGN ]")
   protected async openAssign(persist?: PERSIST): Promise<FORM> {
     if (persist instanceof this.Persist) {
       return new this.Form(persist.toJS());
@@ -201,7 +198,6 @@ export class RepositoryFormStore<
     return new this.Form();
   }
 
-  @action("[ REPOSITORY_FORM_STORE ][ CHANGE_ASSIGN ]")
   protected async changeAssign(form: FORM, change: CHANGE): Promise<FORM> {
     console.log(change);
     return form;
