@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.9",
+  "version": "1.0.10",
   "files": [
     "build.config.json",
     "dll_bundle"
@@ -31,7 +31,7 @@
     "@types/querystringify": "2.0.0",
     "@types/react": "16.4.18",
     "@types/react-dom": "16.0.9",
-    "antd": "3.10.1",
+    "antd": "3.10.8",
     "antd-mobile": "2.2.6",
     "history": "4.7.2",
     "hoist-non-react-statics": "3.0.1",
