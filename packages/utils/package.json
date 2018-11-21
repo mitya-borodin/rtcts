@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.3.5",
+  "version": "1.3.6",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -30,10 +30,10 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@borodindmitriy/vendors-dll": "1.0.10"
+    "@borodindmitriy/vendors-dll": "1.0.11"
   },
   "devDependencies": {
-    "@borodindmitriy/vendors-dll": "1.0.10"
+    "@borodindmitriy/vendors-dll": "1.0.11"
   },
   "engines": {
     "node": ">=8",
