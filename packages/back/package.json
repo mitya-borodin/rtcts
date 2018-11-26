@@ -15,8 +15,6 @@
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
-    "build.config.json",
-    "dll_bundle",
     "lib",
     "lib_bundle"
   ],
@@ -88,8 +86,16 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "isDLL": false,
-  "isLibrary": true,
-  "isProject": false,
+  "rearguard": {
+    "sync_project_deps": [
+      "@borodindmitriy/vendors-dll",
+      "@borodindmitriy/interfaces",
+      "@borodindmitriy/utils",
+      "@borodindmitriy/isomorphic"
+    ],
+    "has_dll": false,
+    "has_node_lib": true,
+    "has_ui_lib": false
+  },
   "types": "lib/lib_exports.d.ts"
 }

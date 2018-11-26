@@ -13,7 +13,6 @@
   },
   "version": "1.0.11",
   "files": [
-    "build.config.json",
     "dll_bundle"
   ],
   "scripts": {
@@ -63,7 +62,10 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "isDLL": true,
-  "isLibrary": false,
-  "isProject": false
+  "rearguard": {
+    "sync_project_deps": [],
+    "has_dll": true,
+    "has_node_lib": false,
+    "has_ui_lib": false
+  }
 }
