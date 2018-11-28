@@ -3,7 +3,7 @@ dll_bundle
 lib_bundle
 lib
 dist
-readruard.json
+rearguard.json
 tsconfig.json
 tslint.json
 src/typings.d.ts
