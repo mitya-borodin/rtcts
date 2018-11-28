@@ -14,7 +14,7 @@ export interface ILinkProps {
   to: string;
   children?: React.ReactNode;
 
-  onClick?: (event: React.SyntheticEvent) => void;
+  onClick?: (event: any) => void;
 }
 
 export class Link extends React.Component<ILinkProps, any> {
