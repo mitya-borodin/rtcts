@@ -1,7 +1,7 @@
-import chalk from "chalk";
-import { Db, MongoClient } from "mongodb";
 import { EventEmitter } from "@borodindmitriy/isomorphic";
 import { getErrorMessage } from "@borodindmitriy/utils";
+import chalk from "chalk";
+import { Db, MongoClient } from "mongodb";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IDBConnection } from "./interfaces/IDBConnection";
 

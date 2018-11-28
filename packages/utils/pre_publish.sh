@@ -17,5 +17,7 @@ cd ..
 rm -rf $tgdir
 
 echo "Pre publish test well done;"
+echo ""
+echo "==========================="
 
 exit 0

@@ -1,6 +1,6 @@
+import { isNumber } from "@borodindmitriy/utils";
 import chalk from "chalk";
 import { ExtractJwt, JwtFromRequestFunction } from "passport-jwt";
-import { isNumber } from "@borodindmitriy/utils";
 import { IAppConfig } from "./interfaces/IAppConfig";
 
 export class AppConfig implements IAppConfig {

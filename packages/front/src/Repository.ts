@@ -276,7 +276,7 @@ export class Repository<
     this.collection.clear();
   }
 
-  private handleAssigment() {
+  private handleAssigment(): void {
     try {
       this.service.onChannel();
 
@@ -287,12 +287,10 @@ export class Repository<
       console.log(`[ ${this.constructor.name} ][ ASSIGMENT ]`);
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
-
-      return Promise.reject();
     }
   }
 
-  private handleCancelAssigment() {
+  private handleCancelAssigment(): void {
     try {
       if (this.ws.has(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage)) {
         this.ws.off(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage);
@@ -303,8 +301,6 @@ export class Repository<
       console.log(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ]`);
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
-
-      return Promise.reject();
     }
   }
 }

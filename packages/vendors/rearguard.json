@@ -1,0 +1,9 @@
+{
+  "wds": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "analyze": {
+    "port": 10000
+  }
+}

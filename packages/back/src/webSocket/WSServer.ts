@@ -1,3 +1,14 @@
+import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import {
+  assigment_to_user_of_the_connection_channel,
+  cancel_assigment_to_user_of_the_connection_channel,
+  makeErrorMessage,
+  makeMessage,
+  PingChannel,
+  PongChannel,
+  recognizeMessage,
+} from "@borodindmitriy/isomorphic";
+import { getErrorMessage, isArray, isString } from "@borodindmitriy/utils";
 import chalk from "chalk";
 import * as express from "express";
 import * as WebSocket from "ws";
@@ -5,17 +16,6 @@ import { IAppConfig } from "../interfaces/IAppConfig";
 import { IChannels } from "../interfaces/IChannels";
 import { IConnection } from "../interfaces/IConnection";
 import { IUserModel } from "../interfaces/IUserModel";
-import { IPersist, IUser } from "@borodindmitriy/interfaces";
-import { getErrorMessage, isArray, isString } from "@borodindmitriy/utils";
-import {
-  assigment_to_user_of_the_connection_channel,
-  cancel_assigment_to_user_of_the_connection_channel,
-  PingChannel,
-  PongChannel,
-  makeErrorMessage,
-  makeMessage,
-  recognizeMessage,
-} from "@borodindmitriy/isomorphic";
 
 export class WSServer<U extends IUserModel<IUser & IPersist>> {
   private config: IAppConfig;

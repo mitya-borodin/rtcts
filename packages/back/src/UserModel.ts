@@ -1,15 +1,15 @@
+import { IPersist, IUser, IUserGroup, userGroupEnum } from "@borodindmitriy/interfaces";
+import { checkPassword, isString } from "@borodindmitriy/utils";
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
 import { FindOneAndReplaceOption, FindOneOptions } from "mongodb";
-import { userGroupEnum, IPersist, IUser, IUserGroup } from "@borodindmitriy/interfaces";
-import { authenticate } from "./utils/authenticate";
-import { checkPassword, isString } from "@borodindmitriy/utils";
-import { encryptPassword } from "./utils/encryptPassword";
-import { getSalt } from "./utils/getSalt";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IRepository } from "./interfaces/IRepository";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Model } from "./Model";
+import { authenticate } from "./utils/authenticate";
+import { encryptPassword } from "./utils/encryptPassword";
+import { getSalt } from "./utils/getSalt";
 
 export class UserModel<
   P extends IUser & IPersist,

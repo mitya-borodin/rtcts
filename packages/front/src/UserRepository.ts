@@ -320,7 +320,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
   }
 
   @action("[ USER_REPOSITORY ][ DESTROY ]")
-  protected destroy() {
+  protected destroy(): void {
     try {
       super.destroy();
 
@@ -337,8 +337,6 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
       console.log(`[ ${this.constructor.name} ][ DESTROY ][ SUCCESS ]`);
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ DESTROY ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
-
-      return Promise.reject();
     }
   }
 

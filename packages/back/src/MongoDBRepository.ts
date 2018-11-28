@@ -1,3 +1,4 @@
+import { isString } from "@borodindmitriy/utils";
 import { ObjectId } from "bson";
 import {
   AggregationCursor,
@@ -15,7 +16,6 @@ import {
   InsertWriteOpResult,
   ReplaceOneOptions,
 } from "mongodb";
-import { isString } from "@borodindmitriy/utils";
 import { IDBConnection } from "./interfaces/IDBConnection";
 import { IRepository } from "./interfaces/IRepository";
 
@@ -51,7 +51,7 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
-  public async onValidation() {
+  public async onValidation(): Promise<void> {
     try {
       const db: Db = await this.db.getDB();
 
@@ -70,7 +70,7 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
-  public async offValidation() {
+  public async offValidation(): Promise<void> {
     try {
       const db: Db = await this.db.getDB();
 

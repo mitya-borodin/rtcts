@@ -1,0 +1,14 @@
+node_modules
+dll_bundle
+lib_bundle
+lib
+dist
+readruard.json
+tsconfig.json
+tslint.json
+src/typings.d.ts
+.dockerignore
+.editorconfig
+.npmrc
+pre_publish.sh
+pre_publish_build_tmp

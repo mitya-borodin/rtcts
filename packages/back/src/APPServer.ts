@@ -1,10 +1,10 @@
+import { isString } from "@borodindmitriy/utils";
 import * as bodyParser from "body-parser";
 import chalk from "chalk";
 import * as express from "express";
 import * as http from "http";
 import { AddressInfo } from "net";
 import * as passport from "passport";
-import { isString } from "@borodindmitriy/utils";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAPPServer } from "./interfaces/IAPPServer";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
