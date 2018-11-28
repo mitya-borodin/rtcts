@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -48,6 +48,7 @@
       "publicPath": "/"
     },
     "sync_project_deps": [],
+    "has_project": false,
     "has_dll": false,
     "has_node_lib": true,
     "has_ui_lib": true,

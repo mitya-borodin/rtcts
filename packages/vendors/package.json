@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "files": [
     "dll_bundle"
   ],
@@ -70,6 +70,7 @@
       "publicPath": "/"
     },
     "sync_project_deps": [],
+    "has_project": false,
     "has_dll": true,
     "has_node_lib": false,
     "has_ui_lib": false,
