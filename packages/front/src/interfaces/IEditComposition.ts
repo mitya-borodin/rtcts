@@ -18,7 +18,7 @@ export interface IEditCompositionAdapter extends IComposition {
 export interface IEditCompositionActions<CHANGE> {
   change(chage: CHANGE): void;
   save(): Promise<void>;
-  remove(): Promise<void>;
+  remove(id?: string): Promise<void>;
   cancel(): void;
 
   // HOOKS
