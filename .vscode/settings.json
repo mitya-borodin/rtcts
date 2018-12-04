@@ -3,7 +3,7 @@
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
   "workbench.startupEditor": "newUntitledFile",
-  "workbench.colorTheme": "Dracula - WebStorm Edition",
+  "workbench.colorTheme": "Darcula - WebStorm Edition",
   "editor.formatOnPaste": false,
   "editor.formatOnSave": true,
   "editor.formatOnType": false,
