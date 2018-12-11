@@ -17,6 +17,8 @@ export class RepositoryFormStore<
 > implements IRepositoryFormStore<FORM, CHANGE> {
   // PUBLIC_PROPS
   @observable
+  public isLoading: boolean = false;
+  @observable
   public isValid: boolean = false;
   @observable
   public showAlerts: boolean = false;
@@ -188,6 +190,16 @@ export class RepositoryFormStore<
     this.isValid = false;
     this.showAlerts = false;
     this.form = undefined;
+  }
+
+  @action("[ START_LOADING ]")
+  public startLoading(): void {
+    this.isLoading = true;
+  }
+
+  @action("[ END_LOADING ]")
+  public endLoading(): void {
+    this.isLoading = false;
   }
 
   protected async openAssign(persist?: PERSIST): Promise<FORM> {

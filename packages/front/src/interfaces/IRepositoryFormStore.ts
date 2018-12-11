@@ -31,6 +31,10 @@ import { IFormStore } from "./IFormStore";
 
 export interface IRepositoryFormStore<F extends IForm, C> extends IFormStore<F, C> {
   id: string | void;
+  isLoading: boolean;
 
   setIsValid(isValid: boolean): void;
+
+  startLoading(): void;
+  endLoading(): void;
 }
