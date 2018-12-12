@@ -22,7 +22,9 @@
     "build": "rearguard build --ui_lib",
     "build:both": "rearguard build --both --ui_lib",
     "build:release": "rearguard build -r --ui_lib",
-    "prepublishOnly": "npm run build:both"
+    "prepublishOnly": "npm run build:both",
+    "start": "rearguard wds",
+    "start:release": "rearguard wds -r"
   },
   "dependencies": {},
   "devDependencies": {
@@ -40,6 +42,7 @@
   },
   "rearguard": {
     "context": "src",
+    "entry": "index.tsx",
     "lib_entry": "lib_exports.ts",
     "modules": [
       "src"
