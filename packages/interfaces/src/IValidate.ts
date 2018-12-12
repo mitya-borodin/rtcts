@@ -2,7 +2,7 @@ import { ILog } from "./ILog";
 
 export interface IValidate extends ILog {
   // DATA_SOURCE
-  field: string;
+  field: string | string[];
   title?: string;
 
   // COMPUTED

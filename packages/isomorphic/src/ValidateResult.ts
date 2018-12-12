@@ -1,5 +1,6 @@
 import { ILog, IValidate, IValidateResult, logTypeEnum } from "@borodindmitriy/interfaces";
-import { isObject } from "@borodindmitriy/utils";
+import { isArray, isObject } from "@borodindmitriy/utils";
+import { isString } from "util";
 import { Validate } from "./Validate";
 
 // tslint:disable:object-literal-sort-keys
@@ -99,7 +100,17 @@ export class ValidateResult implements IValidateResult<IValidate> {
       return result;
     }
 
-    result = this.results.find(({ field }) => a_field === field);
+    result = this.results.find(({ field }) => {
+      if (isString(field)) {
+        return a_field === field;
+      }
+
+      if (isArray(field)) {
+        return field.includes(a_field);
+      }
+
+      return false;
+    });
 
     this.__CACHE__[a_field] = result;
 

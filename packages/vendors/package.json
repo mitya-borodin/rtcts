@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.6",
+  "version": "1.0.7",
   "files": [
     "dll_bundle"
   ],
