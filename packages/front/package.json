@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.27",
+  "version": "1.0.28",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -20,29 +20,27 @@
     "lib_bundle"
   ],
   "scripts": {
-    "build": "rearguard build --dll --ui_lib --node_lib",
-    "build:both": "rearguard build --both --dll --ui_lib --node_lib",
-    "build:release": "rearguard build -r --dll --ui_lib --node_lib",
+    "build": "rearguard build --dll --ui_lib",
+    "build:both": "rearguard build --both --dll --ui_lib",
+    "build:release": "rearguard build -r --dll --ui_lib",
     "dll": "rearguard build --dll",
     "dll:release": "rearguard build --dll -r",
-    "project:build": "rearguard build --project",
-    "project:build:release": "rearguard build --project -r",
     "prepublishOnly": "npm run build:both",
     "start": "rearguard wds",
     "start:release": "rearguard wds -r"
   },
   "dependencies": {},
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "1.0.13",
-    "@borodindmitriy/isomorphic": "1.0.18",
-    "@borodindmitriy/utils": "1.3.16",
-    "@borodindmitriy/vendors": "1.0.5"
+    "@borodindmitriy/interfaces": "1.0.14",
+    "@borodindmitriy/isomorphic": "1.0.19",
+    "@borodindmitriy/utils": "1.3.17",
+    "@borodindmitriy/vendors": "1.0.6"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "1.0.13",
-    "@borodindmitriy/isomorphic": "1.0.18",
-    "@borodindmitriy/utils": "1.3.16",
-    "@borodindmitriy/vendors": "1.0.5"
+    "@borodindmitriy/interfaces": "1.0.14",
+    "@borodindmitriy/isomorphic": "1.0.19",
+    "@borodindmitriy/utils": "1.3.17",
+    "@borodindmitriy/vendors": "1.0.6"
   },
   "engines": {
     "node": ">=8",
@@ -70,10 +68,11 @@
       "@borodindmitriy/utils",
       "@borodindmitriy/isomorphic"
     ],
-    "has_project": true,
     "has_dll": true,
-    "has_node_lib": true,
     "has_ui_lib": true,
+    "load_on_demand": false,
+    "has_project": true,
+    "has_node_lib": false,
     "publish_in_git": false
   },
   "types": "lib/lib_exports.d.ts"

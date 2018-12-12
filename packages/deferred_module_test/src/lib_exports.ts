@@ -1,0 +1,1 @@
+export { doLog } from "./test";

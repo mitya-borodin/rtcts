@@ -11,14 +11,15 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.5",
+  "version": "1.0.6",
   "files": [
     "dll_bundle"
   ],
   "scripts": {
     "build": "rearguard build --dll",
+    "build:both": "rearguard build --both --dll",
     "build:release": "rearguard build -r --dll",
-    "prepublishOnly": "npm run build && npm run build:release"
+    "prepublishOnly": "npm run build:both"
   },
   "dependencies": {
     "@types/history": "4.7.2",
@@ -70,10 +71,11 @@
       "publicPath": "/"
     },
     "sync_project_deps": [],
-    "has_project": false,
     "has_dll": true,
-    "has_node_lib": false,
     "has_ui_lib": false,
+    "load_on_demand": false,
+    "has_project": false,
+    "has_node_lib": false,
     "publish_in_git": false
   }
 }

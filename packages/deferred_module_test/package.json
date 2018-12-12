@@ -1,6 +1,6 @@
 {
-  "name": "@borodindmitriy/interfaces",
-  "description": "Common interface's library.",
+  "name": "@borodindmitriy/deferred_module_test",
+  "description": "Deferred_module_test.",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
@@ -9,30 +9,25 @@
     "url": "git@gitlab.com:mitya-borodin/base-code.git"
   },
   "bugs": {
-    "url": "https://gitlab.com/mitya-borodin/base-code"
+    "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.14",
+  "version": "1.0.1",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
+    "dll_bundle",
     "lib",
     "lib_bundle"
   ],
   "scripts": {
-    "build": "rearguard build --ui_lib",
-    "build:both": "rearguard build --both --ui_lib",
-    "build:release": "rearguard build -r --ui_lib",
+    "build": "rearguard build --dll --ui_lib",
+    "build:both": "rearguard build --both --dll --ui_lib",
+    "build:release": "rearguard build -r --dll --ui_lib",
     "prepublishOnly": "npm run build:both"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "tslint": "^5.11.0",
-    "tslint-no-circular-imports": "^0.6.1",
-    "typescript": "^3.1.3"
-  },
   "engines": {
-    "node": ">=8",
-    "npm": ">=5"
+    "node": ">=10",
+    "npm": ">=6"
   },
   "publishConfig": {
     "access": "public",
@@ -40,6 +35,8 @@
   },
   "rearguard": {
     "context": "src",
+    "entry": "index.tsx",
+    "dll_entry": "vendors.ts",
     "lib_entry": "lib_exports.ts",
     "modules": [
       "src"
@@ -49,9 +46,9 @@
       "publicPath": "/"
     },
     "sync_project_deps": [],
-    "has_dll": false,
+    "has_dll": true,
     "has_ui_lib": true,
-    "load_on_demand": false,
+    "load_on_demand": true,
     "has_project": false,
     "has_node_lib": false,
     "publish_in_git": false
