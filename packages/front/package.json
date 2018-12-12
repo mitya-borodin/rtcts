@@ -23,8 +23,6 @@
     "build": "rearguard build --dll --ui_lib",
     "build:both": "rearguard build --both --dll --ui_lib",
     "build:release": "rearguard build -r --dll --ui_lib",
-    "dll": "rearguard build --dll",
-    "dll:release": "rearguard build --dll -r",
     "prepublishOnly": "npm run build:both",
     "start": "rearguard wds",
     "start:release": "rearguard wds -r"
@@ -71,7 +69,7 @@
     "has_dll": true,
     "has_ui_lib": true,
     "load_on_demand": false,
-    "has_project": true,
+    "has_project": false,
     "has_node_lib": false,
     "publish_in_git": false
   },
