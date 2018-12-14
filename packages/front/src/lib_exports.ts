@@ -27,5 +27,8 @@ export { UnionAdapter } from "./UnionAdapter";
 export { RepositoryFormStore } from "./RepositoryFormStore";
 
 // COMPONENTS
-
 export { Link } from "./components/Link";
+
+// ENUMS
+export { mediatorChannelEnum } from "./enums/mediatorChannelEnum";
+export { CacheManagementRepository } from "./CacheManagementRepository";

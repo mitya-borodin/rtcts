@@ -209,7 +209,7 @@ export class Repository<
   }
 
   @action("[ REPOSITORY ][ RECEIVE_MESSAGE ]")
-  public receiveMessage([channelName, payload]: [string, any]): void {
+  public receiveMessage([channelName, payload]: [string, any]): T | T[] | void {
     if (this.isInit) {
       try {
         console.log(`[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]`, [channelName, payload]);
@@ -219,32 +219,52 @@ export class Repository<
             const item: T = new this.Persist(payload.create);
 
             this.collection.set(item.id, item);
+
+            return item;
           }
 
           if (isArray(payload.bulkCreate)) {
+            const items: T[] = [];
+
             for (const create of payload.bulkCreate) {
               const item: T = new this.Persist(create);
 
               this.collection.set(item.id, item);
+
+              items.push(item);
             }
+
+            return items;
           }
 
           if (isObject(payload.update)) {
             const item: T = new this.Persist(payload.update);
 
             this.collection.set(item.id, item);
+
+            return item;
           }
 
           if (isArray(payload.bulkUpdate)) {
+            const items: T[] = [];
+
             for (const update of payload.bulkUpdate) {
               const item: T = new this.Persist(update);
 
               this.collection.set(item.id, item);
+
+              items.push(item);
+
+              return items;
             }
           }
 
           if (isObject(payload.remove)) {
+            const item = this.collection.get(payload.remove.id);
+
             this.collection.delete(payload.remove.id);
+
+            return item;
           }
         }
       } catch (error) {
