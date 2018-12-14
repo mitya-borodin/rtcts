@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.29",
+  "version": "1.0.30",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -29,14 +29,14 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "1.0.15",
-    "@borodindmitriy/isomorphic": "1.0.20",
+    "@borodindmitriy/interfaces": "1.0.16",
+    "@borodindmitriy/isomorphic": "1.0.21",
     "@borodindmitriy/utils": "1.3.18",
     "@borodindmitriy/vendors": "1.0.7"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "1.0.15",
-    "@borodindmitriy/isomorphic": "1.0.20",
+    "@borodindmitriy/interfaces": "1.0.16",
+    "@borodindmitriy/isomorphic": "1.0.21",
     "@borodindmitriy/utils": "1.3.18",
     "@borodindmitriy/vendors": "1.0.7"
   },
