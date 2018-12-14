@@ -117,6 +117,16 @@ export class ValidateResult implements IValidateResult<IValidate> {
     return result;
   }
 
+  public getFieldTitle(a_field: string): string {
+    const v = this.getFieldValidation(a_field);
+
+    if (v instanceof Validate && isString(v.title)) {
+      return v.title;
+    }
+
+    return "";
+  }
+
   public getFieldMessage(a_field: string): string {
     const v = this.getFieldValidation(a_field);
 
