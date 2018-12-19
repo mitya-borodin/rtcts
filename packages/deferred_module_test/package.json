@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -20,9 +20,9 @@
     "lib_bundle"
   ],
   "scripts": {
-    "build": "rearguard build --dll --ui_lib",
-    "build:both": "rearguard build --both --dll --ui_lib",
-    "build:release": "rearguard build -r --dll --ui_lib",
+    "build": "rearguard build --dll --browser_lib",
+    "build:both": "rearguard build --both --dll --browser_lib",
+    "build:release": "rearguard build -r --dll --browser_lib",
     "prepublishOnly": "npm run build:both",
     "start": "rearguard wds",
     "start:release": "rearguard wds -r"
@@ -49,7 +49,7 @@
     },
     "sync_project_deps": [],
     "has_dll": true,
-    "has_ui_lib": true,
+    "has_browser_lib": true,
     "load_on_demand": true,
     "has_project": false,
     "has_node_lib": false,
