@@ -13,9 +13,10 @@ export class CacheManagementRepository<
   FORM extends IForm,
   CACHE extends IForm,
   FILTER,
-  CACHE_REP extends ICacheRepository<PERSIST, FORM, CACHE, FILTER, FILTER_TYPES>,
+  FILTER_TYPES extends string,
+  FILTER_STATE,
+  CACHE_REP extends ICacheRepository<PERSIST, FORM, CACHE, FILTER, FILTER_TYPES, FILTER_STATE>,
   S extends IService<PERSIST>,
-  FILTER_TYPES extends string = "warning" | "error",
   WS extends IWSClient = IWSClient,
   ME extends IMediator = IMediator
 > extends Repository<PERSIST, S> implements IRepository<PERSIST> {

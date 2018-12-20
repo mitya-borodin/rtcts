@@ -1,4 +1,4 @@
-export interface ICacheRepository<PERSIST, FORM, CACHE, FILTER, FILTER_TYPES extends string> {
+export interface ICacheRepository<PERSIST, FORM, CACHE, FILTER, FILTER_TYPES extends string, STATE> {
   map: Map<string, CACHE>;
   list: CACHE[];
   filter: FILTER;
@@ -13,5 +13,5 @@ export interface ICacheRepository<PERSIST, FORM, CACHE, FILTER, FILTER_TYPES ext
 
   calc(item: PERSIST | FORM): Promise<CACHE>;
 
-  setFilter(type: FILTER_TYPES, state: boolean): void;
+  setFilter(type: FILTER_TYPES, state: STATE): void;
 }
