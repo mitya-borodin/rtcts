@@ -30,8 +30,8 @@ export class Service<
   constructor(
     name: string,
     router: Router,
-    Persist: { new (data: any): P },
-    Insert: { new (data: any): I },
+    Persist: new (data: any) => P,
+    Insert: new (data: any) => I,
     model: M,
     channels: C,
     ACL: {

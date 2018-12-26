@@ -9,13 +9,13 @@ import { Repository } from "./Repository";
 
 export class UserRepository<U extends IUser & IPersist, S extends IUserService<U>> extends Repository<U, S>
   implements IUserRepository<U> {
-  protected Persist: { new (data: any): U };
+  protected Persist: new (data: any) => U;
 
   @observable
   private currentUserID: string | void;
 
   constructor(
-    Persist: { new (data: any): U },
+    Persist: new (data: any) => U,
     service: S,
     wsClient: IWSClient,
     channelName: string,

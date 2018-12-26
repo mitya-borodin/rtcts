@@ -29,8 +29,8 @@ export class UserService<
   constructor(
     name: string,
     router: express.Router,
-    Persist: { new (data: any): P },
-    Insert: { new (data: any): I },
+    Persist: new (data: any) => P,
+    Insert: new (data: any) => I,
     model: M,
     channels: C,
     ACL: {

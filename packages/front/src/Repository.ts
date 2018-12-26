@@ -21,13 +21,13 @@ export class Repository<
   @observable
   protected collection: ObservableMap<string, T>;
 
-  protected Persist: { new (data?: any): T };
+  protected Persist: new (data?: any) => T;
   protected service: S;
   protected ws: WS;
   protected channelName: string;
   protected mediator: ME;
 
-  constructor(Persist: { new (data?: any): T }, service: S, ws: WS, channelName: string, mediator: ME) {
+  constructor(Persist: new (data?: any) => T, service: S, ws: WS, channelName: string, mediator: ME) {
     super();
 
     // DEPS

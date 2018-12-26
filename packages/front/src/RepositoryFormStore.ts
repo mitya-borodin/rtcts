@@ -26,30 +26,30 @@ export class RepositoryFormStore<
   public form: FORM | void;
 
   // DEPS
-  protected readonly Persist: { new (...args: any[]): PERSIST };
-  protected readonly Insert: { new (...args: any[]): INSERT };
-  protected readonly Form: { new (...args: any[]): FORM };
+  protected readonly Persist: new (...args: any[]) => PERSIST;
+  protected readonly Insert: new (...args: any[]) => INSERT;
+  protected readonly Form: new (...args: any[]) => FORM;
   protected readonly repository: REP;
   protected readonly ACL: {
     save: string[];
   };
   protected mediator: ME;
-  protected UserPersist: { new (data?: any): USER };
+  protected UserPersist: new (data?: any) => USER;
 
   // PROPS
   protected user: USER | void;
   protected group: string;
 
   constructor(
-    Persist: { new (...args: any[]): PERSIST },
-    Insert: { new (...args: any[]): INSERT },
-    Form: { new (...args: any[]): FORM },
+    Persist: new (...args: any[]) => PERSIST,
+    Insert: new (...args: any[]) => INSERT,
+    Form: new (...args: any[]) => FORM,
     repository: REP,
     ACL: {
       save: string[];
     },
     mediator: ME,
-    UserPersist: { new (data?: any): USER },
+    UserPersist: new (data?: any) => USER,
   ) {
     // DEPS
     this.Persist = Persist;

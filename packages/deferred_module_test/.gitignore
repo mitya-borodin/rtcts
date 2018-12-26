@@ -1,4 +1,5 @@
 node_modules
+.env
 dll_bundle
 lib_bundle
 lib

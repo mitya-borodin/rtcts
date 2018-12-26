@@ -23,7 +23,7 @@ export class CacheManagementRepository<
   protected cacheRepository: CACHE_REP;
 
   constructor(
-    Persist: { new (data?: any): PERSIST },
+    Persist: new (data?: any) => PERSIST,
     service: S,
     ws: WS,
     channelName: string,
