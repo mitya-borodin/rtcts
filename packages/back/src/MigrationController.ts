@@ -78,7 +78,7 @@ export class MigrationController implements IMigrationController {
           if (collection) {
             let list = this.migrations.filter((m) => m.name === name).sort((a, b) => (a.version > b.version ? 1 : -1));
             let curVersion = 0;
-            const curMigration: IMigration | void = await collection.findOne({ name });
+            const curMigration: IMigration | null = await collection.findOne({ name });
 
             if (curMigration) {
               curVersion = curMigration.version;

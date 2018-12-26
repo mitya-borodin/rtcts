@@ -146,7 +146,7 @@ export class UserModel<
         const result: object | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
         if (result) {
-          return await super.update({ ...result, ...data }, uid, wsid);
+          return await super.update({ ...result, login: data.login }, uid, wsid);
         } else {
           return Promise.reject(`[ USER_NOT_FOUND ][ ID: ${data.id} ][ login: ${data.login} ]`);
         }

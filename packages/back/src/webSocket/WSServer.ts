@@ -8,7 +8,7 @@ import {
   PongChannel,
   recognizeMessage,
 } from "@borodindmitriy/isomorphic";
-import { getErrorMessage, isArray, isString } from "@borodindmitriy/utils";
+import { getErrorMessage, isArray, isString, isUndefined } from "@borodindmitriy/utils";
 import chalk from "chalk";
 import * as express from "express";
 import * as WebSocket from "ws";
@@ -135,87 +135,89 @@ export class WSServer<U extends IUserModel<IUser & IPersist>> {
     }
   }
 
-  private messageHandler(connection: IConnection, message: string | Buffer | ArrayBuffer | Buffer[]): void {
+  private messageHandler(connection: IConnection, message?: string | Buffer | ArrayBuffer | Buffer[]): void {
     try {
-      if (isString(message)) {
-        const recieveData = this.recognizeMessage(message);
+      if (!isUndefined(message)) {
+        if (isString(message)) {
+          const recieveData = this.recognizeMessage(message);
 
-        if (isArray(recieveData)) {
-          const [channelName, payload] = recieveData;
+          if (isArray(recieveData)) {
+            const [channelName, payload] = recieveData;
 
-          if (channelName === PingChannel) {
-            connection.send(this.makeMessage(PongChannel, {}));
-          } else if (isString(payload.uid)) {
-            if (
-              channelName === assigment_to_user_of_the_connection_channel ||
-              channelName === cancel_assigment_to_user_of_the_connection_channel
-            ) {
-              this.user
-                .readById(payload.uid)
-                .then((user: IUser & IPersist | null) => {
-                  if (user) {
-                    if (channelName === assigment_to_user_of_the_connection_channel) {
-                      connection.setUserID(user.id);
+            if (channelName === PingChannel) {
+              connection.send(this.makeMessage(PongChannel, {}));
+            } else if (isString(payload.uid)) {
+              if (
+                channelName === assigment_to_user_of_the_connection_channel ||
+                channelName === cancel_assigment_to_user_of_the_connection_channel
+              ) {
+                this.user
+                  .readById(payload.uid)
+                  .then((user: IUser & IPersist | null) => {
+                    if (user) {
+                      if (channelName === assigment_to_user_of_the_connection_channel) {
+                        connection.setUserID(user.id);
 
-                      this.channels.addConnection(connection);
+                        this.channels.addConnection(connection);
 
+                        connection.send(
+                          this.makeMessage(channelName, {
+                            message: "[ ASSIGMENT ][ DONE ]",
+                            uid: connection.uid,
+                            wsid: connection.wsid,
+                          }),
+                        );
+                      }
+
+                      if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
+                        this.channels.deleteConnection(connection);
+
+                        connection.send(
+                          this.makeMessage(channelName, {
+                            message: "[ CANCELING ][ ASSIGMENT ][ DONE ]",
+                            uid: connection.uid,
+                            wsid: connection.wsid,
+                          }),
+                        );
+                      }
+                    } else {
                       connection.send(
-                        this.makeMessage(channelName, {
-                          message: "[ ASSIGMENT ][ DONE ]",
-                          uid: connection.uid,
-                          wsid: connection.wsid,
+                        this.makeErrorMessage(`[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`, {
+                          channelName,
+                          payload,
                         }),
                       );
                     }
-
-                    if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
-                      this.channels.deleteConnection(connection);
-
-                      connection.send(
-                        this.makeMessage(channelName, {
-                          message: "[ CANCELING ][ ASSIGMENT ][ DONE ]",
-                          uid: connection.uid,
-                          wsid: connection.wsid,
-                        }),
-                      );
-                    }
-                  } else {
+                  })
+                  .catch((error: any) => {
                     connection.send(
-                      this.makeErrorMessage(`[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`, {
-                        channelName,
-                        payload,
-                      }),
+                      this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${getErrorMessage(error)}`, { error, payload }),
                     );
-                  }
-                })
-                .catch((error: any) => {
-                  connection.send(
-                    this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${getErrorMessage(error)}`, { error, payload }),
-                  );
-                });
+                  });
+              } else {
+                connection.send(
+                  this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
+                );
+              }
             } else {
-              connection.send(
-                this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
-              );
+              console.log("");
+              console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`));
             }
           } else {
             console.log("");
-            console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`));
+            console.log(
+              chalk.redBright(`[ MESSAGE_HANDLING ][ RECIEVE_DATA ] must be [ String, { [ key: string ]: any } ]`),
+            );
           }
         } else {
           console.log("");
           console.log(
-            chalk.redBright(`[ MESSAGE_HANDLING ][ RECIEVE_DATA ] must be [ String, { [ key: string ]: any } ]`),
+            chalk.redBright(
+              `[ MESSAGE_HANDLING ] have NOT implement message hanler ` +
+                `for other data types Buffer | ArrayBuffer | Buffer[]`,
+            ),
           );
         }
-      } else {
-        console.log("");
-        console.log(
-          chalk.redBright(
-            `[ MESSAGE_HANDLING ] have NOT implement message hanler for other data types
-             Buffer | ArrayBuffer | Buffer[]`,
-          ),
-        );
       }
     } catch (error) {
       console.error(error);
