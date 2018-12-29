@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.34",
+  "version": "1.0.38",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -27,18 +27,17 @@
     "start": "rearguard wds",
     "start:release": "rearguard wds -r"
   },
-  "dependencies": {},
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "1.1.3",
-    "@borodindmitriy/isomorphic": "1.0.25",
-    "@borodindmitriy/utils": "1.3.22",
-    "@borodindmitriy/vendors": "1.0.10"
+    "@borodindmitriy/interfaces": "1.1.7",
+    "@borodindmitriy/isomorphic": "1.0.29",
+    "@borodindmitriy/utils": "1.3.26",
+    "@borodindmitriy/vendors": "1.0.16"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "1.1.3",
-    "@borodindmitriy/isomorphic": "1.0.25",
-    "@borodindmitriy/utils": "1.3.22",
-    "@borodindmitriy/vendors": "1.0.10"
+    "@borodindmitriy/interfaces": "1.1.7",
+    "@borodindmitriy/isomorphic": "1.0.29",
+    "@borodindmitriy/utils": "1.3.26",
+    "@borodindmitriy/vendors": "1.0.16"
   },
   "engines": {
     "node": ">=8",

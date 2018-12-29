@@ -23,4 +23,5 @@ import "prop-types";
 import "react";
 import "react-dom";
 import "react-dom/server";
+import "react-helmet";
 import "validatorjs";
