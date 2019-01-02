@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.1.7",
+  "version": "1.1.10",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -22,6 +22,8 @@
     "build": "rearguard build --browser_lib --node_lib",
     "build:both": "rearguard build --both --browser_lib --node_lib",
     "build:release": "rearguard build -r --browser_lib --node_lib",
+    "check_deps_on_npm": "rearguard check_deps_on_npm",
+    "check_deps_on_npm:install": "rearguard check_deps_on_npm --install_deps",
     "prepublishOnly": "npm run build:both",
     "start": "rearguard wds",
     "start:release": "rearguard wds -r"

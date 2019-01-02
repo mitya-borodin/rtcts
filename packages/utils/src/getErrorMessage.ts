@@ -1,14 +1,19 @@
+import { isUndefined } from "util";
 import { isString } from "./isType";
 
 export function getErrorMessage(error: any) {
-  let message = "error message not forund";
+  const message = "error message not forund";
 
-  if (error instanceof Error || isString(error.message)) {
-    message = error.message;
+  if (isUndefined(error)) {
+    return message;
   }
 
   if (isString(error)) {
-    message = error;
+    return error;
+  }
+
+  if (error instanceof Error || isString(error.message)) {
+    return error.message;
   }
 
   return message;
