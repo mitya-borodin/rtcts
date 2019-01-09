@@ -59,7 +59,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
 
   @computed({ name: "[ USER_REPOSITORY ][ IS_AUTHORIZED ]", keepAlive: true })
   get isAuthorized() {
-    return this.user instanceof this.Persist;
+    return this.user instanceof this.Persist || isString(this.isToken);
   }
 
   @computed({ name: "[ USER_REPOSITORY ][ IS_ADMIN ]", keepAlive: true })
