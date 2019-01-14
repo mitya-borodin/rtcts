@@ -68,7 +68,7 @@ export class ValidateResult implements IValidateResult<IValidate> {
         value: results.map((r) => Object.freeze(r)),
       },
       isValid: {
-        value: results.length === 0,
+        value: !hasError,
       },
       hasError: {
         value: hasError,
