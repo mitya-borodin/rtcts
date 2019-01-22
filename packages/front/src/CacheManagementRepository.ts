@@ -46,6 +46,8 @@ export class CacheManagementRepository<
 
     if (result instanceof this.Persist) {
       this.cacheRepository.create(result);
+    } else {
+      console.warn(`[ ${this.constructor.name} ][ CREATE ][ result is not instanseof ${this.Persist.name} ]`);
     }
 
     return result;
@@ -56,6 +58,8 @@ export class CacheManagementRepository<
 
     if (result instanceof this.Persist) {
       this.cacheRepository.update(result);
+    } else {
+      console.warn(`[ ${this.constructor.name} ][ UPDATE ][ result is not instanseof ${this.Persist.name} ]`);
     }
 
     return result;
@@ -66,6 +70,8 @@ export class CacheManagementRepository<
 
     if (result instanceof this.Persist) {
       this.cacheRepository.remove(id);
+    } else {
+      console.warn(`[ ${this.constructor.name} ][ REMOVE ][ result is not instanseof ${this.Persist.name} ]`);
     }
 
     return result;
@@ -76,28 +82,52 @@ export class CacheManagementRepository<
 
     if (this.isInit) {
       if (this.channelName === channelName) {
-        if (isObject(payload.create) && result instanceof this.Persist) {
-          this.cacheRepository.create(result);
+        if (isObject(payload.create)) {
+          if (result instanceof this.Persist) {
+            this.cacheRepository.create(result);
+          } else {
+            console.warn(`[ ${this.constructor.name} ][ CREATE ][ result is not instanseof ${this.Persist.name} ]`);
+          }
         }
 
         if (isArray(payload.bulkCreate) && isArray(result)) {
           for (const item of result) {
-            this.cacheRepository.create(item);
+            if (item instanceof this.Persist) {
+              this.cacheRepository.create(item);
+            } else {
+              console.warn(
+                `[ ${this.constructor.name} ][ BULK_CREATE ][ result is not instanseof ${this.Persist.name} ]`,
+              );
+            }
           }
         }
 
-        if (isObject(payload.update) && result instanceof this.Persist) {
-          this.cacheRepository.update(result);
+        if (isObject(payload.update)) {
+          if (result instanceof this.Persist) {
+            this.cacheRepository.update(result);
+          } else {
+            console.warn(`[ ${this.constructor.name} ][ UPDATE ][ result is not instanseof ${this.Persist.name} ]`);
+          }
         }
 
         if (isArray(payload.bulkUpdate) && isArray(result)) {
           for (const item of result) {
-            this.cacheRepository.update(item);
+            if (item instanceof this.Persist) {
+              this.cacheRepository.update(item);
+            } else {
+              console.warn(
+                `[ ${this.constructor.name} ][ BULK_UPDATE ][ result is not instanseof ${this.Persist.name} ]`,
+              );
+            }
           }
         }
 
-        if (isObject(payload.remove) && result instanceof this.Persist) {
-          this.cacheRepository.remove(result.id);
+        if (isObject(payload.remove)) {
+          if (result instanceof this.Persist) {
+            this.cacheRepository.remove(result.id);
+          } else {
+            console.warn(`[ ${this.constructor.name} ][ REMOVE ][ result is not instanseof ${this.Persist.name} ]`);
+          }
         }
       }
     }
