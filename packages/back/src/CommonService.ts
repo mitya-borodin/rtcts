@@ -3,10 +3,11 @@ import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
 import { IChannels } from "./interfaces/IChannels";
+import { ICommonModel } from "./interfaces/ICommonModel";
 import { IModel } from "./interfaces/IModel";
 
 export class CommonService<
-  M extends IModel<P>,
+  M extends ICommonModel<P>,
   P extends IPersist,
   I extends IInsert,
   C extends IChannels,
@@ -62,7 +63,7 @@ export class CommonService<
       async (req: express.Request, res: express.Response) => {
         try {
           if (this.ACL.model.length === 0 || (req.user && this.ACL.model.includes(req.user.group))) {
-            const result: P | null = await this.model.readById(req.query.id);
+            const result: P | null = await this.model.read();
 
             if (result) {
               res.status(200).json(result.toJS());
