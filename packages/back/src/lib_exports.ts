@@ -10,6 +10,7 @@ export { IAuthStrategy } from "./interfaces/IAuthStrategy";
 export { IAPPServer } from "./interfaces/IAPPServer";
 export { IMigrationController } from "./interfaces/IMigrationController";
 export { IMigration } from "./interfaces/IMigration";
+export { ICommonModel } from "./interfaces/ICommonModel";
 
 // CLASSES
 export { toMongo } from "./toMongo";
@@ -18,9 +19,11 @@ export { AuthStrategy } from "./AuthStrategy";
 export { APPServer } from "./APPServer";
 export { AppConfig } from "./AppConfig";
 export { Model } from "./Model";
+export { CommonModel } from "./CommonModel";
 export { MongoDBRepository } from "./MongoDBRepository";
 export { UserModel } from "./UserModel";
 export { Service } from "./Service";
+export { CommonService } from "./CommonService";
 export { UserService } from "./UserService";
 export { MigrationController } from "./MigrationController";
 export { Migration } from "./Migration";
