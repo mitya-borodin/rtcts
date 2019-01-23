@@ -1,8 +1,8 @@
 import { IForm, IPersist } from "@borodindmitriy/interfaces";
+import { IMediator } from "@borodindmitriy/isomorphic";
 import { isArray, isObject } from "@borodindmitriy/utils";
 import { mediatorChannelEnum } from "./enums/mediatorChannelEnum";
 import { ICacheRepository } from "./interfaces/ICacheRepository";
-import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
 import { IService } from "./interfaces/IService";
 import { IWSClient } from "./interfaces/IWSClient";

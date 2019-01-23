@@ -1,5 +1,5 @@
 import { IPersist, IUser } from "@borodindmitriy/interfaces";
-import { IMediator } from "./interfaces/IMediator";
+import { IMediator } from "@borodindmitriy/isomorphic";
 import { IUserService } from "./interfaces/IUserService";
 import { IWSClient } from "./interfaces/IWSClient";
 import { Service } from "./Service";

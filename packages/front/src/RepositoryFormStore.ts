@@ -1,8 +1,7 @@
 import { IForm, IInsert, IPersist, IUser, IValidateResult, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
-import { ValidateResult } from "@borodindmitriy/isomorphic";
+import { IMediator, ValidateResult } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
-import { IMediator } from "./interfaces/IMediator";
 import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
 

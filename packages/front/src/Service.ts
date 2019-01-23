@@ -1,6 +1,6 @@
 import { userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { IMediator } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
-import { IMediator } from "./interfaces/IMediator";
 import { IService } from "./interfaces/IService";
 import { IWSClient } from "./interfaces/IWSClient";
 

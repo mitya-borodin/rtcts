@@ -1,4 +1,14 @@
+/**
+ * INTERFACES
+ */
+export { IMediator } from "./interfaces/IMediator";
+
+/**
+ * IMPLEMENTATION
+ */
+
 export { EventEmitter } from "./EventEmitter";
+export { Mediator } from "./Mediator";
 export { User } from "./user/User";
 export { UserInsert } from "./user/UserInsert";
 export { ValidateResult } from "./ValidateResult";

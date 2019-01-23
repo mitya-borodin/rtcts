@@ -1,7 +1,7 @@
 import { IPersist, IUser, userGroupEnum, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
-import { IMediator } from "./interfaces/IMediator";
 import { IUserRepository } from "./interfaces/IUserRepository";
 import { IUserService } from "./interfaces/IUserService";
 import { IWSClient } from "./interfaces/IWSClient";
