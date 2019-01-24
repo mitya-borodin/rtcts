@@ -19,3 +19,4 @@ export { yearOnly } from "./yearOnly";
 export { checkPassword } from "./checkPassword";
 export { getAttribute } from "./getAttribute";
 export { getErrorMessage } from "./getErrorMessage";
+export { applyMixins } from "./applyMixins";
