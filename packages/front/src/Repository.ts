@@ -211,9 +211,9 @@ export class Repository<
   public receiveMessage([channelName, payload]: [string, any]): T | T[] | void {
     if (this.isInit) {
       try {
-        console.log(`[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]`, [channelName, payload]);
-
         if (this.channelName === channelName) {
+          console.log(`%c[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]`, "color: #1890ff;", [channelName, payload]);
+
           if (isObject(payload.create)) {
             const item: T = new this.Persist(payload.create);
 
@@ -253,9 +253,9 @@ export class Repository<
               this.collection.set(item.id, item);
 
               items.push(item);
-
-              return items;
             }
+
+            return items;
           }
 
           if (isObject(payload.remove)) {
@@ -274,7 +274,10 @@ export class Repository<
         );
       }
     } else {
-      console.error(`[ ${this.constructor.name} ][ RESEIVE_MESSAGE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+      console.info(
+        `%c[ ${this.constructor.name} ][ RESEIVE_MESSAGE ][ INFO_MESSAGE: IS_NOT_INIT ]`,
+        "color: rgba(255,255,255, 0.2);",
+      );
     }
   }
 
