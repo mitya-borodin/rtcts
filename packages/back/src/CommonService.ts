@@ -4,7 +4,6 @@ import * as express from "express";
 import * as passport from "passport";
 import { IChannels } from "./interfaces/IChannels";
 import { ICommonModel } from "./interfaces/ICommonModel";
-import { IModel } from "./interfaces/IModel";
 
 export class CommonService<
   M extends ICommonModel<P>,
@@ -49,7 +48,6 @@ export class CommonService<
     this.ACL = ACL;
 
     this.read();
-    this.create();
     this.update();
     this.channel();
   }
@@ -68,45 +66,12 @@ export class CommonService<
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res
-                .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.query.id} ]`);
+              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ NO_EXIST ]`);
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
-          res
-            .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
-        }
-      },
-    );
-  }
-
-  protected create(): void {
-    const URL = `/${this.name}/create`;
-
-    this.router.put(
-      URL,
-      passport.authenticate("jwt", { session: false }),
-      async (req: express.Request, res: express.Response) => {
-        try {
-          if (this.ACL.create.length === 0 || (req.user && this.ACL.create.includes(req.user.group))) {
-            const { wsid, ...data } = req.body;
-            const insert = new this.Insert(data);
-            const result = await this.model.create(insert.toJS(), req.user.id, wsid);
-
-            if (result) {
-              res.status(200).json(result.toJS());
-            } else {
-              throw new Error("MODEL_DOES_NOT_CREATED");
-            }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
-          }
-        } catch (error) {
-          console.error(error);
           res
             .status(500)
             .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
@@ -131,9 +96,7 @@ export class CommonService<
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res
-                .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
+              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND ]`);
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);

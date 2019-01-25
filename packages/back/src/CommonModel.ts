@@ -38,11 +38,11 @@ export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepos
     return null;
   }
 
-  public async create(
+  public async update(
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-    options?: CollectionInsertOneOptions,
+    options?: FindOneAndReplaceOption,
     excludeCurrentDevice?: boolean,
   ): Promise<P | null> {
     try {
@@ -60,26 +60,6 @@ export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepos
 
         return persist;
       } else {
-        return await this.update(data, uid, wsid, options);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
-    return null;
-  }
-
-  public async update(
-    data: { [key: string]: any },
-    uid: string,
-    wsid: string,
-    options?: FindOneAndReplaceOption,
-    excludeCurrentDevice?: boolean,
-  ): Promise<P | null> {
-    try {
-      const curValue: P | null = await this.read();
-
-      if (curValue !== null) {
         let persist: P = new this.Persist(data);
 
         const { _id, ...$set } = toMongo(persist);
@@ -89,6 +69,7 @@ export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepos
           { $set },
           {
             returnOriginal: false,
+            upsert: true,
             ...(isObject(options) && Object.keys(options).length > 0 ? options : undefined),
           },
         );
@@ -100,8 +81,6 @@ export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepos
 
           return persist;
         }
-      } else {
-        return await this.create(data, uid, wsid, options, excludeCurrentDevice);
       }
     } catch (error) {
       console.error(error);

@@ -23,7 +23,7 @@ export class UserService<U extends IUser & IPersist, WS extends IWSClient = IWSC
 
   constructor(
     name: string,
-    Class: { new (data?: any): U },
+    Class: new (data?: any) => U,
     ws: WS,
     channelName: string,
     ACL: {

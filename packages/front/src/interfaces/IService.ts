@@ -1,4 +1,6 @@
-export interface IService<T> {
+import { IBaseService } from "./IBaseService";
+
+export interface IService<T> extends IBaseService<T> {
   ACL: {
     collection: string[];
     model: string[];
@@ -8,13 +10,10 @@ export interface IService<T> {
     onChannel: string[];
     offChannel: string[];
   };
-  group: string;
 
   collection(): Promise<T[] | void>;
   model(id: string): Promise<T | void>;
   create(data: object): Promise<T | void>;
   update(data: object): Promise<T | void>;
   remove(id: string): Promise<T | void>;
-  onChannel(): Promise<void>;
-  offChannel(): Promise<void>;
 }
