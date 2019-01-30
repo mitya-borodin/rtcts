@@ -156,9 +156,15 @@ export class CommonStoreForm<
         this.showAlerts = false;
 
         if (this.form instanceof this.Form) {
-          const persist = new this.Persist(this.form.toJS());
+          let update: { [key: string]: any } = {};
 
-          await this.store.update(persist.toJS());
+          if (isString(this.form.id)) {
+            update = new this.Persist(this.form.toJS()).toJS();
+          } else {
+            update = new this.Insert(this.form.toJS()).toJS();
+          }
+
+          await this.store.update(update);
         } else {
           console.error(`[ ${this.constructor.name} ][ FORM IS NOT INSTANCE_OF ${this.Form.name} ]`);
         }

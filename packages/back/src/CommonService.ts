@@ -1,4 +1,4 @@
-import { IInsert, IPersist } from "@borodindmitriy/interfaces";
+import { IPersist } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
@@ -6,16 +6,13 @@ import { IChannels } from "./interfaces/IChannels";
 import { ICommonModel } from "./interfaces/ICommonModel";
 
 export class CommonService<
-  M extends ICommonModel<P>,
   P extends IPersist,
-  I extends IInsert,
+  M extends ICommonModel<P>,
   C extends IChannels,
   Router extends express.Router = express.Router
 > {
   protected readonly name: string;
   protected readonly router: Router;
-  protected readonly Insert: { new (data: any): I };
-  protected readonly Persist: { new (data: any): P };
   protected readonly model: M;
   protected readonly channels: C;
   protected readonly ACL: {
@@ -28,8 +25,6 @@ export class CommonService<
   constructor(
     name: string,
     router: Router,
-    Persist: new (data: any) => P,
-    Insert: new (data: any) => I,
     model: M,
     channels: C,
     ACL: {
@@ -41,8 +36,6 @@ export class CommonService<
   ) {
     this.name = name;
     this.router = router;
-    this.Insert = Insert;
-    this.Persist = Persist;
     this.model = model;
     this.channels = channels;
     this.ACL = ACL;
@@ -90,8 +83,7 @@ export class CommonService<
         try {
           if (this.ACL.update.length === 0 || (req.user && this.ACL.update.includes(req.user.group))) {
             const { wsid, ...data } = req.body;
-            const persist = new this.Persist(data);
-            const result: P | null = await this.model.update(persist.toJS(), req.user.id, wsid);
+            const result: P | null = await this.model.update(data, req.user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJS());
