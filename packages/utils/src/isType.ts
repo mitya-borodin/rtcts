@@ -10,8 +10,10 @@ export function isBoolean<T = boolean>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Boolean]";
 }
 
-export function isUndefined<T = undefined | void>(test: any): test is T {
-  return Object.prototype.toString.call(test) === "[object Undefined]";
+export function isUndefined<T = undefined | null | void>(test: any): test is T {
+  const result = Object.prototype.toString.call(test);
+
+  return result === "[object Undefined]" || result === "[object Null]";
 }
 
 export function isObject<T = object>(test: any): test is T {
