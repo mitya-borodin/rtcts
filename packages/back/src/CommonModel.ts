@@ -69,7 +69,6 @@ export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepos
           { $set },
           {
             returnOriginal: false,
-            upsert: true,
             ...(isObject(options) && Object.keys(options).length > 0 ? options : undefined),
           },
         );
