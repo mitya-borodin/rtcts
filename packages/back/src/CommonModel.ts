@@ -1,6 +1,6 @@
 import { IInsert, IPersist } from "@borodindmitriy/interfaces";
 import { isObject } from "@borodindmitriy/utils";
-import { FindOneAndReplaceOption } from "mongodb";
+import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { ICommonModel } from "./interfaces/ICommonModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";
@@ -32,6 +32,10 @@ export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepos
         return new this.Persist(item);
       }
     } catch (error) {
+      const collection: Collection<P> = await this.repository.getCollection();
+
+      await collection.drop();
+
       console.error(error);
     }
 
