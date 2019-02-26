@@ -17,7 +17,7 @@ export class ValidateResult implements IValidateResult<IValidate> {
 
   private readonly __CACHE__: { [key: string]: any } = {};
 
-  constructor(items: Array<object | IValidate | IValidateResult<IValidate>>) {
+  constructor(V: Array<object | IValidate | IValidateResult<IValidate>> | IValidateResult<IValidate>) {
     let hasError = false;
     let hasWarn = false;
     let hasLog = false;
@@ -27,18 +27,26 @@ export class ValidateResult implements IValidateResult<IValidate> {
     const log: ILog[] = [];
     const results: IValidate[] = [];
 
-    for (const item of items) {
-      if (item instanceof Validate) {
-        results.push(item);
-      } else if (item instanceof ValidateResult) {
-        for (const validate_item of item.toValidate()) {
-          results.push(validate_item);
+    if (isArray(V)) {
+      for (const item of V) {
+        if (item instanceof Validate) {
+          results.push(item);
+        } else if (item instanceof ValidateResult) {
+          for (const validate_item of item.toValidate()) {
+            results.push(validate_item);
+          }
+        } else if (isObject(item)) {
+          results.push(new Validate(item));
+        } else {
+          throw new Error(`[ ${this.constructor.name} ][ ${JSON.stringify(item)} ][ unexpected item ]`);
         }
-      } else if (isObject(item)) {
-        results.push(new Validate(item));
-      } else {
-        throw new Error(`[ ${this.constructor.name} ][ ${JSON.stringify(item)} ][ unexpected item ]`);
       }
+    } else if (V instanceof ValidateResult) {
+      for (const validate_item of V.toValidate()) {
+        results.push(validate_item);
+      }
+    } else {
+      throw new Error(`[ ${this.constructor.name} ][ INCORRECT_VALIDATE_OBJECT ]`);
     }
 
     for (const r of results) {
@@ -138,7 +146,51 @@ export class ValidateResult implements IValidateResult<IValidate> {
   }
 
   public hasFieldError(a_field: string): boolean {
-    return !!this.getFieldValidation(a_field);
+    const v: IValidate | void = this.getFieldValidation(a_field);
+
+    if (v instanceof Validate) {
+      if (v.type === logTypeEnum.error) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public hasFieldWarning(a_field: string): boolean {
+    const v: IValidate | void = this.getFieldValidation(a_field);
+
+    if (v instanceof Validate) {
+      if (v.type === logTypeEnum.warn) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public hasFieldInfo(a_field: string): boolean {
+    const v: IValidate | void = this.getFieldValidation(a_field);
+
+    if (v instanceof Validate) {
+      if (v.type === logTypeEnum.info) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public hasFieldLog(a_field: string): boolean {
+    const v: IValidate | void = this.getFieldValidation(a_field);
+
+    if (v instanceof Validate) {
+      if (v.type === logTypeEnum.log) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public toValidate(): IValidate[] {

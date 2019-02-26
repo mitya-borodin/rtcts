@@ -19,6 +19,9 @@ export interface IValidateResult<V extends IValidate = IValidate> {
   getFieldTitle(a_field: string): string;
   getFieldMessage(a_field: string): string;
   hasFieldError(field: string): boolean;
+  hasFieldWarning(field: string): boolean;
+  hasFieldInfo(field: string): boolean;
+  hasFieldLog(field: string): boolean;
   toValidate(): V[];
   toJS(): { [key: string]: any };
 }
