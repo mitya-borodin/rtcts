@@ -18,7 +18,7 @@ export interface IValidateResult<V extends IValidate = IValidate> {
   getFieldValidation(field: string): V | void;
   getFieldTitle(a_field: string): string;
   getFieldMessage(a_field: string): string;
-  getValidateStatus(a_field: string): "success" | "warning" | "error" | "validating";
+  getValidateStatus(a_field: string): any;
   hasFieldError(field: string): boolean;
   hasFieldWarning(field: string): boolean;
   hasFieldInfo(field: string): boolean;

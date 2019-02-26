@@ -145,7 +145,7 @@ export class ValidateResult implements IValidateResult<IValidate> {
     return "";
   }
 
-  public getValidateStatus(a_field: string): "success" | "warning" | "error" | "validating" {
+  public getValidateStatus(a_field: string): any {
     const v = this.getFieldValidation(a_field);
 
     if (v instanceof Validate) {
@@ -156,8 +156,6 @@ export class ValidateResult implements IValidateResult<IValidate> {
         return "warning";
       }
     }
-
-    return "success";
   }
 
   public hasFieldError(a_field: string): boolean {
