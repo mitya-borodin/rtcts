@@ -145,6 +145,21 @@ export class ValidateResult implements IValidateResult<IValidate> {
     return "";
   }
 
+  public getValidateStatus(a_field: string): "success" | "warning" | "error" | "validating" {
+    const v = this.getFieldValidation(a_field);
+
+    if (v instanceof Validate) {
+      if (v.type === logTypeEnum.error) {
+        return "error";
+      }
+      if (v.type === logTypeEnum.warn) {
+        return "warning";
+      }
+    }
+
+    return "success";
+  }
+
   public hasFieldError(a_field: string): boolean {
     const v: IValidate | void = this.getFieldValidation(a_field);
 
