@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.26",
+  "version": "1.0.27",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -29,6 +29,7 @@
     "start": "rearguard wds",
     "start:release": "rearguard wds -r"
   },
+  "types": "lib/lib_exports.d.ts",
   "engines": {
     "node": ">=10",
     "npm": ">=6"
@@ -53,9 +54,9 @@
     "has_dll": true,
     "has_browser_lib": true,
     "load_on_demand": true,
-    "has_project": false,
+    "is_application": false,
     "has_node_lib": false,
-    "publish_in_git": false
-  },
-  "types": "lib/lib_exports.d.ts"
+    "publish_in_git": false,
+    "last_build_time": "2019-02-28T15:05:27.896Z"
+  }
 }

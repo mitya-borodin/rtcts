@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.59",
+  "version": "1.0.60",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -29,17 +29,18 @@
     "start": "rearguard wds",
     "start:release": "rearguard wds -r"
   },
+  "types": "lib/lib_exports.d.ts",
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "1.1.24",
-    "@borodindmitriy/isomorphic": "1.0.47",
-    "@borodindmitriy/utils": "1.3.43",
-    "@borodindmitriy/vendors": "1.0.33"
+    "@borodindmitriy/interfaces": "1.1.25",
+    "@borodindmitriy/isomorphic": "1.0.48",
+    "@borodindmitriy/utils": "1.3.44",
+    "@borodindmitriy/vendors": "1.0.34"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "1.1.24",
-    "@borodindmitriy/isomorphic": "1.0.47",
-    "@borodindmitriy/utils": "1.3.43",
-    "@borodindmitriy/vendors": "1.0.33"
+    "@borodindmitriy/interfaces": "1.1.25",
+    "@borodindmitriy/isomorphic": "1.0.48",
+    "@borodindmitriy/utils": "1.3.44",
+    "@borodindmitriy/vendors": "1.0.34"
   },
   "engines": {
     "node": ">=8",
@@ -70,9 +71,9 @@
     "has_dll": true,
     "has_browser_lib": true,
     "load_on_demand": false,
-    "has_project": false,
+    "is_application": false,
     "has_node_lib": false,
-    "publish_in_git": false
-  },
-  "types": "lib/lib_exports.d.ts"
+    "publish_in_git": false,
+    "last_build_time": "2019-02-28T15:06:45.556Z"
+  }
 }

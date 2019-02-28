@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.33",
+  "version": "1.0.34",
   "files": [
     "dll_bundle"
   ],
@@ -25,39 +25,41 @@
   },
   "dependencies": {
     "@types/history": "4.7.2",
-    "@types/node": "10.12.0",
-    "@types/prop-types": "15.5.6",
+    "@types/node": "11.9.5",
+    "@types/prop-types": "15.7.0",
     "@types/querystringify": "2.0.0",
-    "@types/react": "16.4.18",
-    "@types/react-dom": "16.0.9",
+    "@types/react": "16.8.5",
+    "@types/react-dom": "16.8.2",
     "antd": "3.10.1",
-    "antd-mobile": "2.2.6",
+    "antd-mobile": "2.2.9",
     "history": "4.7.2",
-    "hoist-non-react-statics": "3.0.1",
-    "isomorphic-style-loader": "4.0.0",
-    "mobx": "5.5.2",
-    "mobx-react": "5.3.5",
+    "hoist-non-react-statics": "3.3.0",
+    "isomorphic-style-loader": "5.0.1",
+    "mobx": "5.9.0",
+    "mobx-react": "5.4.3",
     "mobx-react-devtools": "6.0.3",
-    "mobx-utils": "5.0.4",
-    "moment": "2.22.2",
-    "normalize.css": "8.0.0",
-    "prettier": "1.14.3",
-    "prop-types": "15.6.2",
-    "querystringify": "2.0.0",
-    "react": "16.5.2",
-    "react-dom": "16.5.2",
+    "mobx-utils": "5.1.0",
+    "moment": "2.24.0",
+    "normalize.css": "8.0.1",
+    "prop-types": "15.7.2",
+    "querystringify": "2.1.0",
+    "react": "16.8.3",
+    "react-dom": "16.8.3",
     "react-helmet": "5.2.0",
-    "tslint": "5.11.0",
+    "tslint": "5.13.0",
     "tslint-no-circular-imports": "0.6.1",
-    "typescript": "3.1.3",
-    "validatorjs": "3.14.2"
+    "typescript": "3.3.3",
+    "validatorjs": "3.15.1"
+  },
+  "devDependencies": {
+    "prettier": "1.16.4"
   },
   "keywords": [
     "dll"
   ],
   "engines": {
-    "node": ">=8",
-    "npm": ">=5"
+    "node": ">=10",
+    "npm": ">=6"
   },
   "publishConfig": {
     "access": "public",
@@ -77,8 +79,9 @@
     "has_dll": true,
     "has_browser_lib": false,
     "load_on_demand": false,
-    "has_project": false,
+    "is_application": false,
     "has_node_lib": false,
-    "publish_in_git": false
+    "publish_in_git": false,
+    "last_build_time": "2019-02-28T15:04:57.740Z"
   }
 }

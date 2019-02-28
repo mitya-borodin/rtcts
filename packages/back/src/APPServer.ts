@@ -60,9 +60,9 @@ export class APPServer<C extends IAppConfig = IAppConfig, STR extends IAuthStrat
               });
 
               this.server.listen(this.config.server.port, this.config.server.host, () => {
-                const addressInfo: AddressInfo | string = this.server.address();
+                const addressInfo: AddressInfo | string | null = this.server.address();
 
-                if (!isString(addressInfo)) {
+                if (!isString(addressInfo) && addressInfo !== null) {
                   console.log(
                     chalk.blueBright.bold(
                       `[ APP ][ SERVER ][ RUN ][ http://${addressInfo.address}:${addressInfo.port} ]`,

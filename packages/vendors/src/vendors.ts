@@ -12,7 +12,7 @@ import "antd/lib/table";
 import "history";
 import "history/createBrowserHistory";
 import "hoist-non-react-statics";
-import "isomorphic-style-loader/lib/withStyles";
+import "isomorphic-style-loader/withStyles";
 import "mobx";
 import "mobx-react";
 import "mobx-react-devtools";
