@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.34",
+  "version": "1.0.35",
   "files": [
     "dll_bundle"
   ],
@@ -26,7 +26,6 @@
   "dependencies": {
     "@types/history": "4.7.2",
     "@types/node": "11.9.5",
-    "@types/prop-types": "15.7.0",
     "@types/querystringify": "2.0.0",
     "@types/react": "16.8.5",
     "@types/react-dom": "16.8.2",
@@ -41,7 +40,6 @@
     "mobx-utils": "5.1.0",
     "moment": "2.24.0",
     "normalize.css": "8.0.1",
-    "prop-types": "15.7.2",
     "querystringify": "2.1.0",
     "react": "16.8.3",
     "react-dom": "16.8.3",
@@ -82,6 +80,6 @@
     "is_application": false,
     "has_node_lib": false,
     "publish_in_git": false,
-    "last_build_time": "2019-02-28T15:04:57.740Z"
+    "last_build_time": "2019-02-28T15:39:08.525Z"
   }
 }
