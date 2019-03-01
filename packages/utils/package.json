@@ -63,7 +63,6 @@
     "load_on_demand": false,
     "is_application": false,
     "has_node_lib": true,
-    "publish_in_git": false,
-    "last_build_time": "2019-03-01T12:20:06.195Z"
+    "publish_in_git": false
   }
 }
