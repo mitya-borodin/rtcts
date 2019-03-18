@@ -13,6 +13,7 @@ export { minutesToTimeOnly } from "./minutesToTimeOnly";
 export { separateMinutes } from "./separateMinutes";
 export { timeOnly } from "./timeOnly";
 export { uploadHTML } from "./uploadHTML";
+export { uploadCSV } from "./uploadCSV";
 export { overlaps } from "./overlaps";
 export { intersection } from "./intersection";
 export { yearOnly } from "./yearOnly";
