@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.1.27",
+  "version": "1.1.28",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -31,13 +31,13 @@
   "types": "lib/lib_exports.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "tslint": "^5.13.0",
-    "tslint-no-circular-imports": "^0.6.1",
+    "tslint": "^5.14.0",
+    "tslint-no-circular-imports": "^0.6.2",
     "typescript": "^3.3.3"
   },
   "engines": {
-    "node": ">=8",
-    "npm": ">=5"
+    "node": ">=10",
+    "npm": ">=6"
   },
   "publishConfig": {
     "access": "public",

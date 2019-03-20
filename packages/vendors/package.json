@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.36",
+  "version": "1.0.37",
   "files": [
     "dll_bundle"
   ],
@@ -25,32 +25,30 @@
   },
   "dependencies": {
     "@types/history": "4.7.2",
-    "@types/node": "11.9.5",
+    "@types/node": "11.11.4",
     "@types/querystringify": "2.0.0",
-    "@types/react": "16.8.5",
+    "@types/react": "16.8.8",
     "@types/react-dom": "16.8.2",
-    "antd": "3.10.1",
-    "antd-mobile": "2.2.9",
-    "history": "4.7.2",
+    "antd": "3.15.1",
+    "history": "4.9.0",
     "hoist-non-react-statics": "3.3.0",
     "isomorphic-style-loader": "5.0.1",
     "mobx": "5.9.0",
     "mobx-react": "5.4.3",
-    "mobx-react-devtools": "6.0.3",
-    "mobx-utils": "5.1.0",
+    "mobx-react-devtools": "6.1.1",
+    "mobx-utils": "5.2.0",
     "moment": "2.24.0",
     "normalize.css": "8.0.1",
     "querystringify": "2.1.0",
-    "react": "16.8.3",
-    "react-dom": "16.8.3",
+    "react": "16.8.4",
+    "react-dom": "16.8.4",
     "react-helmet": "5.2.0",
-    "tslint": "5.13.0",
-    "tslint-no-circular-imports": "0.6.1",
-    "typescript": "3.3.3",
-    "validatorjs": "3.15.1"
+    "tslint": "5.14.0",
+    "tslint-no-circular-imports": "0.6.2"
   },
   "devDependencies": {
-    "prettier": "1.16.4"
+    "prettier": "1.16.4",
+    "typescript": "3.3.3"
   },
   "keywords": [
     "dll"

@@ -3,8 +3,6 @@
  */
 
 import "antd";
-import "antd-mobile";
-import "antd-mobile/dist/antd-mobile.css";
 import "antd/dist/antd.css";
 import "antd/es/select";
 import "antd/lib/locale-provider/en_US";
@@ -24,4 +22,3 @@ import "react";
 import "react-dom";
 import "react-dom/server";
 import "react-helmet";
-import "validatorjs";
