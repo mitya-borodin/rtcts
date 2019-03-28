@@ -15,6 +15,7 @@ export { timeOnly } from "./timeOnly";
 export { uploadHTML } from "./uploadHTML";
 export { uploadCSV } from "./uploadCSV";
 export { overlaps } from "./overlaps";
+export { overlaps_RS } from "./overlaps_RS";
 export { intersection } from "./intersection";
 export { yearOnly } from "./yearOnly";
 export { checkPassword } from "./checkPassword";
