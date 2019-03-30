@@ -11,7 +11,7 @@ import {
 } from "@borodindmitriy/isomorphic";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
-import { IWSClient } from "./interfaces/IWSClient";
+import { IWSClient } from "../../../interfaces/infrastructure/transport/ws/IWSClient";
 
 export class WSClient extends EventEmitter implements IWSClient {
   @observable

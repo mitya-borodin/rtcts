@@ -1,17 +1,17 @@
 import { IMediator } from "@borodindmitriy/isomorphic";
-import { BaseService } from "./BaseService";
-import { IService } from "./interfaces/IService";
-import { IWSClient } from "./interfaces/IWSClient";
+import { IRepositoryHTTPTransport } from "../../../interfaces/infrastructure/transport/http/IRepositoryHTTPTransport";
+import { IWSClient } from "../../../interfaces/infrastructure/transport/ws/IWSClient";
+import { HTTPTransport } from "./HTTPTransport";
 
-export class Service<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
-  extends BaseService<T, WS, ME>
-  implements IService<T> {
+export class RepositoryHTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
+  extends HTTPTransport<T, WS, ME>
+  implements IRepositoryHTTPTransport<T> {
   public readonly ACL: {
     collection: string[];
-    model: string[];
+    read: string[];
     create: string[];
-    remove: string[];
     update: string[];
+    remove: string[];
     onChannel: string[];
     offChannel: string[];
   };
@@ -31,21 +31,21 @@ export class Service<T, WS extends IWSClient = IWSClient, ME extends IMediator =
     channelName: string,
     ACL: {
       collection: string[];
-      model: string[];
+      read: string[];
       create: string[];
-      remove: string[];
       update: string[];
+      remove: string[];
       onChannel: string[];
       offChannel: string[];
     },
     mediator: ME,
-    root = "/service",
+    root,
   ) {
     super(name, Class, ws, channelName, ACL, mediator, root);
 
     // BINDINGS
     this.collection = this.collection.bind(this);
-    this.model = this.model.bind(this);
+    this.read = this.read.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
@@ -65,10 +65,10 @@ export class Service<T, WS extends IWSClient = IWSClient, ME extends IMediator =
     }
   }
 
-  public async model(id: string): Promise<T | void> {
+  public async read(id: string): Promise<T | void> {
     try {
-      if (this.ACL.model.includes(this.group)) {
-        const output: object | void = await this.get(`/${this.name}/model?id=${id}`);
+      if (this.ACL.read.includes(this.group)) {
+        const output: object | void = await this.get(`/${this.name}/read?id=${id}`);
 
         if (output) {
           return new this.Class(output);

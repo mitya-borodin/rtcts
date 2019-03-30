@@ -1,11 +1,11 @@
 import { userRepositoryEventEnum } from "@borodindmitriy/interfaces";
 import { IMediator } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
-import { IBaseService } from "./interfaces/IBaseService";
-import { IWSClient } from "./interfaces/IWSClient";
+import { IWSClient } from "./../../../../lib/interfaces/IWSClient.d";
+import { IHTTPTransport } from "./../../../interfaces/infrastructure/transport/http/IHTTPTransport";
 
-export class BaseService<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
-  implements IBaseService<T> {
+export class HTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
+  implements IHTTPTransport {
   public readonly ACL: {
     onChannel: string[];
     offChannel: string[];
@@ -29,9 +29,9 @@ export class BaseService<T, WS extends IWSClient = IWSClient, ME extends IMediat
       offChannel: string[];
     },
     mediator: ME,
-    root = "/service",
+    root = "/api",
   ) {
-    // DEPS
+    // * DEPS
     this.name = name.toLocaleLowerCase();
     this.Class = Class;
     this.ws = ws;
@@ -40,7 +40,7 @@ export class BaseService<T, WS extends IWSClient = IWSClient, ME extends IMediat
     this.ACL = ACL;
     this.mediator = mediator;
 
-    // SUBSCRIPTIONS
+    // ! SUBSCRIPTIONS
     this.mediator.on(userRepositoryEventEnum.SET_USER_GROUP, (group: string) => {
       if (isString(group)) {
         this.group = group;
@@ -51,7 +51,7 @@ export class BaseService<T, WS extends IWSClient = IWSClient, ME extends IMediat
       this.group = "";
     });
 
-    // BINDINGS
+    // * BINDINGS
     this.onChannel = this.onChannel.bind(this);
     this.offChannel = this.offChannel.bind(this);
     this.get = this.get.bind(this);

@@ -1,4 +1,4 @@
-export interface IBaseService<T> {
+export interface IHTTPTransport {
   ACL: {
     onChannel: string[];
     offChannel: string[];

@@ -1,18 +1,18 @@
-import { IBaseService } from "./IBaseService";
+import { IHTTPTransport } from "./IHTTPTransport";
 
-export interface IService<T> extends IBaseService<T> {
+export interface IRepositoryHTTPTransport<T> extends IHTTPTransport {
   ACL: {
     collection: string[];
-    model: string[];
+    read: string[];
     create: string[];
-    remove: string[];
     update: string[];
+    remove: string[];
     onChannel: string[];
     offChannel: string[];
   };
 
   collection(): Promise<T[] | void>;
-  model(id: string): Promise<T | void>;
+  read(id: string): Promise<T | void>;
   create(data: object): Promise<T | void>;
   update(data: object): Promise<T | void>;
   remove(id: string): Promise<T | void>;

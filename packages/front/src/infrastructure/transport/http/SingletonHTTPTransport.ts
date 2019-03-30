@@ -1,13 +1,13 @@
 import { IMediator } from "@borodindmitriy/isomorphic";
-import { BaseService } from "./BaseService";
-import { ICommonService } from "./interfaces/ICommonService";
-import { IWSClient } from "./interfaces/IWSClient";
+import { ISingletonHTTPTransport } from "../../../interfaces/infrastructure/transport/http/ISingletonHTTPTransport";
+import { IWSClient } from "../../../interfaces/infrastructure/transport/ws/IWSClient";
+import { HTTPTransport } from "./HTTPTransport";
 
-export class CommonService<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
-  extends BaseService<T, WS, ME>
-  implements ICommonService<T> {
+export class SingletonHTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
+  extends HTTPTransport<T, WS, ME>
+  implements ISingletonHTTPTransport<T> {
   public readonly ACL: {
-    model: string[];
+    read: string[];
     update: string[];
     onChannel: string[];
     offChannel: string[];
@@ -27,7 +27,7 @@ export class CommonService<T, WS extends IWSClient = IWSClient, ME extends IMedi
     ws: WS,
     channelName: string,
     ACL: {
-      model: string[];
+      read: string[];
       update: string[];
       onChannel: string[];
       offChannel: string[];
@@ -38,14 +38,14 @@ export class CommonService<T, WS extends IWSClient = IWSClient, ME extends IMedi
     super(name, Class, ws, channelName, ACL, mediator, root);
 
     // BINDINGS
-    this.model = this.model.bind(this);
+    this.read = this.read.bind(this);
     this.update = this.update.bind(this);
   }
 
-  public async model(): Promise<T | void> {
+  public async read(): Promise<T | void> {
     try {
-      if (this.ACL.model.includes(this.group)) {
-        const output: object | void = await this.get(`/${this.name}/model`);
+      if (this.ACL.read.includes(this.group)) {
+        const output: object | void = await this.get(`/${this.name}/read`);
 
         if (output) {
           return new this.Class(output);
