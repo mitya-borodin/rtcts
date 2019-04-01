@@ -1,6 +1,7 @@
 node_modules
 .env
 deferred_module_list.ts
+examples
 dll_bundle
 lib_bundle
 lib

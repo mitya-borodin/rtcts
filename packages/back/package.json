@@ -71,6 +71,7 @@
     "passport-jwt": "4.0.0",
     "prettier": "1.16.4",
     "ts-node": "8.0.2",
+    "ts-node-dev": "1.0.0-pre.32",
     "tslib": "1.9.3",
     "tslint": "5.14.0",
     "tslint-no-circular-imports": "0.6.2",
@@ -95,9 +96,10 @@
       "@borodindmitriy/utils",
       "@borodindmitriy/isomorphic"
     ],
+    "is_application": false,
+    "is_back_end": false,
     "has_dll": false,
     "has_browser_lib": false,
-    "is_application": false,
     "has_node_lib": true,
     "publish_in_git": false
   }
