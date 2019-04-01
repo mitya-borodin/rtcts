@@ -1,7 +1,7 @@
 import { userRepositoryEventEnum } from "@borodindmitriy/interfaces";
 import { IMediator } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
-import { IWSClient } from "./../../../../lib/interfaces/IWSClient.d";
+import { IWSClient } from "../../../interfaces/infrastructure/transport/ws/IWSClient";
 import { IHTTPTransport } from "./../../../interfaces/infrastructure/transport/http/IHTTPTransport";
 
 export class HTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>

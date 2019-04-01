@@ -1,47 +1,51 @@
-import { IPersist, wsEventEnum } from "@borodindmitriy/interfaces";
+import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
 import { EventEmitter, IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
+import { IWSClient } from "./../lib/interfaces/IWSClient.d";
+import { IRepositoryHTTPTransport } from "./interfaces/infrastructure/transport/http/IRepositoryHTTPTransport";
 import { IRepository } from "./interfaces/IRepository";
-import { IService } from "./interfaces/IService";
-import { IWSClient } from "./interfaces/IWSClient";
 
 export class Repository<
-  T extends IPersist,
-  S extends IService<T>,
+  E extends IEntity,
+  T extends IRepositoryHTTPTransport<E>,
   WS extends IWSClient = IWSClient,
   ME extends IMediator = IMediator
-> extends EventEmitter implements IRepository<T> {
+> extends EventEmitter implements IRepository<E> {
   @observable
-  public isInit: boolean;
-  @observable
-  public isLoading: boolean;
+  public pending: boolean;
 
   @observable
-  protected collection: ObservableMap<string, T>;
+  protected collection: ObservableMap<string, E>;
 
-  protected Persist: new (data?: any) => T;
-  protected service: S;
+  protected Entity: new (data?: any) => E;
+  protected transport: T;
+  protected mediator: ME;
   protected ws: WS;
   protected channelName: string;
-  protected mediator: ME;
 
-  constructor(Persist: new (data?: any) => T, service: S, ws: WS, channelName: string, mediator: ME) {
+  protected isInit: boolean;
+
+  constructor(Entity: new (data?: any) => E, transport: T, mediator: ME, ws: WS, channelName: string) {
     super();
 
-    // DEPS
-    this.Persist = Persist;
-    this.service = service;
+    // * DEPS
+    this.Entity = Entity;
+    this.transport = transport;
+    this.mediator = mediator;
     this.ws = ws;
     this.channelName = channelName;
-    this.mediator = mediator;
 
-    // INIT
+    // * INIT
     this.isInit = false;
-    this.isLoading = false;
-    this.collection = observable.map();
 
-    // BINDINGS
+    // ! OBSERVABLE
+    runInAction(`[ ${this.constructor.name} ][ SET_INITIAL_VALUE ]`, () => {
+      this.pending = false;
+      this.collection = observable.map();
+    });
+
+    // * BINDINGS
     this.init = this.init.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
@@ -51,32 +55,23 @@ export class Repository<
     this.handleAssigment = this.handleAssigment.bind(this);
     this.handleCancelAssigment = this.handleCancelAssigment.bind(this);
 
-    // SUBSCRIPTIONS
+    // ! SUBSCRIPTIONS
     this.ws.on(wsEventEnum.ASSIGMENT, this.handleAssigment);
     this.ws.on(wsEventEnum.CANCEL_ASSIGMENT, this.handleCancelAssigment);
   }
 
   @computed({ name: "[ REPOSITORY ][ MAP ]" })
-  get map(): ObservableMap<string, T> {
+  get map(): ObservableMap<string, E> {
     return this.collection;
   }
 
-  @computed({ name: "[ REPOSITORY ][ PLAIN_MAP ]" })
-  get plainMap(): Map<string, T> {
-    const map: Map<string, T> = new Map();
-
-    this.collection.forEach((val, key) => map.set(key, val));
-
-    return map;
-  }
-
   @computed({ name: "[ REPOSITORY ][ LIST ]" })
-  get list(): T[] {
-    const list: T[] = [];
+  get list(): E[] {
+    const list: E[] = [];
 
-    this.collection.forEach((item) => {
-      list.push(item);
-    });
+    for (const value of this.collection.values()) {
+      list.push(value);
+    }
 
     return list;
   }
@@ -85,137 +80,141 @@ export class Repository<
   public async init(): Promise<void> {
     if (!this.isInit) {
       try {
-        if (this.service.ACL.collection.includes(this.service.group)) {
-          this.startLoad();
+        if (this.transport.ACL.collection.includes(this.transport.group)) {
+          this.start();
 
-          const collection: T[] | void = await this.service.collection();
+          const collection: E[] | void = await this.transport.collection();
 
           if (isArray(collection)) {
             runInAction(`[ SUCCESS ]`, () => {
-              this.collection = collection.reduce<ObservableMap<string, T>>(
-                (preValue, item: T) => preValue.set(item.id, item),
-                observable.map(),
-              );
+              for (const item of collection) {
+                this.collection.set(item.id, item);
+              }
 
               this.isInit = true;
-              console.log(`[ ${this.constructor.name} ][ INIT ][ SUCCESS ]`);
             });
           } else {
-            throw new Error(`collection: ${Object.prototype.toString.call(collection)}`);
+            throw new Error(`COLLECTION IS NOT ARRAY - ${Object.prototype.toString.call(collection)}`);
           }
+        } else {
+          throw new Error(`ACCESS DENIED`);
         }
       } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ INIT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+        console.error(`[ ${this.constructor.name} ][ INIT ][ ${getErrorMessage(error)} ]`);
 
         return Promise.reject();
       } finally {
-        this.endLoad();
+        this.stop();
       }
     }
   }
 
   @action("[ REPOSITORY ][ CREATE ]")
-  public async create(data: object): Promise<T | void> {
-    if (this.isInit) {
-      try {
-        if (this.service.ACL.create.includes(this.service.group)) {
-          this.startLoad();
+  public async create(data: object): Promise<E | void> {
+    try {
+      if (this.isInit) {
+        if (this.transport.ACL.create.includes(this.transport.group)) {
+          this.start();
 
-          const item: T | void = await this.service.create(data);
+          const item: E | void = await this.transport.create(data);
 
-          if (item) {
+          if (item instanceof this.Entity) {
             runInAction(`[ SUCCESS ]`, () => this.collection.set(item.id, item));
+
+            return item;
           } else {
-            throw new Error(`item: ${Object.prototype.toString.call(item)}`);
+            throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`);
           }
-
-          return item;
+        } else {
+          throw new Error(`ACCESS DENIED`);
         }
-      } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
-
-        return Promise.reject();
-      } finally {
-        this.endLoad();
+      } else {
+        throw new Error(`IS_NOT_INIT`);
       }
-    } else {
-      console.error(`[ ${this.constructor.name} ][ CREATE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+    } catch (error) {
+      console.error(`[ ${this.constructor.name} ][ CREATE ][ ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
+    } finally {
+      this.stop();
     }
   }
 
   @action("[ REPOSITORY ][ UPDATE ]")
-  public async update(data: object): Promise<T | void> {
-    if (this.isInit) {
-      try {
-        if (this.service.ACL.update.includes(this.service.group)) {
-          this.startLoad();
+  public async update(data: object): Promise<E | void> {
+    try {
+      if (this.isInit) {
+        if (this.transport.ACL.update.includes(this.transport.group)) {
+          this.start();
 
-          const item: T | void = await this.service.update(data);
+          const item: E | void = await this.transport.update(data);
 
-          if (item) {
+          if (item instanceof this.Entity) {
             runInAction(`[ SUCCESS ]`, () => this.collection.set(item.id, item));
+
+            return item;
           } else {
-            throw new Error(`item: ${Object.prototype.toString.call(item)}`);
+            throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`);
           }
-
-          return item;
+        } else {
+          throw new Error(`ACCESS DENIED`);
         }
-      } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
-
-        return Promise.reject();
-      } finally {
-        this.endLoad();
+      } else {
+        throw new Error(`IS_NOT_INIT`);
       }
-    } else {
-      console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+    } catch (error) {
+      console.error(`[ ${this.constructor.name} ][ UPDATE ][ ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
+    } finally {
+      this.stop();
     }
   }
 
   @action("[ REPOSITORY ][ REMOVE ]")
-  public async remove(id: string): Promise<T | void> {
-    if (this.isInit) {
-      try {
-        if (this.service.ACL.remove.includes(this.service.group)) {
-          this.startLoad();
+  public async remove(id: string): Promise<E | void> {
+    try {
+      if (this.isInit) {
+        if (this.transport.ACL.remove.includes(this.transport.group)) {
+          this.start();
 
-          const item: T | void = await this.service.remove(id);
+          const item: E | void = await this.transport.remove(id);
 
-          if (item) {
+          if (item instanceof this.Entity) {
             runInAction(`[ SUCCESS ]`, () => this.collection.delete(item.id));
+
+            return item;
           } else {
-            throw new Error(`item: ${Object.prototype.toString.call(item)}`);
+            throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`);
           }
-
-          return item;
+        } else {
+          throw new Error(`ACCESS DENIED`);
         }
-      } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
-
-        return Promise.reject();
-      } finally {
-        this.endLoad();
+      } else {
+        throw new Error(`IS_NOT_INIT`);
       }
-    } else {
-      console.error(`[ ${this.constructor.name} ][ UPDATE ][ ERROR_MESSAGE: IS_NOT_INIT ]`);
+    } catch (error) {
+      console.error(`[ ${this.constructor.name} ][ REMOVE ][ ${getErrorMessage(error)} ]`);
 
       return Promise.reject();
+    } finally {
+      this.stop();
     }
   }
 
   @action("[ REPOSITORY ][ RECEIVE_MESSAGE ]")
-  public receiveMessage([channelName, payload]: [string, any]): T | T[] | void {
+  protected receiveMessage([channelName, payload]: [string, any]): E | E[] | void {
     if (this.isInit) {
       try {
         if (this.channelName === channelName) {
-          console.log(`%c[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]`, "color: #1890ff;", [channelName, payload]);
+          console.log(
+            `%c[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ${channelName} ]`,
+            "color: #1890ff;",
+            payload,
+          );
 
           if (isObject(payload.create)) {
-            const item: T = new this.Persist(payload.create);
+            const item: E = new this.Entity(payload.create);
 
             this.collection.set(item.id, item);
 
@@ -223,10 +222,10 @@ export class Repository<
           }
 
           if (isArray(payload.bulkCreate)) {
-            const items: T[] = [];
+            const items: E[] = [];
 
             for (const create of payload.bulkCreate) {
-              const item: T = new this.Persist(create);
+              const item: E = new this.Entity(create);
 
               this.collection.set(item.id, item);
 
@@ -237,7 +236,7 @@ export class Repository<
           }
 
           if (isObject(payload.update)) {
-            const item: T = new this.Persist(payload.update);
+            const item: E = new this.Entity(payload.update);
 
             this.collection.set(item.id, item);
 
@@ -245,10 +244,10 @@ export class Repository<
           }
 
           if (isArray(payload.bulkUpdate)) {
-            const items: T[] = [];
+            const items: E[] = [];
 
             for (const update of payload.bulkUpdate) {
-              const item: T = new this.Persist(update);
+              const item: E = new this.Entity(update);
 
               this.collection.set(item.id, item);
 
@@ -265,42 +264,41 @@ export class Repository<
 
             return item;
           }
+
+          throw new Error("Unknow type of payload");
         }
       } catch (error) {
         console.error(
-          `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ERROR_MESSAGE: ${
-            error ? getErrorMessage(error) : error
-          } ][ PAYLOAD: ${JSON.stringify([channelName, payload])} ]`,
+          `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ][ ${channelName} ]` +
+            `[ PAYLOAD: ${JSON.stringify(payload)} ]` +
+            `[ ${getErrorMessage(error)} ]`,
         );
       }
     } else {
-      console.info(
-        `%c[ ${this.constructor.name} ][ RESEIVE_MESSAGE ][ INFO_MESSAGE: IS_NOT_INIT ]`,
-        "color: rgba(255,255,255, 0.2);",
-      );
+      console.info(`%c[ ${this.constructor.name} ][ IS_NOT_INIT ]`, "color: rgba(255,255,255, 0.2);");
     }
   }
 
-  @action("[ REPOSITORY ][ START_LODING ]")
-  protected startLoad() {
-    this.isLoading = true;
+  @action("[ REPOSITORY ][ START ]")
+  protected start() {
+    this.pending = true;
   }
 
-  @action("[ REPOSITORY ][ STOP_LODING ]")
-  protected endLoad() {
-    this.isLoading = false;
+  @action("[ REPOSITORY ][ STOP ]")
+  protected stop() {
+    this.pending = false;
   }
 
   @action("[ REPOSITORY ][ DESTROY ]")
   protected destroy(): void {
     this.isInit = false;
-    this.isLoading = false;
+    this.pending = false;
     this.collection.clear();
   }
 
   private handleAssigment(): void {
     try {
-      this.service.onChannel();
+      this.transport.onChannel();
 
       if (!this.ws.has(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage)) {
         this.ws.on(wsEventEnum.MESSAGE_RECEIVE, this.receiveMessage);

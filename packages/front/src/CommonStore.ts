@@ -1,13 +1,10 @@
-import { IPersist, wsEventEnum } from "@borodindmitriy/interfaces";
+import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
 import { EventEmitter, IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isObject } from "@borodindmitriy/utils";
 import { action, observable, runInAction } from "mobx";
-import { ICommonService } from "./interfaces/ICommonService";
-import { ICommonStore } from "./interfaces/ICommonStore";
-import { IWSClient } from "./interfaces/IWSClient";
 
 export class CommonStore<
-  T extends IPersist,
+  T extends IEntity,
   S extends ICommonService<T>,
   WS extends IWSClient = IWSClient,
   ME extends IMediator = IMediator

@@ -1,4 +1,4 @@
-import { IForm, IInsert, IPersist, IUser, IValidateResult, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { IForm, IInsert, IEntity, IUser, IValidateResult, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
 import { IMediator, ValidateResult } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
@@ -6,13 +6,13 @@ import { ICommonStore } from "./interfaces/ICommonStore";
 import { ICommonStoreForm } from "./interfaces/ICommonStoreForm";
 
 export class CommonStoreForm<
-  PERSIST extends IPersist,
+  PERSIST extends IEntity,
   INSERT extends IInsert,
   FORM extends IForm,
   CHANGE,
   STORE extends ICommonStore<PERSIST> = ICommonStore<PERSIST>,
   ME extends IMediator = IMediator,
-  USER extends IUser & IPersist = IUser & IPersist
+  USER extends IUser & IEntity = IUser & IEntity
 > implements ICommonStoreForm<FORM, CHANGE> {
   // PUBLIC_PROPS
   @observable

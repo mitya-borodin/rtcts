@@ -1,13 +1,13 @@
-import { IPersist, IUser, userGroupEnum, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { IEntity, IUser, userGroupEnum, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
 import { IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
+import { IWSClient } from "./interfaces/infrastructure/transport/ws/IWSClient";
 import { IUserRepository } from "./interfaces/IUserRepository";
 import { IUserService } from "./interfaces/IUserService";
-import { IWSClient } from "./interfaces/IWSClient";
 import { Repository } from "./Repository";
 
-export class UserRepository<U extends IUser & IPersist, S extends IUserService<U>> extends Repository<U, S>
+export class UserRepository<U extends IUser & IEntity, S extends IUserService<U>> extends Repository<U, S>
   implements IUserRepository<U> {
   protected Persist: new (data: any) => U;
 
@@ -21,7 +21,7 @@ export class UserRepository<U extends IUser & IPersist, S extends IUserService<U
     channelName: string,
     mediator: IMediator,
   ) {
-    super(Persist, service, wsClient, channelName, mediator);
+    super(Persist, service, mediator, wsClient, channelName);
 
     // BINDINGS
     this.init = this.init.bind(this);

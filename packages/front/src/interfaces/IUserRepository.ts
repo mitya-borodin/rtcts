@@ -1,10 +1,10 @@
-import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import { IRepository } from "./IRepository";
 
-export interface IUserRepository<U extends IUser & IPersist> extends IRepository<U> {
-  isToken: boolean;
+export interface IUserRepository<U extends IEntity & IUser> extends IRepository<U> {
   id: string;
   user: U | void;
+  isToken: boolean;
   isAuthorized: boolean;
   isAdmin: boolean;
 

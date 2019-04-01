@@ -1,10 +1,10 @@
-import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import { IMediator } from "@borodindmitriy/isomorphic";
 import { IUserService } from "./interfaces/IUserService";
 import { IWSClient } from "./interfaces/IWSClient";
 import { Service } from "./Service";
 
-export class UserService<U extends IUser & IPersist, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
+export class UserService<U extends IUser & IEntity, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
   extends Service<U, WS>
   implements IUserService<U> {
   public ACL: {

@@ -1,4 +1,4 @@
-import { IForm, IInsert, IPersist, IUser, IValidateResult, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
+import { IEntity, IForm, IInsert, IUser, IValidateResult, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
 import { IMediator, ValidateResult } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
@@ -6,13 +6,13 @@ import { IRepository } from "./interfaces/IRepository";
 import { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
 
 export class RepositoryFormStore<
-  PERSIST extends IPersist,
+  ENTITY extends IEntity,
   INSERT extends IInsert,
   FORM extends IForm,
   CHANGE,
-  REP extends IRepository<PERSIST> = IRepository<PERSIST>,
+  REP extends IRepository<ENTITY>,
   ME extends IMediator = IMediator,
-  USER extends IUser & IPersist = IUser & IPersist
+  USER extends IUser & IEntity = IUser & IEntity
 > implements IRepositoryFormStore<FORM, CHANGE> {
   // PUBLIC_PROPS
   @observable
@@ -25,7 +25,7 @@ export class RepositoryFormStore<
   public form: FORM | void;
 
   // DEPS
-  protected readonly Persist: new (...args: any[]) => PERSIST;
+  protected readonly Persist: new (...args: any[]) => ENTITY;
   protected readonly Insert: new (...args: any[]) => INSERT;
   protected readonly Form: new (...args: any[]) => FORM;
   protected readonly repository: REP;
@@ -40,7 +40,7 @@ export class RepositoryFormStore<
   protected group: string;
 
   constructor(
-    Persist: new (...args: any[]) => PERSIST,
+    Persist: new (...args: any[]) => ENTITY,
     Insert: new (...args: any[]) => INSERT,
     Form: new (...args: any[]) => FORM,
     repository: REP,
@@ -201,7 +201,7 @@ export class RepositoryFormStore<
     this.isLoading = false;
   }
 
-  protected async openAssign(persist?: PERSIST): Promise<FORM> {
+  protected async openAssign(persist?: ENTITY): Promise<FORM> {
     if (persist instanceof this.Persist) {
       return new this.Form(persist.toJS());
     }

@@ -1,5 +1,5 @@
 import { IInsert } from "./IInsert";
 
-export interface IPersist extends IInsert {
+export interface IEntity extends IInsert {
   id: string;
 }

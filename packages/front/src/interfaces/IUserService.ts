@@ -1,16 +1,21 @@
-import { IPersist, IUser } from "@borodindmitriy/interfaces";
-import { IService } from "./IService";
+import { IEntity, IUser } from "@borodindmitriy/interfaces";
+import { IRepositoryHTTPTransport } from "./infrastructure/transport/http/IRepositoryHTTPTransport";
 
-export interface IUserService<U extends IUser & IPersist> extends IService<U> {
+export interface IUserService<U extends IUser & IEntity> extends IRepositoryHTTPTransport<U> {
   ACL: {
+    // ! CRUD
     collection: string[];
-    model: string[];
+    current: string[];
+    read: string[];
     create: string[];
-    remove: string[];
     update: string[];
+    remove: string[];
+
+    // ! WS
     onChannel: string[];
     offChannel: string[];
-    current: string[];
+
+    // ! ACTIONS
     updateLogin: string[];
     updatePassword: string[];
     updateGroup: string[];
