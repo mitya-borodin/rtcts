@@ -1,5 +1,5 @@
 import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
-import { EventEmitter, IMediator } from "@borodindmitriy/isomorphic";
+import { IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
 import { IRepository } from "../../interfaces/repository/IRepository";
@@ -11,7 +11,7 @@ export class Repository<
   T extends IRepositoryHTTPTransport<E>,
   WS extends IWSClient = IWSClient,
   ME extends IMediator = IMediator
-> extends EventEmitter implements IRepository<E> {
+> implements IRepository<E> {
   @observable
   public pending: boolean;
 
@@ -27,8 +27,6 @@ export class Repository<
   protected isInit: boolean;
 
   constructor(Entity: new (data?: any) => E, transport: T, mediator: ME, ws: WS, channelName: string) {
-    super();
-
     // * DEPS
     this.Entity = Entity;
     this.transport = transport;
@@ -54,6 +52,7 @@ export class Repository<
     this.destroy = this.destroy.bind(this);
     this.handleAssigment = this.handleAssigment.bind(this);
     this.handleCancelAssigment = this.handleCancelAssigment.bind(this);
+    this.filter = this.filter.bind(this);
 
     // ! SUBSCRIPTIONS
     this.ws.on(wsEventEnum.ASSIGMENT, this.handleAssigment);
@@ -73,7 +72,7 @@ export class Repository<
       list.push(value);
     }
 
-    return list;
+    return this.filter(list);
   }
 
   @action("[ REPOSITORY ][ INIT ]")
@@ -293,6 +292,10 @@ export class Repository<
       this.pending = false;
       this.collection.clear();
     });
+  }
+
+  protected filter(list: E[]): E[] {
+    return list;
   }
 
   private handleAssigment(): void {

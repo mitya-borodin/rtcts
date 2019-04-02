@@ -8,6 +8,8 @@ export { ISingletonHTTPTransport } from "./interfaces/transport/http/ISingletonH
 export { IWSClient } from "./interfaces/transport/ws/IWSClient";
 export { IUserHTTPTransport } from "./interfaces/user/IUserHTTPTransport";
 export { IUserRepository } from "./interfaces/user/IUserRepository";
+export { IFilterStore } from "./interfaces/filter/IFilterStore";
+export { ICalculationService } from "./interfaces/service/ICalculationService";
 
 // IMPLEMENTATION
 export { FormStore } from "./implementation/form/FormStore";
