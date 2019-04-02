@@ -76,6 +76,7 @@
       "@borodindmitriy/isomorphic"
     ],
     "is_application": false,
+    "is_back_end": false,
     "has_dll": true,
     "has_browser_lib": true,
     "load_on_demand": false,

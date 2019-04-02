@@ -1,4 +1,4 @@
-import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import {
   assigment_to_user_of_the_connection_channel,
   cancel_assigment_to_user_of_the_connection_channel,
@@ -17,7 +17,7 @@ import { IChannels } from "../interfaces/IChannels";
 import { IConnection } from "../interfaces/IConnection";
 import { IUserModel } from "../interfaces/IUserModel";
 
-export class WSServer<U extends IUserModel<IUser & IPersist>> {
+export class WSServer<U extends IUserModel<IUser & IEntity>> {
   private config: IAppConfig;
   private server: WebSocket.Server;
   private connections: Set<IConnection>;
@@ -153,7 +153,7 @@ export class WSServer<U extends IUserModel<IUser & IPersist>> {
               ) {
                 this.user
                   .readById(payload.uid)
-                  .then((user: IUser & IPersist | null) => {
+                  .then((user: IUser & IEntity | null) => {
                     if (user) {
                       if (channelName === assigment_to_user_of_the_connection_channel) {
                         connection.setUserID(user.id);

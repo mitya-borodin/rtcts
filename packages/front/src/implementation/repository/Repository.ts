@@ -2,9 +2,9 @@ import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
 import { EventEmitter, IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
-import { IWSClient } from "./../lib/interfaces/IWSClient.d";
-import { IRepositoryHTTPTransport } from "./interfaces/infrastructure/transport/http/IRepositoryHTTPTransport";
-import { IRepository } from "./interfaces/IRepository";
+import { IRepository } from "../../interfaces/repository/IRepository";
+import { IRepositoryHTTPTransport } from "../../interfaces/transport/http/IRepositoryHTTPTransport";
+import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
 
 export class Repository<
   E extends IEntity,
@@ -86,7 +86,7 @@ export class Repository<
           const collection: E[] | void = await this.transport.collection();
 
           if (isArray(collection)) {
-            runInAction(`[ SUCCESS ]`, () => {
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => {
               for (const item of collection) {
                 this.collection.set(item.id, item);
               }
@@ -119,7 +119,7 @@ export class Repository<
           const item: E | void = await this.transport.create(data);
 
           if (item instanceof this.Entity) {
-            runInAction(`[ SUCCESS ]`, () => this.collection.set(item.id, item));
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
 
             return item;
           } else {
@@ -150,7 +150,7 @@ export class Repository<
           const item: E | void = await this.transport.update(data);
 
           if (item instanceof this.Entity) {
-            runInAction(`[ SUCCESS ]`, () => this.collection.set(item.id, item));
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
 
             return item;
           } else {
@@ -181,7 +181,7 @@ export class Repository<
           const item: E | void = await this.transport.remove(id);
 
           if (item instanceof this.Entity) {
-            runInAction(`[ SUCCESS ]`, () => this.collection.delete(item.id));
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.delete(item.id));
 
             return item;
           } else {
@@ -279,21 +279,20 @@ export class Repository<
     }
   }
 
-  @action("[ REPOSITORY ][ START ]")
   protected start() {
-    this.pending = true;
+    runInAction(`[ ${this.constructor.name} ][ START ]`, () => (this.pending = true));
   }
 
-  @action("[ REPOSITORY ][ STOP ]")
   protected stop() {
-    this.pending = false;
+    runInAction(`[ ${this.constructor.name} ][ STOP ]`, () => (this.pending = false));
   }
 
-  @action("[ REPOSITORY ][ DESTROY ]")
   protected destroy(): void {
-    this.isInit = false;
-    this.pending = false;
-    this.collection.clear();
+    runInAction(`[ ${this.constructor.name} ][ DESTROY ]`, () => {
+      this.isInit = false;
+      this.pending = false;
+      this.collection.clear();
+    });
   }
 
   private handleAssigment(): void {

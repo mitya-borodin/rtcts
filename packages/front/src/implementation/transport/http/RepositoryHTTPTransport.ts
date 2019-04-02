@@ -1,6 +1,6 @@
 import { IMediator } from "@borodindmitriy/isomorphic";
-import { IRepositoryHTTPTransport } from "../../../interfaces/infrastructure/transport/http/IRepositoryHTTPTransport";
-import { IWSClient } from "../../../interfaces/infrastructure/transport/ws/IWSClient";
+import { IRepositoryHTTPTransport } from "../../../interfaces/transport/http/IRepositoryHTTPTransport";
+import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
 import { HTTPTransport } from "./HTTPTransport";
 
 export class RepositoryHTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>

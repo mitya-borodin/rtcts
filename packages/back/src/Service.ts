@@ -1,4 +1,4 @@
-import { IInsert, IPersist } from "@borodindmitriy/interfaces";
+import { IInsert, IEntity } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
@@ -7,7 +7,7 @@ import { IModel } from "./interfaces/IModel";
 
 export class Service<
   M extends IModel<P>,
-  P extends IPersist,
+  P extends IEntity,
   I extends IInsert,
   C extends IChannels,
   Router extends express.Router = express.Router

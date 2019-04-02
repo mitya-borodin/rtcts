@@ -1,21 +1,23 @@
 import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import { IMediator } from "@borodindmitriy/isomorphic";
-import { IUserService } from "./interfaces/IUserService";
-import { IWSClient } from "./interfaces/IWSClient";
-import { Service } from "./Service";
+import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
+import { IUserHTTPTransport } from "../../interfaces/user/IUserHTTPTransport";
+import { RepositoryHTTPTransport } from "../transport/http/RepositoryHTTPTransport";
 
-export class UserService<U extends IUser & IEntity, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
-  extends Service<U, WS>
-  implements IUserService<U> {
+export class UserHTTPTransport<
+  U extends IUser & IEntity,
+  WS extends IWSClient = IWSClient,
+  ME extends IMediator = IMediator
+> extends RepositoryHTTPTransport<U, WS> implements IUserHTTPTransport<U> {
   public ACL: {
     collection: string[];
-    model: string[];
+    current: string[];
+    read: string[];
     create: string[];
-    remove: string[];
     update: string[];
+    remove: string[];
     onChannel: string[];
     offChannel: string[];
-    current: string[];
     updateLogin: string[];
     updatePassword: string[];
     updateGroup: string[];
@@ -28,10 +30,10 @@ export class UserService<U extends IUser & IEntity, WS extends IWSClient = IWSCl
     channelName: string,
     ACL: {
       collection: string[];
-      model: string[];
+      read: string[];
       create: string[];
-      remove: string[];
       update: string[];
+      remove: string[];
       onChannel: string[];
       offChannel: string[];
       updateLogin: string[];

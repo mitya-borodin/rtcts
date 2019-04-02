@@ -1,8 +1,8 @@
-import { IPersist } from "@borodindmitriy/interfaces";
+import { IEntity } from "@borodindmitriy/interfaces";
 import { isUndefined } from "@borodindmitriy/utils";
 import { ObjectId } from "bson";
 
-export function toMongo<T extends IPersist>(persist: T): { [key: string]: any } & { _id: ObjectId } {
+export function toMongo<T extends IEntity>(persist: T): { [key: string]: any } & { _id: ObjectId } {
   const { id, ...data }: any = persist.toJS();
 
   if (isUndefined(id)) {

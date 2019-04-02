@@ -1,4 +1,4 @@
-import { IPersist, IUser, IUserGroup, userGroupEnum } from "@borodindmitriy/interfaces";
+import { IEntity, IUser, IUserGroup, userGroupEnum } from "@borodindmitriy/interfaces";
 import { checkPassword, isString } from "@borodindmitriy/utils";
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
@@ -12,7 +12,7 @@ import { encryptPassword } from "./utils/encryptPassword";
 import { getSalt } from "./utils/getSalt";
 
 export class UserModel<
-  P extends IUser & IPersist,
+  P extends IUser & IEntity,
   I extends IUser,
   R extends IRepository<P> = IRepository<P>,
   AC extends IAppConfig = IAppConfig

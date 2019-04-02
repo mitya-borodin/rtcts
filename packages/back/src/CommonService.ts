@@ -1,4 +1,4 @@
-import { IPersist } from "@borodindmitriy/interfaces";
+import { IEntity } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
@@ -6,7 +6,7 @@ import { IChannels } from "./interfaces/IChannels";
 import { ICommonModel } from "./interfaces/ICommonModel";
 
 export class CommonService<
-  P extends IPersist,
+  P extends IEntity,
   M extends ICommonModel<P>,
   C extends IChannels,
   Router extends express.Router = express.Router

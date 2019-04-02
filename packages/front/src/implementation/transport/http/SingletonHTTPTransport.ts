@@ -1,6 +1,6 @@
 import { IMediator } from "@borodindmitriy/isomorphic";
-import { ISingletonHTTPTransport } from "../../../interfaces/infrastructure/transport/http/ISingletonHTTPTransport";
-import { IWSClient } from "../../../interfaces/infrastructure/transport/ws/IWSClient";
+import { ISingletonHTTPTransport } from "../../../interfaces/transport/http/ISingletonHTTPTransport";
+import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
 import { HTTPTransport } from "./HTTPTransport";
 
 export class SingletonHTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>

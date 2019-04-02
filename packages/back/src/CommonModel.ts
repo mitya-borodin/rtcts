@@ -1,11 +1,11 @@
-import { IInsert, IPersist } from "@borodindmitriy/interfaces";
+import { IInsert, IEntity } from "@borodindmitriy/interfaces";
 import { isObject } from "@borodindmitriy/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { ICommonModel } from "./interfaces/ICommonModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";
 
-export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepository<P> = IRepository<P>>
+export class CommonModel<P extends IEntity, I extends IInsert, R extends IRepository<P> = IRepository<P>>
   implements ICommonModel<P> {
   protected readonly repository: R;
   protected readonly Persist: { new (data?: any): P };
