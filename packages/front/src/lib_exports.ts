@@ -10,6 +10,7 @@ export { IUserHTTPTransport } from "./interfaces/user/IUserHTTPTransport";
 export { IUserRepository } from "./interfaces/user/IUserRepository";
 export { IFilterStore } from "./interfaces/filter/IFilterStore";
 export { ICalculationService } from "./interfaces/service/ICalculationService";
+export { IReportService } from "./interfaces/service/IReportService";
 
 // IMPLEMENTATION
 export { FormStore } from "./implementation/form/FormStore";

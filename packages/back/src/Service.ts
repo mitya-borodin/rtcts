@@ -1,4 +1,4 @@
-import { IInsert, IEntity } from "@borodindmitriy/interfaces";
+import { IEntity, IInsert } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
@@ -14,8 +14,8 @@ export class Service<
 > {
   protected readonly name: string;
   protected readonly router: Router;
-  protected readonly Insert: { new (data: any): I };
-  protected readonly Persist: { new (data: any): P };
+  protected readonly Insert: new (data: any) => I;
+  protected readonly Persist: new (data: any) => P;
   protected readonly model: M;
   protected readonly channels: C;
   protected readonly ACL: {

@@ -21,13 +21,13 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
   private config: IAppConfig;
   private server: WebSocket.Server;
   private connections: Set<IConnection>;
-  private Connection: { new (data: any): IConnection };
+  private Connection: new (data: any) => IConnection;
   private channels: IChannels;
   private user: U;
   private wasRun: boolean;
   private interval: NodeJS.Timer;
 
-  constructor(Connection: { new (data: any): IConnection }, channels: IChannels, config: IAppConfig, user: U) {
+  constructor(Connection: new (data: any) => IConnection, channels: IChannels, config: IAppConfig, user: U) {
     this.Connection = Connection;
     this.connections = new Set();
     this.channels = channels;

@@ -21,8 +21,8 @@ export class UserModel<
 
   constructor(
     repository: R,
-    Persist: { new (data?: any): P },
-    Insert: { new (data?: any): I },
+    Persist: new (data?: any) => P,
+    Insert: new (data?: any) => I,
     send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void,
     config: AC,
   ) {

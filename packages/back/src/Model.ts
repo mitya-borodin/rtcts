@@ -1,4 +1,4 @@
-import { IInsert, IEntity } from "@borodindmitriy/interfaces";
+import { IEntity, IInsert } from "@borodindmitriy/interfaces";
 import { isObject, isString } from "@borodindmitriy/utils";
 import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
 import { IModel } from "./interfaces/IModel";
