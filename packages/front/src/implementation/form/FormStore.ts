@@ -139,7 +139,7 @@ export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, C
   protected async changeForm(form: FORM, change: CHANGE): Promise<FORM> {
     console.log({ change, form });
 
-    return form;
+    return new this.Form({ ...form.toJS(), ...change });
   }
 
   protected async submitForm(submit: FORM): Promise<void> {
