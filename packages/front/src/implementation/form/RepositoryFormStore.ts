@@ -19,12 +19,14 @@ export class RepositoryFormStore<
     Entity: new (...args: any[]) => ENTITY,
     Insert: new (...args: any[]) => INSERT,
     Form: new (...args: any[]) => FORM,
+    repository: REP,
   ) {
     super(Form);
 
     // * DEPS
     this.Entity = Entity;
     this.Insert = Insert;
+    this.repository = repository;
 
     // * BINDS
     this.openForm = this.openForm.bind(this);

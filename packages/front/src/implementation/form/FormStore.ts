@@ -6,17 +6,24 @@ import { IFormStore } from "../../interfaces/form/IFormStore";
 
 export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, CHANGE> {
   @observable
-  public pending: boolean = false;
+  public pending: boolean;
   @observable
   public form: FORM | void;
   @observable
-  public showValidationResult: boolean = false;
+  public showValidationResult: boolean;
 
   protected readonly Form: new (...args: any[]) => FORM;
 
   constructor(Form: new (...args: any[]) => FORM) {
     // * DEPS
     this.Form = Form;
+
+    // * INIT
+
+    runInAction(`[ ${this.constructor.name} ][ INIT ]`, () => {
+      this.pending = false;
+      this.showValidationResult = false;
+    });
 
     // * BINDS
     this.open = this.open.bind(this);
@@ -93,7 +100,7 @@ export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, C
       this.start();
 
       if (this.isValid) {
-        this.showValidationResult = false;
+        this.hideValidation();
 
         if (this.form instanceof this.Form) {
           await this.submitForm(this.form);
@@ -101,7 +108,7 @@ export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, C
           throw new Error(`FORM_IS_NOT_INSTANCE_OF ${this.Form.name}`);
         }
       } else {
-        this.showValidationResult = true;
+        this.showValidation();
 
         throw new Error(`IS_NOT_VALID`);
       }
@@ -118,7 +125,7 @@ export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, C
     runInAction(`[ ${this.constructor.name} ][ CANCEL ]`, () => {
       this.pending = false;
       this.form = undefined;
-      this.showValidationResult = false;
+      this.hideValidation();
     });
   }
 
@@ -128,6 +135,14 @@ export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, C
 
   protected stop() {
     runInAction(`[ ${this.constructor.name} ][ STOP ]`, () => (this.pending = false));
+  }
+
+  protected showValidation() {
+    runInAction(`[ ${this.constructor.name} ][ SHOW_VALIDAION ]`, () => (this.showValidationResult = true));
+  }
+
+  protected hideValidation() {
+    runInAction(`[ ${this.constructor.name} ][ HILE_VALIDATION ]`, () => (this.showValidationResult = false));
   }
 
   protected async openForm(id?: string): Promise<FORM> {

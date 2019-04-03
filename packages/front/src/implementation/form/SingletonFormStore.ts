@@ -12,11 +12,12 @@ export class SingletonFormStore<
   protected readonly Entity: new (...args: any[]) => ENTITY;
   protected readonly repository: REP;
 
-  constructor(Entity: new (...args: any[]) => ENTITY, Form: new (...args: any[]) => FORM) {
+  constructor(Entity: new (...args: any[]) => ENTITY, Form: new (...args: any[]) => FORM, repository: REP) {
     super(Form);
 
     // * DEPS
     this.Entity = Entity;
+    this.repository = repository;
 
     // * BINDS
     this.openForm = this.openForm.bind(this);
