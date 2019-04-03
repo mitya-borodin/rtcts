@@ -1,3 +1,3 @@
 export enum mediatorChannelEnum {
-  init_repository = "init_repository",
+  repository__init_success = "repository__init_success",
 }

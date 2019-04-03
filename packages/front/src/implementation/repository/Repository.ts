@@ -2,6 +2,7 @@ import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
 import { IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
+import { mediatorChannelEnum } from "../../enums/mediatorChannelEnum";
 import { IRepository } from "../../interfaces/repository/IRepository";
 import { IRepositoryHTTPTransport } from "../../interfaces/transport/http/IRepositoryHTTPTransport";
 import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
@@ -93,6 +94,9 @@ export class Repository<
               this.isInit = true;
 
               this.collectionDidUpdate();
+
+              // ! EMIT
+              this.mediator.emit(mediatorChannelEnum.repository__init_success, this);
             });
           } else {
             throw new Error(`COLLECTION IS NOT ARRAY - ${Object.prototype.toString.call(collection)}`);

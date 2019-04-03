@@ -2,6 +2,7 @@ import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
 import { IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isObject } from "@borodindmitriy/utils";
 import { action, observable, runInAction } from "mobx";
+import { mediatorChannelEnum } from "../../enums/mediatorChannelEnum";
 import { ISingletonRepository } from "../../interfaces/repository/ISingletonRepository";
 import { ISingletonHTTPTransport } from "../../interfaces/transport/http/ISingletonHTTPTransport";
 import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
@@ -67,6 +68,9 @@ export class SingletonRepository<
               this.isInit = true;
 
               this.entityDidUpdate();
+
+              // ! EMIT
+              this.mediator.emit(mediatorChannelEnum.repository__init_success, this);
             });
           } else {
             throw new Error(`ENTITY IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);

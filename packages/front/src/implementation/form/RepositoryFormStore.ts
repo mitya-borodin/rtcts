@@ -47,14 +47,18 @@ export class RepositoryFormStore<
   }
 
   protected async submitForm(submit: FORM): Promise<void> {
+    await this.submitToRepository(submit);
+  }
+
+  protected async submitToRepository(submit: FORM): Promise<ENTITY | void> {
     if (isString(submit.id)) {
       const entity: ENTITY = new this.Entity(submit.toJS());
 
-      await this.repository.update(entity.toJS());
+      return await this.repository.update(entity.toJS());
     } else {
       const insert: INSERT = new this.Insert(submit.toJS());
 
-      await this.repository.create(insert.toJS());
+      return await this.repository.create(insert.toJS());
     }
   }
 }
