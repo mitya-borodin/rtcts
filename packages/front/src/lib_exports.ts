@@ -1,6 +1,7 @@
 // INTERFACES
 export { IFormStore } from "./interfaces/form/IFormStore";
 export { IRepository } from "./interfaces/repository/IRepository";
+export { ICacheRepository } from "./interfaces/repository/ICacheRepository";
 export { ISingletonRepository } from "./interfaces/repository/ISingletonRepository";
 export { IHTTPTransport } from "./interfaces/transport/http/IHTTPTransport";
 export { IRepositoryHTTPTransport } from "./interfaces/transport/http/IRepositoryHTTPTransport";
@@ -17,6 +18,7 @@ export { FormStore } from "./implementation/form/FormStore";
 export { RepositoryFormStore } from "./implementation/form/RepositoryFormStore";
 export { SingletonFormStore } from "./implementation/form/SingletonFormStore";
 export { Repository } from "./implementation/repository/Repository";
+export { CacheRepository } from "./implementation/repository/CacheRepository";
 export { SingletonRepository } from "./implementation/repository/SingletonRepository";
 export { HTTPTransport } from "./implementation/transport/http/HTTPTransport";
 export { RepositoryHTTPTransport } from "./implementation/transport/http/RepositoryHTTPTransport";
