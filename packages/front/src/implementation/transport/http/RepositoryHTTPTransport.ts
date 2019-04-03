@@ -39,7 +39,7 @@ export class RepositoryHTTPTransport<T, WS extends IWSClient = IWSClient, ME ext
       offChannel: string[];
     },
     mediator: ME,
-    root,
+    root = "/api",
   ) {
     super(name, Class, ws, channelName, ACL, mediator, root);
 

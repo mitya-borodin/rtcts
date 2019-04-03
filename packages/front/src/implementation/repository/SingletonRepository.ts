@@ -65,6 +65,8 @@ export class SingletonRepository<
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => {
               this.entity = entity;
               this.isInit = true;
+
+              this.entityDidUpdate();
             });
           } else {
             throw new Error(`ENTITY IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);
@@ -91,6 +93,8 @@ export class SingletonRepository<
 
           if (entity instanceof this.Entity) {
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => (this.entity = entity));
+
+            this.entityDidUpdate();
 
             return entity;
           } else {
@@ -123,11 +127,15 @@ export class SingletonRepository<
           if (isObject(payload.create)) {
             this.entity = new this.Entity(payload.create);
 
+            this.entityDidUpdate();
+
             return this.entity;
           }
 
           if (isObject(payload.update)) {
             this.entity = new this.Entity(payload.update);
+
+            this.entityDidUpdate();
 
             return this.entity;
           }
@@ -162,6 +170,10 @@ export class SingletonRepository<
       this.pending = false;
       this.entity = undefined;
     });
+  }
+
+  protected entityDidUpdate(): void {
+    // ! HOOK FOR ENTITY UPDATE
   }
 
   private handleAssigment(): void {

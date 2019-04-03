@@ -91,6 +91,8 @@ export class Repository<
               }
 
               this.isInit = true;
+
+              this.collectionDidUpdate();
             });
           } else {
             throw new Error(`COLLECTION IS NOT ARRAY - ${Object.prototype.toString.call(collection)}`);
@@ -119,6 +121,8 @@ export class Repository<
 
           if (item instanceof this.Entity) {
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
+
+            this.collectionDidUpdate();
 
             return item;
           } else {
@@ -151,6 +155,8 @@ export class Repository<
           if (item instanceof this.Entity) {
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
 
+            this.collectionDidUpdate();
+
             return item;
           } else {
             throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`);
@@ -181,6 +187,8 @@ export class Repository<
 
           if (item instanceof this.Entity) {
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.delete(item.id));
+
+            this.collectionDidUpdate();
 
             return item;
           } else {
@@ -217,6 +225,8 @@ export class Repository<
 
             this.collection.set(item.id, item);
 
+            this.collectionDidUpdate();
+
             return item;
           }
 
@@ -231,6 +241,8 @@ export class Repository<
               items.push(item);
             }
 
+            this.collectionDidUpdate();
+
             return items;
           }
 
@@ -238,6 +250,8 @@ export class Repository<
             const item: E = new this.Entity(payload.update);
 
             this.collection.set(item.id, item);
+
+            this.collectionDidUpdate();
 
             return item;
           }
@@ -253,6 +267,8 @@ export class Repository<
               items.push(item);
             }
 
+            this.collectionDidUpdate();
+
             return items;
           }
 
@@ -260,6 +276,8 @@ export class Repository<
             const item = this.collection.get(payload.remove.id);
 
             this.collection.delete(payload.remove.id);
+
+            this.collectionDidUpdate();
 
             return item;
           }
@@ -291,11 +309,17 @@ export class Repository<
       this.isInit = false;
       this.pending = false;
       this.collection.clear();
+
+      this.collectionDidUpdate();
     });
   }
 
   protected filter(list: E[]): E[] {
     return list;
+  }
+
+  protected collectionDidUpdate(): void {
+    // ! HOOK FOR COLLECTION UPDATE
   }
 
   private handleAssigment(): void {
