@@ -1,6 +1,7 @@
+import { IEventEmitter } from "@borodindmitriy/interfaces";
 import { ObservableMap } from "mobx";
 
-export interface IRepository<T> {
+export interface IRepository<T> extends IEventEmitter {
   pending: boolean;
 
   // ! COMPUTED

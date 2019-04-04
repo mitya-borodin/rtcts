@@ -1,5 +1,5 @@
 import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
-import { IMediator } from "@borodindmitriy/isomorphic";
+import { EventEmitter, IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isObject } from "@borodindmitriy/utils";
 import { action, observable, runInAction } from "mobx";
 import { mediatorChannelEnum } from "../../enums/mediatorChannelEnum";
@@ -7,12 +7,19 @@ import { ISingletonRepository } from "../../interfaces/repository/ISingletonRepo
 import { ISingletonHTTPTransport } from "../../interfaces/transport/http/ISingletonHTTPTransport";
 import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
 
+// tslint:disable: object-literal-sort-keys
+
 export class SingletonRepository<
   E extends IEntity,
   T extends ISingletonHTTPTransport<E>,
   WS extends IWSClient = IWSClient,
   ME extends IMediator = IMediator
-> implements ISingletonRepository<E> {
+> extends EventEmitter implements ISingletonRepository<E> {
+  public static events = {
+    init: `[ Repository ][ INIT ]`,
+    update: `[ Repository ][ UPDATE ]`,
+    destroy: `[ Repository ][ DESTROY ]`,
+  };
   @observable
   public pending: boolean;
   @observable
@@ -27,6 +34,8 @@ export class SingletonRepository<
   protected isInit: boolean;
 
   constructor(Entity: new (data?: any) => E, transport: T, ws: WS, channelName: string, mediator: ME) {
+    super();
+
     // * DEPS
     this.Entity = Entity;
     this.transport = transport;
@@ -67,10 +76,11 @@ export class SingletonRepository<
               this.entity = entity;
               this.isInit = true;
 
-              this.entityDidUpdate();
+              this.entityDidInit();
+              this.emit(SingletonRepository.events.init, entity);
 
               // ! EMIT
-              this.mediator.emit(mediatorChannelEnum.repository__init_success, this);
+              this.mediator.emit(mediatorChannelEnum.repository_init, this);
             });
           } else {
             throw new Error(`ENTITY IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);
@@ -99,6 +109,7 @@ export class SingletonRepository<
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => (this.entity = entity));
 
             this.entityDidUpdate();
+            this.emit(SingletonRepository.events.update, entity);
 
             return entity;
           } else {
@@ -132,6 +143,7 @@ export class SingletonRepository<
             this.entity = new this.Entity(payload.create);
 
             this.entityDidUpdate();
+            this.emit(SingletonRepository.events.update, this.entity);
 
             return this.entity;
           }
@@ -140,6 +152,7 @@ export class SingletonRepository<
             this.entity = new this.Entity(payload.update);
 
             this.entityDidUpdate();
+            this.emit(SingletonRepository.events.update, this.entity);
 
             return this.entity;
           }
@@ -149,7 +162,7 @@ export class SingletonRepository<
       } catch (error) {
         console.error(
           `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]` +
-            `[ ${channelName} ][ PAYLOAD: ${JSON.stringify(payload)} ][  ${getErrorMessage(error)} ]`,
+            `[ ${channelName} ][ ${getErrorMessage(error)} ][ PAYLOAD: ${JSON.stringify(payload)} ]`,
         );
       }
     } else {
@@ -174,6 +187,10 @@ export class SingletonRepository<
       this.pending = false;
       this.entity = undefined;
     });
+  }
+
+  protected entityDidInit(): void {
+    // ! HOOK FOR ENTITY INIT
   }
 
   protected entityDidUpdate(): void {

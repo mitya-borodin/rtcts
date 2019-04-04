@@ -11,6 +11,9 @@ export class RepositoryFormStore<
   CHANGE,
   REP extends IRepository<ENTITY>
 > extends FormStore<FORM, CHANGE> implements IFormStore<FORM, CHANGE> {
+  public static events = {
+    submit: `[ RepositoryFormStore ][ SUBMIT ]`,
+  };
   protected readonly Entity: new (...args: any[]) => ENTITY;
   protected readonly Insert: new (...args: any[]) => INSERT;
   protected readonly repository: REP;
@@ -47,7 +50,9 @@ export class RepositoryFormStore<
   }
 
   protected async submitForm(submit: FORM): Promise<void> {
-    await this.submitToRepository(submit);
+    const result: ENTITY | void = await this.submitToRepository(submit);
+
+    this.emit(RepositoryFormStore.events.submit, result);
   }
 
   protected async submitToRepository(submit: FORM): Promise<ENTITY | void> {

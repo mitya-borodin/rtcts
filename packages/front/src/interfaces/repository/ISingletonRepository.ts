@@ -1,4 +1,6 @@
-export interface ISingletonRepository<T> {
+import { IEventEmitter } from "@borodindmitriy/interfaces";
+
+export interface ISingletonRepository<T> extends IEventEmitter {
   pending: boolean;
 
   entity: T | void;

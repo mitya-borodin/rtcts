@@ -1,10 +1,10 @@
 import { IForm, IValidateResult } from "@borodindmitriy/interfaces";
-import { ValidateResult } from "@borodindmitriy/isomorphic";
+import { EventEmitter, ValidateResult } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
 import { IFormStore } from "../../interfaces/form/IFormStore";
 
-export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, CHANGE> {
+export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implements IFormStore<FORM, CHANGE> {
   @observable
   public pending: boolean;
   @observable
@@ -15,6 +15,8 @@ export class FormStore<FORM extends IForm, CHANGE> implements IFormStore<FORM, C
   protected readonly Form: new (...args: any[]) => FORM;
 
   constructor(Form: new (...args: any[]) => FORM) {
+    super();
+
     // * DEPS
     this.Form = Form;
 

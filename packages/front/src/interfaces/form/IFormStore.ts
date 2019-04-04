@@ -1,6 +1,6 @@
-import { IValidateResult } from "@borodindmitriy/interfaces";
+import { IEventEmitter, IValidateResult } from "@borodindmitriy/interfaces";
 
-export interface IFormStore<F, C> {
+export interface IFormStore<F, C> extends IEventEmitter {
   pending: boolean;
 
   // ! FORM

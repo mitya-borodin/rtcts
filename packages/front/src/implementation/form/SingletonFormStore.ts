@@ -9,6 +9,10 @@ export class SingletonFormStore<
   CHANGE,
   REP extends ISingletonRepository<ENTITY>
 > extends FormStore<FORM, CHANGE> implements IFormStore<FORM, CHANGE> {
+  public static events = {
+    submit: `[ SingletonFormStore ][ SUBMIT ]`,
+  };
+
   protected readonly Entity: new (...args: any[]) => ENTITY;
   protected readonly repository: REP;
 
@@ -37,7 +41,8 @@ export class SingletonFormStore<
 
   protected async submitForm(submit: FORM): Promise<void> {
     const entity: ENTITY = new this.Entity(submit.toJS());
+    const result: ENTITY | void = await this.repository.update(entity.toJS());
 
-    await this.repository.update(entity.toJS());
+    this.emit(SingletonFormStore.events.submit, result);
   }
 }

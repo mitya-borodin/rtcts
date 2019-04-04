@@ -1,5 +1,5 @@
 import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
-import { IMediator } from "@borodindmitriy/isomorphic";
+import { EventEmitter, IMediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
 import { mediatorChannelEnum } from "../../enums/mediatorChannelEnum";
@@ -7,12 +7,20 @@ import { IRepository } from "../../interfaces/repository/IRepository";
 import { IRepositoryHTTPTransport } from "../../interfaces/transport/http/IRepositoryHTTPTransport";
 import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
 
+// tslint:disable: object-literal-sort-keys
+
 export class Repository<
   E extends IEntity,
   T extends IRepositoryHTTPTransport<E>,
   WS extends IWSClient = IWSClient,
   ME extends IMediator = IMediator
-> implements IRepository<E> {
+> extends EventEmitter implements IRepository<E> {
+  public static events = {
+    init: `[ Repository ][ INIT ]`,
+    update: `[ Repository ][ UPDATE ]`,
+    remove: `[ Repository ][ REMOVE ]`,
+    destroy: `[ Repository ][ DESTROY ]`,
+  };
   @observable
   public pending: boolean;
 
@@ -28,6 +36,8 @@ export class Repository<
   protected isInit: boolean;
 
   constructor(Entity: new (data?: any) => E, transport: T, mediator: ME, ws: WS, channelName: string) {
+    super();
+
     // * DEPS
     this.Entity = Entity;
     this.transport = transport;
@@ -93,10 +103,11 @@ export class Repository<
 
               this.isInit = true;
 
-              this.collectionDidUpdate();
+              this.repositoryDidInit(collection);
+              this.emit(Repository.events.init, collection);
 
               // ! EMIT
-              this.mediator.emit(mediatorChannelEnum.repository__init_success, this);
+              this.mediator.emit(mediatorChannelEnum.repository_init, this);
             });
           } else {
             throw new Error(`COLLECTION IS NOT ARRAY - ${Object.prototype.toString.call(collection)}`);
@@ -126,7 +137,8 @@ export class Repository<
           if (item instanceof this.Entity) {
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
 
-            this.collectionDidUpdate();
+            this.collectionDidUpdate([item]);
+            this.emit(Repository.events.update, [item]);
 
             return item;
           } else {
@@ -159,7 +171,8 @@ export class Repository<
           if (item instanceof this.Entity) {
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
 
-            this.collectionDidUpdate();
+            this.collectionDidUpdate([item]);
+            this.emit(Repository.events.update, [item]);
 
             return item;
           } else {
@@ -192,7 +205,8 @@ export class Repository<
           if (item instanceof this.Entity) {
             runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.delete(item.id));
 
-            this.collectionDidUpdate();
+            this.collectionDidRemove([item]);
+            this.emit(Repository.events.remove, [item]);
 
             return item;
           } else {
@@ -228,8 +242,8 @@ export class Repository<
             const item: E = new this.Entity(payload.create);
 
             this.collection.set(item.id, item);
-
-            this.collectionDidUpdate();
+            this.collectionDidUpdate([item]);
+            this.emit(Repository.events.update, [item]);
 
             return item;
           }
@@ -245,7 +259,8 @@ export class Repository<
               items.push(item);
             }
 
-            this.collectionDidUpdate();
+            this.collectionDidUpdate(items);
+            this.emit(Repository.events.update, items);
 
             return items;
           }
@@ -254,8 +269,8 @@ export class Repository<
             const item: E = new this.Entity(payload.update);
 
             this.collection.set(item.id, item);
-
-            this.collectionDidUpdate();
+            this.collectionDidUpdate([item]);
+            this.emit(Repository.events.update, [item]);
 
             return item;
           }
@@ -271,7 +286,8 @@ export class Repository<
               items.push(item);
             }
 
-            this.collectionDidUpdate();
+            this.collectionDidUpdate(items);
+            this.emit(Repository.events.update, items);
 
             return items;
           }
@@ -280,8 +296,8 @@ export class Repository<
             const item = this.collection.get(payload.remove.id);
 
             this.collection.delete(payload.remove.id);
-
-            this.collectionDidUpdate();
+            this.collectionDidRemove([item]);
+            this.emit(Repository.events.remove, [item]);
 
             return item;
           }
@@ -314,7 +330,8 @@ export class Repository<
       this.pending = false;
       this.collection.clear();
 
-      this.collectionDidUpdate();
+      this.collectionDestroied();
+      this.emit(Repository.events.destroy, []);
     });
   }
 
@@ -322,8 +339,19 @@ export class Repository<
     return list;
   }
 
-  protected collectionDidUpdate(): void {
+  protected repositoryDidInit(entity: Array<E | void>): void {
+    // ! HOOK FOR REPOSITORY INIT
+  }
+
+  protected collectionDidUpdate(entity: Array<E | void>): void {
     // ! HOOK FOR COLLECTION UPDATE
+  }
+
+  protected collectionDidRemove(entity: Array<E | void>): void {
+    // ! HOOK FOR REMOVE ITEMS FROM COLLECTION
+  }
+  protected collectionDestroied(): void {
+    // ! HOOK FOR DESTROY
   }
 
   private handleAssigment(): void {
