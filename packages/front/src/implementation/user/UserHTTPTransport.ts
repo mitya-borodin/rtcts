@@ -41,7 +41,7 @@ export class UserHTTPTransport<
       updateGroup: string[];
     },
     mediator: ME,
-    root = "/service",
+    root = "/api",
   ) {
     super(name, Class, ws, channelName, ACL, mediator, root);
   }

@@ -33,7 +33,7 @@ export class SingletonHTTPTransport<T, WS extends IWSClient = IWSClient, ME exte
       offChannel: string[];
     },
     mediator: ME,
-    root = "/service",
+    root = "/api",
   ) {
     super(name, Class, ws, channelName, ACL, mediator, root);
 

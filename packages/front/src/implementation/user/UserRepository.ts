@@ -79,7 +79,10 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
 
         if (this.isToken) {
           await this.getCurrentUser(); // ! Загрузка текущего пользователя;
-          await super.init(); // ! Загрузка коллекции;
+
+          if (this.transport.ACL.collection.includes(this.transport.group)) {
+            await super.init(); // ! Загрузка коллекции;
+          }
 
           runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => (this.isInit = true));
         } else {
