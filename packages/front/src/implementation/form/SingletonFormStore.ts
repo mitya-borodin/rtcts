@@ -1,10 +1,12 @@
-import { IEntity, IForm } from "@borodindmitriy/interfaces";
+import { IEntity, IForm, IInsert } from "@borodindmitriy/interfaces";
+import { isString } from "@borodindmitriy/utils";
 import { IFormStore } from "../../interfaces/form/IFormStore";
 import { ISingletonRepository } from "../../interfaces/repository/ISingletonRepository";
 import { FormStore } from "./FormStore";
 
 export class SingletonFormStore<
   ENTITY extends IEntity,
+  INSERT extends IInsert,
   FORM extends IForm,
   CHANGE,
   REP extends ISingletonRepository<ENTITY>
@@ -14,13 +16,20 @@ export class SingletonFormStore<
   };
 
   protected readonly Entity: new (...args: any[]) => ENTITY;
+  protected readonly Insert: new (...args: any[]) => INSERT;
   protected readonly repository: REP;
 
-  constructor(Entity: new (...args: any[]) => ENTITY, Form: new (...args: any[]) => FORM, repository: REP) {
+  constructor(
+    Entity: new (...args: any[]) => ENTITY,
+    Insert: new (...args: any[]) => INSERT,
+    Form: new (...args: any[]) => FORM,
+    repository: REP,
+  ) {
     super(Form);
 
     // * DEPS
     this.Entity = Entity;
+    this.Insert = Insert;
     this.repository = repository;
 
     // * BINDS
@@ -40,8 +49,17 @@ export class SingletonFormStore<
   }
 
   protected async submitForm(submit: FORM): Promise<void> {
-    const entity: ENTITY = new this.Entity(submit.toJS());
-    const result: ENTITY | void = await this.repository.update(entity.toJS());
+    let result: ENTITY | void;
+
+    if (isString(submit.id)) {
+      const entity: ENTITY = new this.Entity(submit.toJS());
+
+      result = await this.repository.update(entity.toJS());
+    } else {
+      const insert: INSERT = new this.Insert(submit.toJS());
+
+      result = await this.repository.update(insert.toJS());
+    }
 
     this.emit(SingletonFormStore.events.submit, result);
   }
