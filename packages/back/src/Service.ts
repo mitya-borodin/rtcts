@@ -20,7 +20,7 @@ export class Service<
   protected readonly channels: C;
   protected readonly ACL: {
     readonly collection: string[];
-    readonly model: string[];
+    readonly read: string[];
     readonly create: string[];
     readonly remove: string[];
     readonly update: string[];
@@ -37,7 +37,7 @@ export class Service<
     ACL: {
       collection: string[];
       create: string[];
-      model: string[];
+      read: string[];
       remove: string[];
       update: string[];
       channel: string[];
@@ -52,7 +52,7 @@ export class Service<
     this.ACL = ACL;
 
     this.collection();
-    this.readModel();
+    this.read();
     this.create();
     this.update();
     this.remove();
@@ -83,15 +83,15 @@ export class Service<
     );
   }
 
-  protected readModel(): void {
-    const URL = `/${this.name}/model`;
+  protected read(): void {
+    const URL = `/${this.name}/read`;
 
     this.router.get(
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.model.length === 0 || (req.user && this.ACL.model.includes(req.user.group))) {
+          if (this.ACL.read.length === 0 || (req.user && this.ACL.read.includes(req.user.group))) {
             const result: P | null = await this.model.readById(req.query.id);
 
             if (result) {

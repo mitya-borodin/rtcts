@@ -15,7 +15,7 @@ export class UserService<
   protected model: M;
   protected readonly ACL: {
     readonly collection: string[];
-    readonly model: string[];
+    readonly read: string[];
     readonly channel: string[];
     readonly create: string[];
     readonly remove: string[];
@@ -35,7 +35,7 @@ export class UserService<
     channels: C,
     ACL: {
       collection: string[];
-      model: string[];
+      read: string[];
       channel: string[];
       create: string[];
       remove: string[];
