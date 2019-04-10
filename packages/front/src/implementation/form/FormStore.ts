@@ -53,7 +53,7 @@ export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implemen
     return this.form instanceof this.Form;
   }
 
-  @computed({ name: "[ FORM_STORE ][ IS_OPEN ]" })
+  @computed({ name: "[ FORM_STORE ][ IS_EDIT ]" })
   get isEdit(): boolean {
     return this.form instanceof this.Form && isString(this.form.id) && this.form.id.length > 0;
   }
