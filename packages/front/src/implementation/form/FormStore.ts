@@ -150,18 +150,18 @@ export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implemen
   }
 
   protected async openForm(id?: string): Promise<FORM> {
-    console.log({ id });
+    console.log("[ FORM_STORE ][ OPEN_FORM ]", { id });
 
     return new this.Form();
   }
 
   protected async changeForm(form: FORM, change: CHANGE): Promise<FORM> {
-    console.log({ change, form });
+    console.log("[ FORM_STORE ][ CHANGE_FORM ]", { change, form });
 
     return new this.Form({ ...form.toJS(), ...change });
   }
 
   protected async submitForm(submit: FORM): Promise<void> {
-    console.log({ submit });
+    console.log("[ FORM_STORE ][ SUBMIT_FORM ]", { submit });
   }
 }
