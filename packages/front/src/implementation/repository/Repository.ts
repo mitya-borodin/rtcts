@@ -18,7 +18,9 @@ export class Repository<
   public static events = {
     init: `[ Repository ][ INIT ]`,
     update: `[ Repository ][ UPDATE ]`,
+    update_submit: `[ Repository ][ UPDATE ][ SUBMIT ]`,
     remove: `[ Repository ][ REMOVE ]`,
+    remove_submit: `[ Repository ][ REMOVE ][ SUBMIT ]`,
     destroy: `[ Repository ][ DESTROY ]`,
   };
   @observable
@@ -139,6 +141,7 @@ export class Repository<
 
             this.collectionDidUpdate([item]);
             this.emit(Repository.events.update, [item]);
+            this.emit(Repository.events.update_submit, [item]);
 
             return item;
           } else {
@@ -173,6 +176,7 @@ export class Repository<
 
             this.collectionDidUpdate([item]);
             this.emit(Repository.events.update, [item]);
+            this.emit(Repository.events.update_submit, [item]);
 
             return item;
           } else {
@@ -207,6 +211,7 @@ export class Repository<
 
             this.collectionDidRemove([item]);
             this.emit(Repository.events.remove, [item]);
+            this.emit(Repository.events.remove_submit, [item]);
 
             return item;
           } else {

@@ -106,6 +106,8 @@ export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implemen
 
         if (this.form instanceof this.Form) {
           await this.submitForm(this.form);
+
+          this.cancel();
         } else {
           throw new Error(`FORM_IS_NOT_INSTANCE_OF ${this.Form.name}`);
         }

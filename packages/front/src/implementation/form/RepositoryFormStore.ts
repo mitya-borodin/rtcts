@@ -2,6 +2,7 @@ import { IEntity, IForm, IInsert } from "@borodindmitriy/interfaces";
 import { isString } from "@borodindmitriy/utils";
 import { IFormStore } from "../../interfaces/form/IFormStore";
 import { IRepository } from "../../interfaces/repository/IRepository";
+import { Repository } from "../repository/Repository";
 import { FormStore } from "./FormStore";
 
 export class RepositoryFormStore<
@@ -35,6 +36,9 @@ export class RepositoryFormStore<
     this.openForm = this.openForm.bind(this);
     this.changeForm = this.changeForm.bind(this);
     this.submitForm = this.submitForm.bind(this);
+
+    // ! SUBSCRIPTIONS
+    this.repository.on(Repository.events.remove_submit, this.cancel);
   }
 
   protected async openForm(id?: string): Promise<FORM> {
