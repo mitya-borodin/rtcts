@@ -16,9 +16,9 @@ export class SingletonRepository<
   ME extends IMediator = IMediator
 > extends EventEmitter implements ISingletonRepository<E> {
   public static events = {
-    init: `[ Repository ][ INIT ]`,
-    update: `[ Repository ][ UPDATE ]`,
-    destroy: `[ Repository ][ DESTROY ]`,
+    init: `[ SingletonRepository ][ INIT ]`,
+    update: `[ SingletonRepository ][ UPDATE ]`,
+    destroy: `[ SingletonRepository ][ DESTROY ]`,
   };
   @observable
   public pending: boolean;

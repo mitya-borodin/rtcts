@@ -8,8 +8,8 @@ import { ICacheRepository } from "../../interfaces/repository/ICacheRepository";
 
 export class CacheRepository<T extends IForm> extends EventEmitter implements ICacheRepository<T> {
   public static events = {
-    update: `[ Repository ][ UPDATE ]`,
-    remove: `[ Repository ][ REMOVE ]`,
+    update: `[ CacheRepository ][ UPDATE ]`,
+    remove: `[ CacheRepository ][ REMOVE ]`,
   };
 
   @observable
