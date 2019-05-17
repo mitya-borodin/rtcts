@@ -1,7 +1,7 @@
-import { IEventEmitter, IForm } from "@borodindmitriy/interfaces";
+import { IEventEmitter } from "@borodindmitriy/interfaces";
 import { ObservableMap } from "mobx";
 
-export interface ICacheRepository<T extends IForm> extends IEventEmitter {
+export interface ICacheRepository<T> extends IEventEmitter {
   map: ObservableMap<string, T>;
   list: T[];
 
