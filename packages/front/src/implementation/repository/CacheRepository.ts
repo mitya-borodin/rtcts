@@ -6,7 +6,7 @@ import { ICacheRepository } from "../../interfaces/repository/ICacheRepository";
 
 // tslint:disable: object-literal-sort-keys
 
-export class CacheRepository<T extends IForm> extends EventEmitter implements ICacheRepository<T> {
+export class CacheRepository<T extends { id: string | void }> extends EventEmitter implements ICacheRepository<T> {
   public static events = {
     update: `[ CacheRepository ][ UPDATE ]`,
     remove: `[ CacheRepository ][ REMOVE ]`,

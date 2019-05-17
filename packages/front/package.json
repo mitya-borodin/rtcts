@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "3.0.3",
+  "version": "3.0.4",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -31,6 +31,9 @@
     "test": "rearguard test"
   },
   "types": "lib/lib_exports.d.ts",
+  "dependencies": {
+    "tslib": "1.9.3"
+  },
   "peerDependencies": {
     "@borodindmitriy/interfaces": "2.0.1",
     "@borodindmitriy/isomorphic": "2.0.1",
@@ -51,7 +54,6 @@
     "prettier": "1.16.4",
     "ts-node": "8.1.0",
     "ts-node-dev": "1.0.0-pre.32",
-    "tslib": "1.9.3",
     "tslint": "5.14.0",
     "typescript": "3.4.1"
   },
