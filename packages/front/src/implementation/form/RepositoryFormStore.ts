@@ -41,7 +41,7 @@ export class RepositoryFormStore<
     this.repository.on(Repository.events.remove_submit, this.cancel);
   }
 
-  protected async openForm(id?: string): Promise<FORM> {
+  protected async openForm(id?: string, ...args: any[]): Promise<FORM> {
     if (isString(id) && id.length > 0) {
       const entity: ENTITY | void = this.repository.map.get(id);
 

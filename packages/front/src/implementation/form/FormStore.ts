@@ -149,19 +149,19 @@ export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implemen
     runInAction(`[ ${this.constructor.name} ][ HILE_VALIDATION ]`, () => (this.showValidationResult = false));
   }
 
-  protected async openForm(id?: string): Promise<FORM> {
+  protected async openForm(id?: string, ...args: any[]): Promise<FORM> {
     console.log("[ FORM_STORE ][ OPEN_FORM ]", { id });
 
     return new this.Form();
   }
 
-  protected async changeForm(form: FORM, change: CHANGE): Promise<FORM> {
+  protected async changeForm(form: FORM, change: CHANGE, ...args: any[]): Promise<FORM> {
     console.log("[ FORM_STORE ][ CHANGE_FORM ]", { change, form });
 
     return new this.Form({ ...form.toJS(), ...change });
   }
 
-  protected async submitForm(submit: FORM): Promise<void> {
+  protected async submitForm(submit: FORM, ...args: any[]): Promise<void> {
     console.log("[ FORM_STORE ][ SUBMIT_FORM ]", { submit });
   }
 }
