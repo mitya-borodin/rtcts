@@ -35,16 +35,16 @@
     "tslib": "1.9.3"
   },
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "2.0.1",
-    "@borodindmitriy/isomorphic": "2.0.1",
-    "@borodindmitriy/utils": "2.0.1",
-    "@borodindmitriy/vendors": "2.0.1"
+    "@borodindmitriy/interfaces": "2.0.2",
+    "@borodindmitriy/isomorphic": "2.0.2",
+    "@borodindmitriy/utils": "2.0.2",
+    "@borodindmitriy/vendors": "2.0.2"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "2.0.1",
-    "@borodindmitriy/isomorphic": "2.0.1",
-    "@borodindmitriy/utils": "2.0.1",
-    "@borodindmitriy/vendors": "2.0.1",
+    "@borodindmitriy/interfaces": "2.0.2",
+    "@borodindmitriy/isomorphic": "2.0.2",
+    "@borodindmitriy/utils": "2.0.2",
+    "@borodindmitriy/vendors": "2.0.2",
     "@types/chai": "4.1.7",
     "@types/mocha": "5.2.6",
     "@types/node": "11.12.2",
