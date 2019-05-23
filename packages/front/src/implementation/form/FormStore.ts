@@ -37,7 +37,7 @@ export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implemen
   @computed({ name: "[ FORM_STORE ][ VALIDATE ]" })
   get validate(): IValidateResult {
     if (this.form instanceof this.Form) {
-      return this.form.validate();
+      return this.form.getValidateResult();
     }
 
     return new ValidateResult([]);
