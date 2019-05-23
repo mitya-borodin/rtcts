@@ -23,7 +23,8 @@
     "build:release": "rearguard build -r --node_lib",
     "check_deps_on_npm": "rearguard check_deps_on_npm",
     "check_deps_on_npm:install": "rearguard check_deps_on_npm --install_deps",
-    "prepublishOnly": "npm run build:release"
+    "prepublishOnly": "npm run build:release",
+    "test": "rearguard test"
   },
   "types": "lib/lib_exports.d.ts",
   "peerDependencies": {
