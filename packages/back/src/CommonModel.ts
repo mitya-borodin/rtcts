@@ -1,21 +1,21 @@
-import { IInsert, IPersist } from "@borodindmitriy/interfaces";
+import { IEntity, IInsert } from "@borodindmitriy/interfaces";
 import { isObject } from "@borodindmitriy/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { ICommonModel } from "./interfaces/ICommonModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";
 
-export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepository<P> = IRepository<P>>
+export class CommonModel<P extends IEntity, I extends IInsert, R extends IRepository<P> = IRepository<P>>
   implements ICommonModel<P> {
   protected readonly repository: R;
-  protected readonly Persist: { new (data?: any): P };
-  protected readonly Insert: { new (data?: any): I };
+  protected readonly Persist: new (data?: any) => P;
+  protected readonly Insert: new (data?: any) => I;
   protected readonly send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void;
 
   constructor(
     repository: R,
-    Persist: { new (data?: any): P },
-    Insert: { new (data?: any): I },
+    Persist: new (data?: any) => P,
+    Insert: new (data?: any) => I,
     send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void,
   ) {
     this.repository = repository;
@@ -26,7 +26,7 @@ export class CommonModel<P extends IPersist, I extends IInsert, R extends IRepos
 
   public async read(): Promise<P | null> {
     try {
-      const item: object | null = await this.repository.findOne({});
+      const item: P | null = await this.repository.findOne({});
 
       if (item) {
         return new this.Persist(item);

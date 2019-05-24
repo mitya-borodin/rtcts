@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.38",
+  "version": "2.0.2",
   "files": [
     "dll_bundle"
   ],
@@ -21,7 +21,8 @@
     "build:release": "rearguard build -r --dll",
     "check_deps_on_npm": "rearguard check_deps_on_npm",
     "check_deps_on_npm:install": "rearguard check_deps_on_npm --install_deps",
-    "prepublishOnly": "npm run build:both"
+    "prepublishOnly": "npm run build:both",
+    "test": "rearguard test"
   },
   "dependencies": {
     "@types/history": "4.7.2",
@@ -45,9 +46,14 @@
     "tslint-no-circular-imports": "0.6.2"
   },
   "devDependencies": {
+    "@types/chai": "4.1.7",
+    "@types/mocha": "5.2.6",
     "@types/node": "11.11.4",
+    "chai": "4.2.0",
     "husky": "1.3.1",
+    "mocha": "6.1.4",
     "prettier": "1.16.4",
+    "ts-node": "8.1.0",
     "ts-node-dev": "1.0.0-pre.32",
     "tslib": "1.9.3",
     "tslint": "5.14.0",

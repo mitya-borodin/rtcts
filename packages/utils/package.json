@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.3.48",
+  "version": "2.0.2",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -26,21 +26,27 @@
     "check_deps_on_npm:install": "rearguard check_deps_on_npm --install_deps",
     "prepublishOnly": "npm run build:both",
     "start": "rearguard wds",
-    "start:release": "rearguard wds -r"
+    "start:release": "rearguard wds -r",
+    "test": "rearguard test"
   },
   "types": "lib/lib_exports.d.ts",
   "dependencies": {},
   "peerDependencies": {
-    "@borodindmitriy/vendors": "1.0.38"
+    "@borodindmitriy/vendors": "2.0.2"
   },
   "devDependencies": {
-    "@borodindmitriy/vendors": "1.0.38",
-    "@types/node": "11.12.2",
+    "@borodindmitriy/vendors": "2.0.2",
+    "@types/chai": "4.1.7",
+    "@types/mocha": "5.2.6",
+    "@types/node": "11.13.0",
+    "chai": "4.2.0",
     "husky": "1.3.1",
+    "mocha": "6.1.4",
     "prettier": "1.16.4",
+    "ts-node": "8.1.0",
     "ts-node-dev": "1.0.0-pre.32",
     "tslib": "1.9.3",
-    "tslint": "5.14.0",
+    "tslint": "5.15.0",
     "typescript": "3.4.1"
   },
   "engines": {

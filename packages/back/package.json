@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.57",
+  "version": "2.0.1",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -23,14 +23,15 @@
     "build:release": "rearguard build -r --node_lib",
     "check_deps_on_npm": "rearguard check_deps_on_npm",
     "check_deps_on_npm:install": "rearguard check_deps_on_npm --install_deps",
-    "prepublishOnly": "npm run build:release"
+    "prepublishOnly": "npm run build:release",
+    "test": "rearguard test"
   },
   "types": "lib/lib_exports.d.ts",
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "1.1.29",
-    "@borodindmitriy/isomorphic": "1.0.52",
-    "@borodindmitriy/utils": "1.3.48",
-    "@borodindmitriy/vendors": "1.0.38",
+    "@borodindmitriy/interfaces": "2.0.2",
+    "@borodindmitriy/isomorphic": "2.0.2",
+    "@borodindmitriy/utils": "2.0.2",
+    "@borodindmitriy/vendors": "2.0.2",
     "body-parser": "1.18.3",
     "bson": "3.0.2",
     "chalk": "2.4.2",
@@ -44,10 +45,10 @@
     "ws": "6.2.0"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "1.1.29",
-    "@borodindmitriy/isomorphic": "1.0.52",
-    "@borodindmitriy/utils": "1.3.48",
-    "@borodindmitriy/vendors": "1.0.38",
+    "@borodindmitriy/interfaces": "2.0.2",
+    "@borodindmitriy/isomorphic": "2.0.2",
+    "@borodindmitriy/utils": "2.0.2",
+    "@borodindmitriy/vendors": "2.0.2",
     "@types/bson": "1.0.11",
     "@types/chai": "4.1.7",
     "@types/mocha": "5.2.6",

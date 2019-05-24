@@ -1,4 +1,4 @@
-import { IPersist } from "@borodindmitriy/interfaces";
+import { IEntity } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
@@ -6,7 +6,7 @@ import { IChannels } from "./interfaces/IChannels";
 import { ICommonModel } from "./interfaces/ICommonModel";
 
 export class CommonService<
-  P extends IPersist,
+  P extends IEntity,
   M extends ICommonModel<P>,
   C extends IChannels,
   Router extends express.Router = express.Router
@@ -16,8 +16,8 @@ export class CommonService<
   protected readonly model: M;
   protected readonly channels: C;
   protected readonly ACL: {
-    readonly model: string[];
     readonly create: string[];
+    readonly read: string[];
     readonly update: string[];
     readonly channel: string[];
   };
@@ -28,8 +28,8 @@ export class CommonService<
     model: M,
     channels: C,
     ACL: {
-      model: string[];
       create: string[];
+      read: string[];
       update: string[];
       channel: string[];
     },
@@ -46,14 +46,14 @@ export class CommonService<
   }
 
   protected read(): void {
-    const URL = `/${this.name}/model`;
+    const URL = `/${this.name}/read`;
 
     this.router.get(
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.model.length === 0 || (req.user && this.ACL.model.includes(req.user.group))) {
+          if (this.ACL.read.length === 0 || (req.user && this.ACL.read.includes(req.user.group))) {
             const result: P | null = await this.model.read();
 
             if (result) {

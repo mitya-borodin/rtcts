@@ -1,4 +1,4 @@
-import { IInsert, IPersist } from "@borodindmitriy/interfaces";
+import { IEntity, IInsert } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
@@ -7,20 +7,20 @@ import { IModel } from "./interfaces/IModel";
 
 export class Service<
   M extends IModel<P>,
-  P extends IPersist,
+  P extends IEntity,
   I extends IInsert,
   C extends IChannels,
   Router extends express.Router = express.Router
 > {
   protected readonly name: string;
   protected readonly router: Router;
-  protected readonly Insert: { new (data: any): I };
-  protected readonly Persist: { new (data: any): P };
+  protected readonly Insert: new (data: any) => I;
+  protected readonly Persist: new (data: any) => P;
   protected readonly model: M;
   protected readonly channels: C;
   protected readonly ACL: {
     readonly collection: string[];
-    readonly model: string[];
+    readonly read: string[];
     readonly create: string[];
     readonly remove: string[];
     readonly update: string[];
@@ -37,7 +37,7 @@ export class Service<
     ACL: {
       collection: string[];
       create: string[];
-      model: string[];
+      read: string[];
       remove: string[];
       update: string[];
       channel: string[];
@@ -52,7 +52,7 @@ export class Service<
     this.ACL = ACL;
 
     this.collection();
-    this.readModel();
+    this.read();
     this.create();
     this.update();
     this.remove();
@@ -83,15 +83,15 @@ export class Service<
     );
   }
 
-  protected readModel(): void {
-    const URL = `/${this.name}/model`;
+  protected read(): void {
+    const URL = `/${this.name}/read`;
 
     this.router.get(
       URL,
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.model.length === 0 || (req.user && this.ACL.model.includes(req.user.group))) {
+          if (this.ACL.read.length === 0 || (req.user && this.ACL.read.includes(req.user.group))) {
             const result: P | null = await this.model.readById(req.query.id);
 
             if (result) {

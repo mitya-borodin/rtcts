@@ -1,4 +1,4 @@
-import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import { Strategy } from "passport-jwt";
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { IAppConfig } from "./interfaces/IAppConfig";
@@ -12,7 +12,7 @@ import { IUserModel } from "./interfaces/IUserModel";
  * */
 
 export class AuthStrategy<
-  P extends IUser & IPersist = IUser & IPersist,
+  P extends IUser & IEntity = IUser & IEntity,
   M extends IUserModel<P> = IUserModel<P>,
   AC extends IAppConfig = IAppConfig
 > implements IAuthStrategy {

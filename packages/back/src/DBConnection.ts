@@ -42,10 +42,7 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
       this.status = Status.CONNECTING;
 
       try {
-        this.client = await MongoClient.connect(
-          this.config.db.url,
-          { useNewUrlParser: true },
-        );
+        this.client = await MongoClient.connect(this.config.db.url, { useNewUrlParser: true });
 
         this.status = Status.OPEN;
 

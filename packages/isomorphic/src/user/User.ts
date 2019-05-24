@@ -1,8 +1,8 @@
-import { IPersist, IUser } from "@borodindmitriy/interfaces";
+import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import { detectID } from "@borodindmitriy/utils";
 import { UserInsert } from "./UserInsert";
 
-export class User extends UserInsert implements IUser, IPersist {
+export class User extends UserInsert implements IUser, IEntity {
   public readonly id: string;
 
   constructor(data?: any) {

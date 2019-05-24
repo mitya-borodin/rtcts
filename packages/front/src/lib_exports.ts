@@ -1,38 +1,34 @@
 // INTERFACES
-export { IUserRepository } from "./interfaces/IUserRepository";
-export { IWSClient } from "./interfaces/IWSClient";
-export { IService } from "./interfaces/IService";
-export { ICommonService } from "./interfaces/ICommonService";
-export { ICommonStore } from "./interfaces/ICommonStore";
-export { ICommonStoreForm } from "./interfaces/ICommonStoreForm";
-export { IUserService } from "./interfaces/IUserService";
-export { IRepository } from "./interfaces/IRepository";
-export { ICacheRepository } from "./interfaces/ICacheRepository";
-export { IComposition } from "./interfaces/IComposition";
-export { IListComposition, IListCompositionAdapter, IListCompositionActions } from "./interfaces/IListComposition";
-export { IEditComposition, IEditCompositionAdapter, IEditCompositionActions } from "./interfaces/IEditComposition";
-export { IUnionComposition, IUnionCompositionActions, IUnionCompositionAdapter } from "./interfaces/IUnionComposition";
-export { IFormStore } from "./interfaces/IFormStore";
-export { IRepositoryFormStore } from "./interfaces/IRepositoryFormStore";
-export { IUIStore } from "./interfaces/IUIStore";
+export { IFormStore } from "./interfaces/form/IFormStore";
+export { IRepository } from "./interfaces/repository/IRepository";
+export { ICacheRepository } from "./interfaces/repository/ICacheRepository";
+export { ISingletonRepository } from "./interfaces/repository/ISingletonRepository";
+export { IHTTPTransport } from "./interfaces/transport/http/IHTTPTransport";
+export { IRepositoryHTTPTransport } from "./interfaces/transport/http/IRepositoryHTTPTransport";
+export { ISingletonHTTPTransport } from "./interfaces/transport/http/ISingletonHTTPTransport";
+export { IWSClient } from "./interfaces/transport/ws/IWSClient";
+export { IUserHTTPTransport } from "./interfaces/user/IUserHTTPTransport";
+export { IUserRepository } from "./interfaces/user/IUserRepository";
+export { IFilterStore } from "./interfaces/filter/IFilterStore";
+export { ICalculationService } from "./interfaces/service/ICalculationService";
+export { IReportService } from "./interfaces/service/IReportService";
 
-// CLASSES
-export { UserRepository } from "./UserRepository";
-export { UserService } from "./UserService";
-export { Service } from "./Service";
-export { CommonService } from "./CommonService";
-export { CommonStore } from "./CommonStore";
-export { CommonStoreForm } from "./CommonStoreForm";
-export { WSClient } from "./WSClient";
-export { Repository } from "./Repository";
-export { ListAdapter } from "./ListAdapter";
-export { EditAdapter } from "./EditAdapter";
-export { UnionAdapter } from "./UnionAdapter";
-export { RepositoryFormStore } from "./RepositoryFormStore";
+// IMPLEMENTATION
+export { FormStore } from "./implementation/form/FormStore";
+export { RepositoryFormStore } from "./implementation/form/RepositoryFormStore";
+export { SingletonFormStore } from "./implementation/form/SingletonFormStore";
+export { Repository } from "./implementation/repository/Repository";
+export { CacheRepository } from "./implementation/repository/CacheRepository";
+export { SingletonRepository } from "./implementation/repository/SingletonRepository";
+export { HTTPTransport } from "./implementation/transport/http/HTTPTransport";
+export { RepositoryHTTPTransport } from "./implementation/transport/http/RepositoryHTTPTransport";
+export { SingletonHTTPTransport } from "./implementation/transport/http/SingletonHTTPTransport";
+export { WSClient } from "./implementation/transport/ws/WSClient";
+export { UserHTTPTransport } from "./implementation/user/UserHTTPTransport";
+export { UserRepository } from "./implementation/user/UserRepository";
 
 // COMPONENTS
 export { Link } from "./components/Link";
 
 // ENUMS
 export { mediatorChannelEnum } from "./enums/mediatorChannelEnum";
-export { CacheManagementRepository } from "./CacheManagementRepository";

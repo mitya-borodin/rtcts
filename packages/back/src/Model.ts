@@ -1,21 +1,21 @@
-import { IInsert, IPersist } from "@borodindmitriy/interfaces";
+import { IEntity, IInsert } from "@borodindmitriy/interfaces";
 import { isObject, isString } from "@borodindmitriy/utils";
 import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
 import { IModel } from "./interfaces/IModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";
 
-export class Model<P extends IPersist, I extends IInsert, R extends IRepository<P> = IRepository<P>>
+export class Model<P extends IEntity, I extends IInsert, R extends IRepository<P> = IRepository<P>>
   implements IModel<P> {
   protected readonly repository: R;
-  protected readonly Persist: { new (data?: any): P };
-  protected readonly Insert: { new (data?: any): I };
+  protected readonly Persist: new (data?: any) => P;
+  protected readonly Insert: new (data?: any) => I;
   protected readonly send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void;
 
   constructor(
     repository: R,
-    Persist: { new (data?: any): P },
-    Insert: { new (data?: any): I },
+    Persist: new (data?: any) => P,
+    Insert: new (data?: any) => I,
     send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void,
   ) {
     this.repository = repository;

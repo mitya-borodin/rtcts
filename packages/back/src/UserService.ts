@@ -1,4 +1,4 @@
-import { IPersist, IUser, userGroupEnum } from "@borodindmitriy/interfaces";
+import { IEntity, IUser, userGroupEnum } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
 import * as passport from "passport";
@@ -7,7 +7,7 @@ import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";
 
 export class UserService<
-  P extends IUser & IPersist = IUser & IPersist,
+  P extends IUser & IEntity = IUser & IEntity,
   I extends IUser = IUser,
   C extends IChannels = IChannels,
   M extends IUserModel<P> = IUserModel<P>
@@ -15,7 +15,7 @@ export class UserService<
   protected model: M;
   protected readonly ACL: {
     readonly collection: string[];
-    readonly model: string[];
+    readonly read: string[];
     readonly channel: string[];
     readonly create: string[];
     readonly remove: string[];
@@ -35,7 +35,7 @@ export class UserService<
     channels: C,
     ACL: {
       collection: string[];
-      model: string[];
+      read: string[];
       channel: string[];
       create: string[];
       remove: string[];

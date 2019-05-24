@@ -1,5 +1,5 @@
 // INTERFACES
-export { IPersist } from "./IPersist";
+export { IEntity } from "./IEntity";
 export { IInsert } from "./IInsert";
 export { IForm } from "./IForm";
 export { IUser } from "./IUser";
