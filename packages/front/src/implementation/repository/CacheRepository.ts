@@ -66,6 +66,7 @@ export class CacheRepository<T extends { id: string | void }> extends EventEmitt
       this.emit(CacheRepository.events.update, entities);
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ UPDATE ][ ${getErrorMessage(error)} ]`);
+      console.error(error);
     }
   }
 
@@ -87,6 +88,7 @@ export class CacheRepository<T extends { id: string | void }> extends EventEmitt
       this.emit(CacheRepository.events.update, entities);
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ REMOVE ][ ${getErrorMessage(error)} ]`);
+      console.error(error);
     }
   }
 
