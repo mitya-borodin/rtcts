@@ -40,7 +40,6 @@
     "mongodb": "3.1.13",
     "passport": "0.4.0",
     "passport-jwt": "4.0.0",
-    "tslib": "1.9.3",
     "uuid": "3.3.2",
     "ws": "6.2.0"
   },
