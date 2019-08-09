@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "2.1.1",
+  "version": "3.0.0",
   "files": [
     "dll_bundle"
   ],
@@ -25,39 +25,39 @@
     "test": "rearguard test"
   },
   "dependencies": {
-    "@types/history": "4.7.2",
-    "@types/querystringify": "2.0.0",
-    "@types/react": "16.8.23",
-    "@types/react-dom": "16.8.4",
-    "antd": "3.20.0",
+    "antd": "3.19.1",
     "history": "4.9.0",
     "hoist-non-react-statics": "3.3.0",
     "isomorphic-style-loader": "5.1.0",
-    "mobx": "5.11.0",
-    "mobx-react": "6.1.1",
-    "mobx-react-devtools": "6.1.1",
-    "mobx-utils": "5.4.1",
+    "mobx": "5.9.0",
+    "mobx-react": "5.4.3",
+    "mobx-react-devtools": "6.0.3",
+    "mobx-utils": "5.2.0",
     "moment": "2.24.0",
     "normalize.css": "8.0.1",
     "querystringify": "2.1.1",
-    "react": "16.8.6",
-    "react-dom": "16.8.6",
+    "react": "16.8.3",
+    "react-dom": "16.8.3",
     "react-helmet": "5.2.1",
-    "tslib": "1.10.0",
+    "tslib": "1.9.3",
     "tslint-no-circular-imports": "0.7.0"
   },
   "devDependencies": {
-    "@types/chai": "4.1.7",
+    "@types/chai": "4.2.0",
+    "@types/history": "4.7.2",
     "@types/mocha": "5.2.7",
-    "@types/node": "12.0.12",
+    "@types/node": "12.7.1",
+    "@types/querystringify": "2.0.0",
+    "@types/react": "16.9.0",
+    "@types/react-dom": "16.8.5",
     "chai": "4.2.0",
-    "husky": "3.0.0",
-    "mocha": "6.1.4",
+    "husky": "3.0.3",
+    "mocha": "6.2.0",
     "prettier": "1.18.2",
     "ts-node": "8.3.0",
     "ts-node-dev": "1.0.0-pre.40",
     "tslint": "5.18.0",
-    "typescript": "3.5.2"
+    "typescript": "3.5.3"
   },
   "keywords": [
     "dll"
