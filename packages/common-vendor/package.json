@@ -1,6 +1,6 @@
 {
-  "name": "@borodindmitriy/vendors",
-  "description": "This package is DLL bundle of verndors only;",
+  "name": "@borodindmitriy/common-vendor",
+  "description": "",
   "license": "MIT",
   "author": "Borodin Dmitriy",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
@@ -11,7 +11,8 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "3.0.0",
+  "version": "1.0.1",
+  "main": "index.js",
   "files": [
     "dll_bundle"
   ],
@@ -25,46 +26,27 @@
     "test": "rearguard test"
   },
   "dependencies": {
-    "antd": "3.19.1",
     "history": "4.9.0",
-    "hoist-non-react-statics": "3.3.0",
-    "isomorphic-style-loader": "5.1.0",
-    "mobx": "5.9.0",
-    "mobx-react": "5.4.3",
-    "mobx-react-devtools": "6.0.3",
-    "mobx-utils": "5.2.0",
     "moment": "2.24.0",
     "normalize.css": "8.0.1",
-    "querystringify": "2.1.1",
-    "react": "16.8.3",
-    "react-dom": "16.8.3",
-    "react-helmet": "5.2.1",
-    "tslib": "1.9.3",
-    "tslint-no-circular-imports": "0.7.0"
+    "tslib": "1.10.0"
   },
   "devDependencies": {
-    "@types/chai": "4.2.0",
-    "@types/history": "4.7.2",
+    "@types/chai": "4.2.1",
     "@types/mocha": "5.2.7",
-    "@types/node": "12.7.1",
-    "@types/querystringify": "2.0.0",
-    "@types/react": "16.9.0",
-    "@types/react-dom": "16.8.5",
+    "@types/node": "12.7.4",
     "chai": "4.2.0",
-    "husky": "3.0.3",
+    "husky": "3.0.5",
     "mocha": "6.2.0",
     "prettier": "1.18.2",
     "ts-node": "8.3.0",
-    "ts-node-dev": "1.0.0-pre.40",
-    "tslint": "5.18.0",
-    "typescript": "3.5.3"
+    "ts-node-dev": "1.0.0-pre.42",
+    "tslint": "5.19.0",
+    "typescript": "3.6.2"
   },
-  "keywords": [
-    "dll"
-  ],
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=10 <11",
+    "npm": ">=6 <7"
   },
   "publishConfig": {
     "access": "public",

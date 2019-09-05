@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "3.0.0",
+  "version": "3.0.1",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -28,10 +28,10 @@
   },
   "types": "lib/lib_exports.d.ts",
   "peerDependencies": {
-    "@borodindmitriy/interfaces": "3.0.0",
-    "@borodindmitriy/isomorphic": "3.0.0",
-    "@borodindmitriy/utils": "3.0.0",
-    "@borodindmitriy/vendors": "3.0.0",
+    "@borodindmitriy/common-vendor": "1.0.1",
+    "@borodindmitriy/interfaces": "3.0.1",
+    "@borodindmitriy/isomorphic": "3.0.1",
+    "@borodindmitriy/utils": "3.0.1",
     "body-parser": "1.18.3",
     "bson": "3.0.2",
     "chalk": "2.4.2",
@@ -41,13 +41,14 @@
     "passport": "0.4.0",
     "passport-jwt": "4.0.0",
     "uuid": "3.3.2",
-    "ws": "6.2.0"
+    "ws": "6.2.0",
+    "tslib": "1.9.3"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "3.0.0",
-    "@borodindmitriy/isomorphic": "3.0.0",
-    "@borodindmitriy/utils": "3.0.0",
-    "@borodindmitriy/vendors": "3.0.0",
+    "@borodindmitriy/common-vendor": "1.0.1",
+    "@borodindmitriy/interfaces": "3.0.1",
+    "@borodindmitriy/isomorphic": "3.0.1",
+    "@borodindmitriy/utils": "3.0.1",
     "@types/bson": "1.0.11",
     "@types/chai": "4.1.7",
     "@types/mocha": "5.2.6",
@@ -72,7 +73,6 @@
     "prettier": "1.16.4",
     "ts-node": "8.0.2",
     "ts-node-dev": "1.0.0-pre.32",
-    "tslib": "1.9.3",
     "tslint": "5.14.0",
     "tslint-no-circular-imports": "0.6.2",
     "typescript": "3.3.3",
@@ -80,8 +80,8 @@
     "ws": "6.2.0"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=10 <11",
+    "npm": ">=6 <7"
   },
   "publishConfig": {
     "access": "public",
@@ -91,7 +91,7 @@
     "context": "src",
     "lib_entry": "lib_exports.ts",
     "sync_project_deps": [
-      "@borodindmitriy/vendors",
+      "@borodindmitriy/common-vendor",
       "@borodindmitriy/interfaces",
       "@borodindmitriy/utils",
       "@borodindmitriy/isomorphic"

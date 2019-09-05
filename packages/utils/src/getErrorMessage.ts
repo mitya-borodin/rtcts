@@ -1,5 +1,4 @@
-import { isUndefined } from "util";
-import { isString } from "./isType";
+import { isString, isUndefined } from "./isType";
 
 export function getErrorMessage(error: any) {
   const message = "error message not forund";
