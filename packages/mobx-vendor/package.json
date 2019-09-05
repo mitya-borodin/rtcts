@@ -25,10 +25,10 @@
     "test": "rearguard test"
   },
   "dependencies": {
-    "mobx": "5.13.0",
-    "mobx-react": "6.1.3",
-    "mobx-react-devtools": "6.1.1",
-    "mobx-utils": "5.4.1",
+    "mobx": "5.9.0",
+    "mobx-react": "5.4.3",
+    "mobx-react-devtools": "6.0.3",
+    "mobx-utils": "5.2.0",
     "tslib": "1.10.0"
   },
   "devDependencies": {

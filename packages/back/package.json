@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "3.0.3",
+  "version": "3.0.4",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -45,8 +45,10 @@
     "ws": "6.2.0"
   },
   "devDependencies": {
+    "@types/body-parser": "1.17.0",
     "@types/bson": "1.0.11",
     "@types/chai": "4.1.7",
+    "@types/express": "4.16.1",
     "@types/mocha": "5.2.6",
     "@types/mongodb": "3.1.22",
     "@types/node": "11.11.4",

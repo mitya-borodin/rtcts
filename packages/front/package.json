@@ -32,7 +32,7 @@
   },
   "types": "lib/lib_exports.d.ts",
   "dependencies": {
-    "@borodindmitriy/ant-design-vendor": "1.0.3",
+    "@borodindmitriy/ant-design-vendor": "1.0.4",
     "@borodindmitriy/common-vendor": "1.0.4",
     "@borodindmitriy/interfaces": "3.0.3",
     "@borodindmitriy/isomorphic": "3.0.3",
