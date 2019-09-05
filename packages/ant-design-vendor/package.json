@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "index.js",
   "files": [
     "dll_bundle"
@@ -26,7 +26,7 @@
     "test": "rearguard test"
   },
   "dependencies": {
-    "@borodindmitriy/react-vendor": "1.0.2",
+    "@borodindmitriy/react-vendor": "1.0.4",
     "antd": "3.23.1",
     "tslib": "1.10.0"
   },

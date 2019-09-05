@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "4.0.2",
+  "version": "4.0.3",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -32,22 +32,16 @@
   },
   "types": "lib/lib_exports.d.ts",
   "dependencies": {
-    "tslib": "1.9.3"
-  },
-  "peerDependencies": {
-    "@borodindmitriy/ant-design-vendor": "1.0.2",
-    "@borodindmitriy/common-vendor": "1.0.2",
-    "@borodindmitriy/interfaces": "3.0.2",
-    "@borodindmitriy/isomorphic": "3.0.2",
-    "@borodindmitriy/mobx-vendor": "1.0.2",
-    "@borodindmitriy/react-vendor": "1.0.2",
-    "@borodindmitriy/utils": "3.0.2"
+    "@borodindmitriy/ant-design-vendor": "1.0.3",
+    "@borodindmitriy/common-vendor": "1.0.4",
+    "@borodindmitriy/interfaces": "3.0.3",
+    "@borodindmitriy/isomorphic": "3.0.3",
+    "@borodindmitriy/mobx-vendor": "1.0.4",
+    "@borodindmitriy/react-vendor": "1.0.4",
+    "@borodindmitriy/utils": "3.0.3",
+    "tslib": "1.10.0"
   },
   "devDependencies": {
-    "@borodindmitriy/interfaces": "3.0.2",
-    "@borodindmitriy/isomorphic": "3.0.2",
-    "@borodindmitriy/utils": "3.0.2",
-    "@borodindmitriy/vendors": "3.0.0",
     "@types/chai": "4.1.7",
     "@types/mocha": "5.2.6",
     "@types/node": "11.12.2",
