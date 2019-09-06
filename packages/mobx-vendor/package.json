@@ -3,6 +3,10 @@
   "license": "MIT",
   "author": "Borodin Dmitriy",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
+  "engines": {
+    "node": ">=10 <11",
+    "npm": ">=6 <7"
+  },
   "repository": {
     "type": "git",
     "url": "git@gitlab.com:mitya-borodin/base-code.git"
