@@ -4,10 +4,6 @@
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
-  "engines": {
-    "node": ">=10 <11",
-    "npm": ">=6 <7"
-  },
   "repository": {
     "type": "git",
     "url": "git@gitlab.com:mitya-borodin/base-code.git"
@@ -15,7 +11,7 @@
   "bugs": {
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "4.0.3",
+  "version": "4.0.4",
   "main": "lib/lib_exports.js",
   "module": "lib/lib_exports.js",
   "files": [
@@ -36,13 +32,13 @@
   },
   "types": "lib/lib_exports.d.ts",
   "dependencies": {
-    "@borodindmitriy/ant-design-vendor": "1.0.4",
-    "@borodindmitriy/common-vendor": "1.0.4",
-    "@borodindmitriy/interfaces": "3.0.3",
-    "@borodindmitriy/isomorphic": "3.0.3",
-    "@borodindmitriy/mobx-vendor": "1.0.4",
-    "@borodindmitriy/react-vendor": "1.0.4",
-    "@borodindmitriy/utils": "3.0.3",
+    "@borodindmitriy/ant-design-vendor": "1.0.5",
+    "@borodindmitriy/common-vendor": "1.0.6",
+    "@borodindmitriy/interfaces": "3.0.5",
+    "@borodindmitriy/isomorphic": "3.0.4",
+    "@borodindmitriy/mobx-vendor": "1.0.6",
+    "@borodindmitriy/react-vendor": "1.0.6",
+    "@borodindmitriy/utils": "3.0.4",
     "tslib": "1.10.0"
   },
   "devDependencies": {
