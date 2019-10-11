@@ -19,40 +19,13 @@
     "dll_bundle"
   ],
   "scripts": {
-    "start": "npx rearguard start",
-    "build": "npx rearguard build",
-    "test": "npx rearguard test",
-    "sync": "npx rearguard sync",
-    "check_deps_on_npm": "npx rearguard check_deps_on_npm",
-    "lint": "npx rearguard lint",
-    "lint-fix": "npx rearguard lint --fix",
-    "typecheck": "tsc --noEmit",
-    "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
-    "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
-    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
+    "build": "npx rearguard build"
   },
+  "types": "",
   "dependencies": {
-    "@borodindmitriy/react-vendor": "1.0.6",
+    "@borodindmitriy/general-vendor": "1.0.0",
     "antd": "3.23.2",
     "tslib": "1.10.0"
-  },
-  "devDependencies": {
-    "@types/chai": "4.2.1",
-    "@types/mocha": "5.2.7",
-    "@types/node": "12.7.4",
-    "@typescript-eslint/eslint-plugin": "^2.3.3",
-    "@typescript-eslint/parser": "^2.3.3",
-    "chai": "4.2.0",
-    "eslint": "^6.5.1",
-    "eslint-config-prettier": "^6.4.0",
-    "husky": "3.0.5",
-    "mocha": "6.2.0",
-    "prettier": "1.18.2",
-    "pretty-quick": "^1.11.1",
-    "ts-node": "8.3.0",
-    "ts-node-dev": "1.0.0-pre.42",
-    "tslint": "5.19.0",
-    "typescript": "3.6.2"
   },
   "engines": {
     "node": ">=10 <11",
@@ -71,31 +44,14 @@
   "rearguard": {
     "webpack": {
       "context": "src",
-      "dll_entry": "vendors.ts",
-      "entry": "index.tsx",
-      "lib_entry": "export.ts",
-      "modules": [
-        "src"
-      ],
-      "output": {
-        "path": "dist",
-        "publicPath": "/"
-      }
+      "dll_entry": "vendors.ts"
     },
     "project": {
       "runtime": "browser",
-      "type": "lib",
-      "will_load_on_demand": false
+      "type": "dll"
     },
     "distribution": {
       "publish_to_git": false
-    },
-    "configs": {
-      "noOverwriteTSConfig": false,
-      "noOverwriteTSTestConfig": false,
-      "noOverwriteLintConfig": false,
-      "noOverwriteGitIgnore": false
-    },
-    "postcss_plugins": "postcss.config.js"
+    }
   }
 }
