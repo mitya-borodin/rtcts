@@ -1,4 +1,4 @@
-import { ILog, ILogType } from "@borodindmitriy/interfaces";
+import { ILog, ILogType, logTypeEnum } from "@borodindmitriy/interfaces";
 import { isString } from "@borodindmitriy/utils";
 
 export class Log implements ILog {
@@ -6,6 +6,9 @@ export class Log implements ILog {
   public readonly message: string;
 
   constructor(data?: { type?: ILogType; message?: string }) {
+    this.type = logTypeEnum.log;
+    this.message = "";
+
     if (data) {
       if (isString(data.type)) {
         this.type = data.type;

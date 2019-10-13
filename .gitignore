@@ -85,6 +85,10 @@ Thumbs.db
 
 # Rearguard Project
 
+dll_bundle
+lib_bundle
+lib
+
 tsconfig.json
 .eslintrc
 src/typings.d.ts

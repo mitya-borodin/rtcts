@@ -7,12 +7,13 @@ import { IUserHTTPTransport } from "../../interfaces/user/IUserHTTPTransport";
 import { IUserRepository } from "../../interfaces/user/IUserRepository";
 import { Repository } from "../repository/Repository";
 
-export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransport<E>> extends Repository<E, T>
+export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransport<E>>
+  extends Repository<E, T>
   implements IUserRepository<E> {
   protected Entity: new (data: any) => E;
 
   @observable
-  private currentUserID: string | void;
+  private currentUserID: string | undefined;
 
   constructor(
     Entity: new (data: any) => E,
@@ -216,12 +217,19 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
         const cur_user: E | void = this.map.get(data.id);
 
         if (cur_user instanceof this.Entity) {
-          const entity: E | void = await this.transport.updateLogin({ ...cur_user.toJS(), ...data });
+          const entity: E | void = await this.transport.updateLogin({
+            ...cur_user.toJS(),
+            ...data,
+          });
 
           if (entity instanceof this.Entity) {
-            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(entity.id, entity));
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
+              this.collection.set(entity.id, entity),
+            );
           } else {
-            throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);
+            throw new Error(
+              `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
+            );
           }
         } else {
           throw new Error("USER_NOT_FOUND");
@@ -247,12 +255,18 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
         const entity = await this.transport.updatePassword(data);
 
         if (entity instanceof this.Entity) {
-          runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(entity.id, entity));
+          runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
+            this.collection.set(entity.id, entity),
+          );
         } else {
-          throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);
+          throw new Error(
+            `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
+          );
         }
       } else {
-        throw new Error(`data failed: { password: ${data.password}, password_confirm: ${data.password_confirm} }`);
+        throw new Error(
+          `data failed: { password: ${data.password}, password_confirm: ${data.password_confirm} }`,
+        );
       }
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ${getErrorMessage(error)} ]`);
@@ -276,7 +290,9 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
             if (user instanceof this.Entity) {
               this.collection.set(user.id, user);
             } else {
-              throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(user)}`);
+              throw new Error(
+                `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(user)}`,
+              );
             }
           }
         });
@@ -300,9 +316,13 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
       const user: E | void = await this.transport.remove(id);
 
       if (user instanceof this.Entity) {
-        runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.delete(user.id));
+        runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
+          this.collection.delete(user.id),
+        );
       } else {
-        throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(user)}`);
+        throw new Error(
+          `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(user)}`,
+        );
       }
     } catch (error) {
       console.error(`[ ${this.constructor.name} ][ REMOVE ][ ${getErrorMessage(error)} ]`);
@@ -365,13 +385,17 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
             this.mediator.emit(userRepositoryEventEnum.LOGIN);
           });
         } else {
-          throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);
+          throw new Error(
+            `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
+          );
         }
       } else {
         throw new Error(`TOKEN_IS_MISSING`);
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ${getErrorMessage(error)} ]`);
+      console.error(
+        `[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ${getErrorMessage(error)} ]`,
+      );
 
       this.destroy();
 

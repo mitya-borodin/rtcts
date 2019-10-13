@@ -1,4 +1,3 @@
-import { IForm } from "@borodindmitriy/interfaces";
 import { EventEmitter } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isString } from "@borodindmitriy/utils";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
@@ -6,7 +5,8 @@ import { ICacheRepository } from "../../interfaces/repository/ICacheRepository";
 
 // tslint:disable: object-literal-sort-keys
 
-export class CacheRepository<T extends { id: string | void }> extends EventEmitter implements ICacheRepository<T> {
+export class CacheRepository<T extends { id: string | void }> extends EventEmitter
+  implements ICacheRepository<T> {
   public static events = {
     update: `[ CacheRepository ][ UPDATE ]`,
     remove: `[ CacheRepository ][ REMOVE ]`,
@@ -23,7 +23,10 @@ export class CacheRepository<T extends { id: string | void }> extends EventEmitt
     this.Entity = Entity;
 
     // ! OBSERVABLE
-    runInAction(`[ ${this.constructor.name} ][ SET_INITIAL_VALUE ]`, () => (this.collection = observable.map()));
+    runInAction(
+      `[ ${this.constructor.name} ][ SET_INITIAL_VALUE ]`,
+      () => (this.collection = observable.map()),
+    );
 
     // * BINDINGS
     this.update = this.update.bind(this);

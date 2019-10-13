@@ -10,6 +10,8 @@ export class Validate extends Log implements IValidate {
   constructor(data?: any) {
     super(data);
 
+    this.field = "";
+
     if (data) {
       if (isString(data.field)) {
         this.field = data.field;
@@ -28,7 +30,9 @@ export class Validate extends Log implements IValidate {
       }
 
       if (isUndefined(this.field)) {
-        throw new Error(`[ ${this.constructor.name} ][ field ][ MUST_BE_A_STRING OR ARRAY OF STRING ]`);
+        throw new Error(
+          `[ ${this.constructor.name} ][ field ][ MUST_BE_A_STRING OR ARRAY OF STRING ]`,
+        );
       }
 
       if (!isUndefined(data.title)) {

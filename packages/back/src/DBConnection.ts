@@ -20,13 +20,10 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
 
   constructor(config: IAppConfig, reconnectTimeOut: number = 2000) {
     super();
-    // DEPS
+
     this.config = config;
-
-    // PROPS
     this.status = Status.CLOSED;
-
-    // BINDS
+    this.pingTimer = setInterval(() => null, 1000 * 1000);
     this.connect = this.connect.bind(this);
   }
 
@@ -37,7 +34,11 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
   public async connect(): Promise<void> {
     if (this.status === Status.CLOSED) {
       console.log("");
-      console.log(chalk.blue.bold(`[ ${this.name} ][ connect ][ TRY: ${this.config.db.url}/${this.config.db.name} ]`));
+      console.log(
+        chalk.blue.bold(
+          `[ ${this.name} ][ connect ][ TRY: ${this.config.db.url}/${this.config.db.name} ]`,
+        ),
+      );
 
       this.status = Status.CONNECTING;
 
@@ -47,12 +48,18 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
         this.status = Status.OPEN;
 
         console.log(
-          chalk.blue.bold(`[ ${this.name} ][ connect ][ ESTABLISHED: ${this.config.db.url}/${this.config.db.name} ]`),
+          chalk.blue.bold(
+            `[ ${this.name} ][ connect ][ ESTABLISHED: ${this.config.db.url}/${
+              this.config.db.name
+            } ]`,
+          ),
         );
 
         // Если ошибок не возникло, то подписывается на события закрытия процесса;
         process.once("beforeExit", async (code) => {
-          console.log(chalk.red.bold(`[ ${this.name} ][ connect ][ BEFORE_EXIT ][ CODE: ${code} ]`));
+          console.log(
+            chalk.red.bold(`[ ${this.name} ][ connect ][ BEFORE_EXIT ][ CODE: ${code} ]`),
+          );
 
           await this.disconnect();
         });
@@ -68,7 +75,11 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
           }
         }, 1000);
       } catch (error) {
-        console.log(chalk.red.bold(`[ ${this.name} ][ connect ][ ERROR ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`));
+        console.log(
+          chalk.red.bold(
+            `[ ${this.name} ][ connect ][ ERROR ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`,
+          ),
+        );
       } finally {
         if (!(this.client instanceof MongoClient)) {
           console.log(chalk.yellow.bold(`[ ${this.name} ][ RECONNECT ][ WILL_THROUGHT: 2500 ms ]`));
@@ -96,13 +107,21 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
         this.DB = undefined;
 
         console.log(
-          chalk.magenta.bold(`[ ${this.name} ][ disconnect ][ CLOSED: ${this.config.db.url}/${this.config.db.name} ]`),
+          chalk.magenta.bold(
+            `[ ${this.name} ][ disconnect ][ CLOSED: ${this.config.db.url}/${
+              this.config.db.name
+            } ]`,
+          ),
         );
       } else {
         console.log(chalk.magenta.bold(`[ ${this.name} ][ disconnect ][ ALREADY_CLOSED ]`));
       }
     } catch (error) {
-      console.log(chalk.red.bold(`[ ${this.name} ][ disconnect ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`));
+      console.log(
+        chalk.red.bold(
+          `[ ${this.name} ][ disconnect ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`,
+        ),
+      );
     } finally {
       if (this.status !== Status.CLOSED) {
         this.status = Status.CLOSED;

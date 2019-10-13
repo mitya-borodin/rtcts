@@ -1,9 +1,0 @@
-{
-  "status": "done",
-  "analyze": {
-    "port": 10000
-  },
-  "last_build_time": "2019-08-09T08:13:49.640Z",
-  "hash_dev": "43e3f97c26da95077a0a",
-  "hash_prod": "9251c26bc0855b3d4763"
-}

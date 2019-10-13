@@ -13,10 +13,9 @@
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
   "version": "4.0.4",
-  "main": "lib/lib_exports.js",
+  "main": "./lib/export.ts",
   "bin": "",
   "files": [
-    "dll_bundle",
     "lib",
     "lib_bundle"
   ],
@@ -33,21 +32,26 @@
     "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
     "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
   },
-  "types": "lib/lib_exports.d.ts",
+  "types": "./lib/export.d.ts",
   "dependencies": {
-    "@borodindmitriy/ant-design-vendor": "1.0.5",
-    "@borodindmitriy/common-vendor": "1.0.6",
+    "@borodindmitriy/ant-design-vendor": "1.0.8",
+    "@borodindmitriy/general-vendor": "1.0.2",
     "@borodindmitriy/interfaces": "3.0.5",
     "@borodindmitriy/isomorphic": "3.0.4",
-    "@borodindmitriy/mobx-vendor": "1.0.6",
-    "@borodindmitriy/react-vendor": "1.0.6",
     "@borodindmitriy/utils": "3.0.4",
     "tslib": "1.10.0"
   },
   "devDependencies": {
     "@types/chai": "4.1.7",
+    "@types/history": "^4.7.3",
+    "@types/hoist-non-react-statics": "^3.3.1",
     "@types/mocha": "5.2.6",
     "@types/node": "11.12.2",
+    "@types/numeral": "0.0.26",
+    "@types/prop-types": "^15.7.3",
+    "@types/react": "^16.9.5",
+    "@types/react-dom": "^16.9.1",
+    "@types/react-helmet": "^5.0.11",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "chai": "4.2.0",

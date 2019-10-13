@@ -13,10 +13,9 @@
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
   "version": "3.0.5",
-  "main": "lib/lib_exports.js",
+  "main": "./lib/export.ts",
   "bin": "",
   "files": [
-    "dll_bundle",
     "lib",
     "lib_bundle"
   ],
@@ -33,6 +32,7 @@
     "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
     "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
   },
+  "types": "./lib/export.d.ts",
   "dependencies": {
     "tslib": "1.10.0"
   },
@@ -83,7 +83,7 @@
       }
     },
     "project": {
-      "runtime": "isomorphic",
+      "runtime": "browser",
       "type": "lib",
       "will_load_on_demand": true
     },

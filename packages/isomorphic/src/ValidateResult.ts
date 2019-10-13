@@ -1,6 +1,5 @@
 import { ILog, IValidate, IValidateResult, logTypeEnum } from "@borodindmitriy/interfaces";
-import { isArray, isObject } from "@borodindmitriy/utils";
-import { isString } from "util";
+import { isArray, isObject, isString } from "@borodindmitriy/utils";
 import { Validate } from "./Validate";
 
 // tslint:disable:object-literal-sort-keys
@@ -17,7 +16,19 @@ export class ValidateResult implements IValidateResult<IValidate> {
 
   private readonly __CACHE__: { [key: string]: any } = {};
 
-  constructor(V: Array<object | IValidate | IValidateResult<IValidate>> | IValidateResult<IValidate>) {
+  constructor(
+    V: Array<object | IValidate | IValidateResult<IValidate>> | IValidateResult<IValidate>,
+  ) {
+    this.results = [];
+    this.isValid = false;
+    this.hasError = false;
+    this.hasWarn = false;
+    this.hasLog = false;
+    this.hasInfo = false;
+
+    this.messages = [];
+    this.log = [];
+
     let hasError = false;
     let hasWarn = false;
     let hasLog = false;
@@ -38,7 +49,9 @@ export class ValidateResult implements IValidateResult<IValidate> {
         } else if (isObject(item)) {
           results.push(new Validate(item));
         } else {
-          throw new Error(`[ ${this.constructor.name} ][ ${JSON.stringify(item)} ][ unexpected item ]`);
+          throw new Error(
+            `[ ${this.constructor.name} ][ ${JSON.stringify(item)} ][ unexpected item ]`,
+          );
         }
       }
     } else if (V instanceof ValidateResult) {

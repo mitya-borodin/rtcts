@@ -1,1 +1,1 @@
-// В этом файле указываются импорты пакетов, которые необходимо вынести в dll;
+// Entry point for collect vendors deps into dll library

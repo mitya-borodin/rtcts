@@ -48,6 +48,9 @@ export class UserService<
   ) {
     super(name, router, Persist, Insert, model, channels, ACL);
 
+    this.model = model;
+    this.ACL = ACL;
+
     this.current();
     this.signIn();
     this.signUp();
@@ -64,13 +67,20 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
+          if (
+            this.ACL.collection.length === 0 ||
+            (req.user && this.ACL.collection.includes(req.user.group))
+          ) {
             let collection: P[] = [];
 
             if (req.user.group === userGroupEnum.admin) {
               collection = await this.model.readAll();
             } else {
-              collection = await this.model.read({}, { projection: { login: 1, group: 1 } }, req.user.id);
+              collection = await this.model.read(
+                {},
+                { projection: { login: 1, group: 1 } },
+                req.user.id,
+              );
             }
 
             res.status(200).json(collection.map((item) => item.toJSSecure()));
@@ -80,7 +90,11 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -102,14 +116,22 @@ export class UserService<
             persist.id === req.user.id ||
             (req.user && this.ACL.update.includes(req.user.group))
           ) {
-            const result: P | null = await this.model.update(persist.toJSSecure(), req.user.id, wsid);
+            const result: P | null = await this.model.update(
+              persist.toJSSecure(),
+              req.user.id,
+              wsid,
+            );
 
             if (result) {
               res.status(200).json(result.toJS());
             } else {
               res
                 .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${req.body.id} ]`);
+                .send(
+                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${
+                    req.body.id
+                  } ]`,
+                );
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -117,7 +139,11 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -135,7 +161,11 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -149,7 +179,10 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.signUp.length === 0 || (req.user && this.ACL.signUp.includes(req.user.group))) {
+          if (
+            this.ACL.signUp.length === 0 ||
+            (req.user && this.ACL.signUp.includes(req.user.group))
+          ) {
             const result: { token: string; user: object } = await this.model.signUp(req.body);
 
             res.status(200).json(result);
@@ -159,7 +192,11 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -178,13 +215,21 @@ export class UserService<
           res
             .status(404)
             .send(
-              `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN_AND_PASSWORD: { login: ${
+              `[ ${
+                this.constructor.name
+              } ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN_AND_PASSWORD: { login: ${
                 req.body.login
               }, password: ${req.body.password} } ]`,
             );
         }
       } catch (error) {
-        res.status(500).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+        res
+          .status(500)
+          .send(
+            `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+              error,
+            )} ]`,
+          );
       }
     });
   }
@@ -197,7 +242,10 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.updateLogin.length === 0 || (req.user && this.ACL.updateLogin.includes(req.user.group))) {
+          if (
+            this.ACL.updateLogin.length === 0 ||
+            (req.user && this.ACL.updateLogin.includes(req.user.group))
+          ) {
             const { wsid, ...data } = req.body;
             const result: P | null = await this.model.updateLogin(data, req.user.id, wsid);
 
@@ -206,7 +254,11 @@ export class UserService<
             } else {
               res
                 .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN: ${data.login} ]`);
+                .send(
+                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN: ${
+                    data.login
+                  } ]`,
+                );
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -214,7 +266,11 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -241,7 +297,13 @@ export class UserService<
             if (result) {
               res.status(200).json(result.toJSSecure());
             } else {
-              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${data.id} ]`);
+              res
+                .status(404)
+                .send(
+                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${
+                    data.id
+                  } ]`,
+                );
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -249,7 +311,11 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -267,13 +333,21 @@ export class UserService<
           const himSelfUpdate = ids.length === 1 && ids[0] === req.user.id;
 
           if (req.user) {
-            if (this.ACL.updateGroup.length === 0 || himSelfUpdate || this.ACL.updateGroup.includes(req.user.group)) {
+            if (
+              this.ACL.updateGroup.length === 0 ||
+              himSelfUpdate ||
+              this.ACL.updateGroup.includes(req.user.group)
+            ) {
               const result: P[] = await this.model.updateGroup(ids, group, req.user.id, wsid);
 
               if (result) {
                 res.status(200).json(result.map((r) => r.toJSSecure()));
               } else {
-                res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`);
+                res
+                  .status(404)
+                  .send(
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`,
+                  );
               }
             } else {
               res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -282,7 +356,11 @@ export class UserService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );

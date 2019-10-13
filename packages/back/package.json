@@ -13,7 +13,7 @@
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
   "version": "3.0.5",
-  "main": "lib/lib_exports.js",
+  "main": "./lib/export.ts",
   "bin": "",
   "files": [
     "lib"
@@ -30,9 +30,8 @@
     "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
     "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
   },
-  "types": "lib/lib_exports.d.ts",
+  "types": "./lib/export.d.ts",
   "dependencies": {
-    "@borodindmitriy/common-vendor": "1.0.6",
     "@borodindmitriy/interfaces": "3.0.5",
     "@borodindmitriy/isomorphic": "3.0.4",
     "@borodindmitriy/utils": "3.0.4",
@@ -55,7 +54,7 @@
     "@types/express": "4.16.1",
     "@types/mocha": "5.2.6",
     "@types/mongodb": "3.1.22",
-    "@types/node": "11.11.4",
+    "@types/node": "12.7.12",
     "@types/passport": "1.0.0",
     "@types/passport-jwt": "3.0.1",
     "@types/uuid": "3.4.4",

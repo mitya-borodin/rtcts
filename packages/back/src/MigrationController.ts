@@ -14,7 +14,7 @@ export class MigrationController implements IMigrationController {
 
   private secret: string;
   private connection: IDBConnection<Db>;
-  private collection: Collection | void;
+  private collection: Collection | undefined;
   private validator: object = {
     $jsonSchema: {
       bsonType: "object",
@@ -76,7 +76,9 @@ export class MigrationController implements IMigrationController {
           const collection = await this.getCollection();
 
           if (collection) {
-            let list = this.migrations.filter((m) => m.name === name).sort((a, b) => (a.version > b.version ? 1 : -1));
+            let list = this.migrations
+              .filter((m) => m.name === name)
+              .sort((a, b) => (a.version > b.version ? 1 : -1));
             let curVersion = 0;
             const curMigration: IMigration | null = await collection.findOne({ name });
 
@@ -199,7 +201,9 @@ export class MigrationController implements IMigrationController {
             );
         }
       } else {
-        res.status(403).send(`[ ACCESS DENYED ] \n` + `[ DATE: ${moment().format("YYYY-MM-DD HH:mm:ss ZZ")} ]`);
+        res
+          .status(403)
+          .send(`[ ACCESS DENYED ] \n` + `[ DATE: ${moment().format("YYYY-MM-DD HH:mm:ss ZZ")} ]`);
       }
     } else {
       res

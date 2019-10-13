@@ -27,7 +27,12 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
   private wasRun: boolean;
   private interval: NodeJS.Timer;
 
-  constructor(Connection: new (data: any) => IConnection, channels: IChannels, config: IAppConfig, user: U) {
+  constructor(
+    Connection: new (data: any) => IConnection,
+    channels: IChannels,
+    config: IAppConfig,
+    user: U,
+  ) {
     this.Connection = Connection;
     this.connections = new Set();
     this.channels = channels;
@@ -35,6 +40,7 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
     this.user = user;
     this.server = new WebSocket.Server({ host: this.config.ws.host, port: this.config.ws.port });
     this.wasRun = false;
+    this.interval = setInterval(() => null, 1000 * 1000);
 
     this.run = this.run.bind(this);
     this.connectionHandler = this.connectionHandler.bind(this);
@@ -44,7 +50,9 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
     try {
       if (!this.wasRun) {
         console.log(
-          chalk.blueBright.bold(`[ WS ][ SERVER ][ RUN ][ ws://${this.config.ws.host}:${this.config.ws.port} ]`),
+          chalk.blueBright.bold(
+            `[ WS ][ SERVER ][ RUN ][ ws://${this.config.ws.host}:${this.config.ws.port} ]`,
+          ),
         );
 
         this.wasRun = true;
@@ -75,8 +83,16 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
               this.connections.delete(connection);
               this.server.clients.delete(connection.ws);
 
-              console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-              console.log(chalk.cyan.bold("[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+              console.log(
+                chalk.cyan.bold(
+                  "[ TERMINATE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size,
+                ),
+              );
+              console.log(
+                chalk.cyan.bold(
+                  "[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size,
+                ),
+              );
             }
           }
         }, 2000);
@@ -94,8 +110,14 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
       this.connections.add(connection);
 
       console.log("");
-      console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-      console.log(chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+      console.log(
+        chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size),
+      );
+      console.log(
+        chalk.cyan.bold(
+          "[ NEW_CONNECTION ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size,
+        ),
+      );
 
       ws.on("message", messageHandler);
 
@@ -111,8 +133,12 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
         console.log(chalk.grey.bold(`[ CLOSE ][ CODE ]: ${code}`));
         console.log(chalk.grey.bold(`[ CLOSE ][ MESSAGE ]: ${message}`));
         console.log(chalk.grey.bold(`[ CLOSE ]${connection.getConnectionID()}`));
-        console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-        console.log(chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+        console.log(
+          chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size),
+        );
+        console.log(
+          chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size),
+        );
       });
 
       ws.on("error", (error) => {
@@ -124,8 +150,12 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
         this.server.clients.delete(connection.ws);
 
         console.log("");
-        console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size));
-        console.log(chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size));
+        console.log(
+          chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size),
+        );
+        console.log(
+          chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size),
+        );
         console.log(chalk.cyan.bold(`[ ERROR ]${connection.getConnectionID()}`));
 
         console.error(error);
@@ -135,7 +165,10 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
     }
   }
 
-  private messageHandler(connection: IConnection, message?: string | Buffer | ArrayBuffer | Buffer[]): void {
+  private messageHandler(
+    connection: IConnection,
+    message?: string | Buffer | ArrayBuffer | Buffer[],
+  ): void {
     try {
       if (!isUndefined(message)) {
         if (isString(message)) {
@@ -182,31 +215,44 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
                       }
                     } else {
                       connection.send(
-                        this.makeErrorMessage(`[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`, {
-                          channelName,
-                          payload,
-                        }),
+                        this.makeErrorMessage(
+                          `[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`,
+                          {
+                            channelName,
+                            payload,
+                          },
+                        ),
                       );
                     }
                   })
                   .catch((error: any) => {
                     connection.send(
-                      this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${getErrorMessage(error)}`, { error, payload }),
+                      this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${getErrorMessage(error)}`, {
+                        error,
+                        payload,
+                      }),
                     );
                   });
               } else {
                 connection.send(
-                  this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, { channelName, payload }),
+                  this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, {
+                    channelName,
+                    payload,
+                  }),
                 );
               }
             } else {
               console.log("");
-              console.log(chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`));
+              console.log(
+                chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`),
+              );
             }
           } else {
             console.log("");
             console.log(
-              chalk.redBright(`[ MESSAGE_HANDLING ][ RECIEVE_DATA ] must be [ String, { [ key: string ]: any } ]`),
+              chalk.redBright(
+                `[ MESSAGE_HANDLING ][ RECIEVE_DATA ] must be [ String, { [ key: string ]: any } ]`,
+              ),
             );
           }
         } else {
