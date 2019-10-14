@@ -13,7 +13,7 @@
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
   "version": "3.0.5",
-  "main": "./lib/export.ts",
+  "main": "./lib/export.js",
   "bin": "",
   "files": [
     "lib",
@@ -41,6 +41,7 @@
     "@typescript-eslint/parser": "^2.3.3",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-react": "^7.16.0",
     "husky": "^3.0.9",
     "prettier": "^1.18.2",
     "pretty-quick": "^2.0.0",

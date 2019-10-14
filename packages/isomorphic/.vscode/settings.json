@@ -11,7 +11,7 @@
 
   "files.autoSave": "afterDelay",
 
-  "workbench.colorTheme": "Nord",
+  "workbench.colorTheme": "Darcula - WebStorm Edition",
   "workbench.iconTheme": "vscode-icons",
   "workbench.editor.revealIfOpen": true,
 
@@ -28,10 +28,17 @@
   "eslint.alwaysShowStatus": true,
   "eslint.autoFixOnSave": true,
   "eslint.enable": true,
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    { "language": "typescript", "autoFix": true },
+    { "language": "typescriptreact", "autoFix": true }
+  ],
   "eslint.packageManager": "npm",
   "eslint.workingDirectories": ["src", "bin", "tests"],
 
-  "cSpell.words": [],
-  "cSpell.language": "en, ru"
+  "cSpell.words": ["borodindmitriy"],
+  "cSpell.language": "en, ru",
+
+  "terminal.integrated.rendererType": "canvas"
 }
