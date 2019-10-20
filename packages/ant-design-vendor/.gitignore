@@ -89,12 +89,7 @@ dll_bundle
 lib_bundle
 lib
 
-tsconfig.json
-.eslintrc
 src/typings.d.ts
 .rearguardrc
-.npmrc
-.dockerignore
-.editorconfig
 examples
 list_for_load_on_demand.ts

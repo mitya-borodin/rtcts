@@ -1,7 +1,7 @@
 import { isString } from "@borodindmitriy/utils";
 import * as bodyParser from "body-parser";
 import chalk from "chalk";
-import * as express from "express";
+import express from "express";
 import * as http from "http";
 import { AddressInfo } from "net";
 import * as passport from "passport";
@@ -15,7 +15,11 @@ export class APPServer<C extends IAppConfig = IAppConfig, STR extends IAuthStrat
   private config: C;
   private authStrategy: STR;
   private app: express.Application;
-  private WSMidelware: (req: express.Request, res: express.Response, next: express.NextFunction) => void;
+  private WSMidelware: (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => void;
   private migrationRouter: express.Router;
   private services: (app: express.Application) => void;
   private server: http.Server;
@@ -65,7 +69,9 @@ export class APPServer<C extends IAppConfig = IAppConfig, STR extends IAuthStrat
                 if (!isString(addressInfo) && addressInfo !== null) {
                   console.log(
                     chalk.blueBright.bold(
-                      `[ APP ][ SERVER ][ RUN ][ http://${addressInfo.address}:${addressInfo.port} ]`,
+                      `[ APP ][ SERVER ][ RUN ][ http://${addressInfo.address}:${
+                        addressInfo.port
+                      } ]`,
                     ),
                   );
                 }

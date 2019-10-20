@@ -1,5 +1,6 @@
 dll_bundle
 lib_bundle
 lib
+dist
 src/typings.d.ts
 examples

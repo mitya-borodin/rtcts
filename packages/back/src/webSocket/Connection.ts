@@ -1,6 +1,6 @@
 import { isString } from "@borodindmitriy/utils";
 import chalk from "chalk";
-import * as uuid from "uuid/v1";
+import uuid from "uuid/v1";
 import * as WebSocket from "ws";
 import { IConnection } from "../interfaces/IConnection";
 
@@ -36,7 +36,9 @@ export class Connection implements IConnection {
       }
 
       console.log("");
-      console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ GET_CONNECTION_ID ][ UID_IS_NOT_DEFINED ]`));
+      console.error(
+        chalk.redBright(`[ CONNECTION ][ ERROR ][ GET_CONNECTION_ID ][ UID_IS_NOT_DEFINED ]`),
+      );
 
       return "";
     } catch (error) {

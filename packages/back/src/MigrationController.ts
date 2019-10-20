@@ -1,7 +1,7 @@
 import { getErrorMessage, isNumber } from "@borodindmitriy/utils";
 import * as bodyParser from "body-parser";
 import * as express from "express";
-import * as moment from "moment";
+import moment from "moment";
 import { Collection, Db } from "mongodb";
 import { IDBConnection } from "./interfaces/IDBConnection";
 import { IMigration } from "./interfaces/IMigration";
