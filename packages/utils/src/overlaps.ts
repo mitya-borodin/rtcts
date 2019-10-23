@@ -9,7 +9,13 @@ export function overlaps(
   a_includeLeftBoundary?: boolean,
   a_includeRightBoundary?: boolean,
 ): boolean;
-export function overlaps(x_0: Moment, x_1: Moment, y_0: Moment, y_1: Moment, a_includeBoundary?: boolean): boolean {
+export function overlaps(
+  x_0: Moment,
+  x_1: Moment,
+  y_0: Moment,
+  y_1: Moment,
+  a_includeBoundary?: boolean,
+): boolean {
   let includeBoundary: boolean = false;
   let includeLeftBoundary: boolean = false;
   let includeRightBoundary: boolean = false;
