@@ -1,0 +1,29 @@
+{
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "react"],
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "eslint-config-prettier"
+  ],
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-use-before-define": "warn",
+    "no-console": "off",
+    "variable-name": "off",
+    "object-literal-sort-keys": "off",
+    "@typescript-eslint/interface-name-prefix": "warn",
+    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-unused-expressions": "error",
+    "no-underscore-dangle": ["warn", { "enforceInMethodNames": true }],
+    "react/display-name": "warn",
+    "react/prop-types": "off"
+  }
+}

@@ -21,6 +21,7 @@
   ],
   "scripts": {
     "start": "npx rearguard start",
+    "start:ts_node_dev": "npx rearguard start --ts_node_dev",
     "build": "npx rearguard build",
     "test": "npx rearguard test",
     "sync": "npx rearguard sync",
