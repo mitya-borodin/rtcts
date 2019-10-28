@@ -4,7 +4,7 @@ import chalk from "chalk";
 import express from "express";
 import * as http from "http";
 import { AddressInfo } from "net";
-import * as passport from "passport";
+import passport from "passport";
 import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAPPServer } from "./interfaces/IAPPServer";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";

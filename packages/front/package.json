@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "4.0.4",
+  "version": "4.0.6",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -34,12 +34,11 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@borodindmitriy/ant-design-vendor": "1.0.8",
-    "@borodindmitriy/general-vendor": "1.0.2",
-    "@borodindmitriy/interfaces": "3.0.5",
-    "@borodindmitriy/isomorphic": "3.0.4",
-    "@borodindmitriy/utils": "3.0.4",
-    "tslib": "1.10.0"
+    "@borodindmitriy/general-vendor": "^1.0.7",
+    "@borodindmitriy/interfaces": "^3.0.6",
+    "@borodindmitriy/isomorphic": "^3.0.5",
+    "@borodindmitriy/utils": "^3.0.5",
+    "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@types/chai": "4.1.7",

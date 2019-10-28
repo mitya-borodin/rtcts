@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "3.0.5",
+  "version": "3.0.6",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -35,7 +35,7 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "tslib": "1.10.0"
+    "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.3.3",

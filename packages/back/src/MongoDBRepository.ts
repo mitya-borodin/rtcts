@@ -19,7 +19,8 @@ import {
 import { IDBConnection } from "./interfaces/IDBConnection";
 import { IRepository } from "./interfaces/IRepository";
 
-export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<Db>> implements IRepository<T> {
+export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<Db>>
+  implements IRepository<T> {
   private readonly name: string;
   private readonly db: DBC;
   private readonly options?: CollectionCreateOptions;
@@ -99,7 +100,7 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
   public async insertMany(docs: object[], options?: CollectionInsertManyOptions): Promise<T[]> {
     try {
       const collection: Collection<T> = await this.getCollection();
-      const insert: InsertWriteOpResult = await collection.insertMany(docs as any, options);
+      const insert: InsertWriteOpResult<any> = await collection.insertMany(docs as any, options);
 
       return insert.ops.map((data: any) => this.prepareId(data));
     } catch (error) {
@@ -112,7 +113,7 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
   public async insertOne(doc: object, options?: CollectionInsertOneOptions): Promise<T> {
     try {
       const collection: Collection<T> = await this.getCollection();
-      const insert: InsertOneWriteOpResult = await collection.insertOne(doc as any, options);
+      const insert: InsertOneWriteOpResult<any> = await collection.insertOne(doc as any, options);
 
       return insert.ops.map((data: any) => this.prepareId(data))[0];
     } catch (error) {
@@ -128,7 +129,10 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
 
       if (options) {
         const $project = { _id: true, ...options.projection };
-        const cursor: AggregationCursor = collection.aggregate([{ $match: this.prepareObjectId(query) }, { $project }]);
+        const cursor: AggregationCursor = collection.aggregate([
+          { $match: this.prepareObjectId(query) },
+          { $project },
+        ]);
 
         const items = await cursor.toArray();
 
@@ -173,7 +177,11 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
-  public async findOneAndUpdate(query: object, update: object, options?: FindOneAndReplaceOption): Promise<T | null> {
+  public async findOneAndUpdate(
+    query: object,
+    update: object,
+    options?: FindOneAndReplaceOption,
+  ): Promise<T | null> {
     try {
       const collection: Collection<T> = await this.getCollection();
       const result: FindAndModifyWriteOpResultObject = await collection.findOneAndUpdate(
@@ -194,7 +202,10 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
-  public async findOneAndRemove(query: object, options?: { projection?: object; sort?: object }): Promise<T | null> {
+  public async findOneAndRemove(
+    query: object,
+    options?: { projection?: object; sort?: object },
+  ): Promise<T | null> {
     try {
       const collection: Collection<T> = await this.getCollection();
       const result: FindAndModifyWriteOpResultObject = await collection.findOneAndDelete(
@@ -214,7 +225,10 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
-  public async findByIdAndRemove(id: string, options?: { projection?: object; sort?: object }): Promise<T | null> {
+  public async findByIdAndRemove(
+    id: string,
+    options?: { projection?: object; sort?: object },
+  ): Promise<T | null> {
     try {
       return await this.findOneAndRemove({ _id: new ObjectId(id) }, options);
     } catch (error) {
@@ -224,7 +238,11 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
-  public async updateOne(query: object, update: object, options?: ReplaceOneOptions): Promise<void> {
+  public async updateOne(
+    query: object,
+    update: object,
+    options?: ReplaceOneOptions,
+  ): Promise<void> {
     try {
       const collection: Collection<T> = await this.getCollection();
 
@@ -236,7 +254,11 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
-  public async updateMany(query: object, update: object, options?: ReplaceOneOptions): Promise<void> {
+  public async updateMany(
+    query: object,
+    update: object,
+    options?: ReplaceOneOptions,
+  ): Promise<void> {
     try {
       const collection: Collection<T> = await this.getCollection();
 

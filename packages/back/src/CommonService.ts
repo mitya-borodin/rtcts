@@ -1,9 +1,10 @@
 import { IEntity } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
-import * as passport from "passport";
+import passport from "passport";
 import { IChannels } from "./interfaces/IChannels";
 import { ICommonModel } from "./interfaces/ICommonModel";
+import { User } from "@borodindmitriy/isomorphic";
 
 export class CommonService<
   P extends IEntity,
@@ -53,7 +54,11 @@ export class CommonService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.read.length === 0 || (req.user && this.ACL.read.includes(req.user.group))) {
+          const user = req.user;
+          if (
+            this.ACL.read.length === 0 ||
+            (user instanceof User && this.ACL.read.includes(user.group))
+          ) {
             const result: P | null = await this.model.read();
 
             if (result) {
@@ -67,7 +72,11 @@ export class CommonService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -81,14 +90,21 @@ export class CommonService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.update.length === 0 || (req.user && this.ACL.update.includes(req.user.group))) {
+          const user = req.user;
+
+          if (
+            user instanceof User &&
+            (this.ACL.update.length === 0 || this.ACL.update.includes(user.group))
+          ) {
             const { wsid, ...data } = req.body;
-            const result: P | null = await this.model.update(data, req.user.id, wsid);
+            const result: P | null = await this.model.update(data, user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJS());
             } else {
-              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND ]`);
+              res
+                .status(404)
+                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND ]`);
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -97,7 +113,11 @@ export class CommonService<
           console.error(error);
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -111,19 +131,28 @@ export class CommonService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.channel.length === 0 || (req.user && this.ACL.channel.includes(req.user.group))) {
+          const user = req.user;
+
+          if (
+            user instanceof User &&
+            (this.ACL.update.length === 0 || this.ACL.update.includes(user.group))
+          ) {
             const { action, channelName, wsid } = req.body;
 
             if (action === "on") {
-              this.channels.on(channelName, req.user.id, wsid);
+              this.channels.on(channelName, user.id, wsid);
 
               res.status(200).json({});
             } else if (action === "off") {
-              this.channels.off(channelName, req.user.id, wsid);
+              this.channels.off(channelName, user.id, wsid);
 
               res.status(200).json({});
             } else {
-              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ UNEXPECTED_ACTION: ${action} ]`);
+              res
+                .status(404)
+                .send(
+                  `[ ${this.constructor.name} ][ URL: ${URL} ][ UNEXPECTED_ACTION: ${action} ]`,
+                );
             }
           } else {
             res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
@@ -131,7 +160,11 @@ export class CommonService<
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );

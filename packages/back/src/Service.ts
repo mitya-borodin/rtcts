@@ -1,9 +1,10 @@
 import { IEntity, IInsert } from "@borodindmitriy/interfaces";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
-import * as passport from "passport";
+import passport from "passport";
 import { IChannels } from "./interfaces/IChannels";
 import { IModel } from "./interfaces/IModel";
+import { User } from "@borodindmitriy/isomorphic";
 
 export class Service<
   M extends IModel<P>,
@@ -67,17 +68,25 @@ export class Service<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.collection.length === 0 || (req.user && this.ACL.collection.includes(req.user.group))) {
-            const collection = await this.model.read({});
+          const user = req.user;
 
-            res.status(200).json(collection.map((item) => item.toJS()));
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
+          if (user instanceof User) {
+            if (this.ACL.collection.length === 0 || this.ACL.collection.includes(user.group)) {
+              const collection = await this.model.read({});
+
+              res.status(200).json(collection.map((item) => item.toJS()));
+            } else {
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
+            }
           }
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -91,23 +100,35 @@ export class Service<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.read.length === 0 || (req.user && this.ACL.read.includes(req.user.group))) {
-            const result: P | null = await this.model.readById(req.query.id);
+          const user = req.user;
 
-            if (result) {
-              res.status(200).json(result.toJS());
+          if (user instanceof User) {
+            if (this.ACL.read.length === 0 || this.ACL.read.includes(user.group)) {
+              const result: P | null = await this.model.readById(req.query.id);
+
+              if (result) {
+                res.status(200).json(result.toJS());
+              } else {
+                res
+                  .status(404)
+                  .send(
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${
+                      req.query.id
+                    } ]`,
+                  );
+              }
             } else {
-              res
-                .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.query.id} ]`);
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -121,24 +142,32 @@ export class Service<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.create.length === 0 || (req.user && this.ACL.create.includes(req.user.group))) {
-            const { wsid, ...data } = req.body;
-            const insert = new this.Insert(data);
-            const result = await this.model.create(insert.toJS(), req.user.id, wsid);
+          const user = req.user;
 
-            if (result) {
-              res.status(200).json(result.toJS());
+          if (user instanceof User) {
+            if (this.ACL.create.length === 0 || this.ACL.create.includes(user.group)) {
+              const { wsid, ...data } = req.body;
+              const insert = new this.Insert(data);
+              const result = await this.model.create(insert.toJS(), user.id, wsid);
+
+              if (result) {
+                res.status(200).json(result.toJS());
+              } else {
+                throw new Error("MODEL_DOES_NOT_CREATED");
+              }
             } else {
-              throw new Error("MODEL_DOES_NOT_CREATED");
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
           console.error(error);
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -152,26 +181,38 @@ export class Service<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.update.length === 0 || (req.user && this.ACL.update.includes(req.user.group))) {
-            const { wsid, ...data } = req.body;
-            const persist = new this.Persist(data);
-            const result: P | null = await this.model.update(persist.toJS(), req.user.id, wsid);
+          const user = req.user;
 
-            if (result) {
-              res.status(200).json(result.toJS());
+          if (user instanceof User) {
+            if (this.ACL.update.length === 0 || this.ACL.update.includes(user.group)) {
+              const { wsid, ...data } = req.body;
+              const persist = new this.Persist(data);
+              const result: P | null = await this.model.update(persist.toJS(), user.id, wsid);
+
+              if (result) {
+                res.status(200).json(result.toJS());
+              } else {
+                res
+                  .status(404)
+                  .send(
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${
+                      req.body.id
+                    } ]`,
+                  );
+              }
             } else {
-              res
-                .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
           console.error(error);
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -185,24 +226,36 @@ export class Service<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.remove.length === 0 || (req.user && this.ACL.remove.includes(req.user.group))) {
-            const { wsid, id } = req.body;
-            const result: P | null = await this.model.remove(id, req.user.id, wsid);
+          const user = req.user;
 
-            if (result) {
-              res.status(200).json(result.toJS());
+          if (user instanceof User) {
+            if (this.ACL.remove.length === 0 || this.ACL.remove.includes(user.group)) {
+              const { wsid, id } = req.body;
+              const result: P | null = await this.model.remove(id, user.id, wsid);
+
+              if (result) {
+                res.status(200).json(result.toJS());
+              } else {
+                res
+                  .status(404)
+                  .send(
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${
+                      req.body.id
+                    } ]`,
+                  );
+              }
             } else {
-              res
-                .status(404)
-                .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`);
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );
@@ -216,27 +269,39 @@ export class Service<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          if (this.ACL.channel.length === 0 || (req.user && this.ACL.channel.includes(req.user.group))) {
-            const { action, channelName, wsid } = req.body;
+          const user = req.user;
 
-            if (action === "on") {
-              this.channels.on(channelName, req.user.id, wsid);
+          if (user instanceof User) {
+            if (this.ACL.channel.length === 0 || this.ACL.channel.includes(user.group)) {
+              const { action, channelName, wsid } = req.body;
 
-              res.status(200).json({});
-            } else if (action === "off") {
-              this.channels.off(channelName, req.user.id, wsid);
+              if (action === "on") {
+                this.channels.on(channelName, user.id, wsid);
 
-              res.status(200).json({});
+                res.status(200).json({});
+              } else if (action === "off") {
+                this.channels.off(channelName, user.id, wsid);
+
+                res.status(200).json({});
+              } else {
+                res
+                  .status(404)
+                  .send(
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ UNEXPECTED_ACTION: ${action} ]`,
+                  );
+              }
             } else {
-              res.status(404).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ UNEXPECTED_ACTION: ${action} ]`);
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
           res
             .status(500)
-            .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+            .send(
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ ERROR_MESSAGE: ${getErrorMessage(
+                error,
+              )} ]`,
+            );
         }
       },
     );

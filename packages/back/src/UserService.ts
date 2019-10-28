@@ -1,7 +1,8 @@
 import { IEntity, IUser, userGroupEnum } from "@borodindmitriy/interfaces";
+import { User } from "@borodindmitriy/isomorphic";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import * as express from "express";
-import * as passport from "passport";
+import passport from "passport";
 import { IChannels } from "./interfaces/IChannels";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Service } from "./Service";
@@ -67,19 +68,21 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
+          const user = req.user;
+
           if (
-            this.ACL.collection.length === 0 ||
-            (req.user && this.ACL.collection.includes(req.user.group))
+            user instanceof User &&
+            (this.ACL.update.length === 0 || this.ACL.update.includes(user.group))
           ) {
             let collection: P[] = [];
 
-            if (req.user.group === userGroupEnum.admin) {
+            if (user.group === userGroupEnum.admin) {
               collection = await this.model.readAll();
             } else {
               collection = await this.model.read(
                 {},
                 { projection: { login: 1, group: 1 } },
-                req.user.id,
+                user.id,
               );
             }
 
@@ -111,16 +114,15 @@ export class UserService<
           const { wsid, ...data } = req.body;
           const persist = new this.Persist(data);
 
+          const user = req.user;
+
           if (
-            this.ACL.update.length === 0 ||
-            persist.id === req.user.id ||
-            (req.user && this.ACL.update.includes(req.user.group))
+            user instanceof User &&
+            (persist.id === user.id ||
+              this.ACL.update.length === 0 ||
+              this.ACL.update.includes(user.group))
           ) {
-            const result: P | null = await this.model.update(
-              persist.toJSSecure(),
-              req.user.id,
-              wsid,
-            );
+            const result: P | null = await this.model.update(persist.toJSSecure(), user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJS());
@@ -179,9 +181,11 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
+          const user = req.user;
+
           if (
-            this.ACL.signUp.length === 0 ||
-            (req.user && this.ACL.signUp.includes(req.user.group))
+            user instanceof User &&
+            (this.ACL.update.length === 0 || this.ACL.update.includes(user.group))
           ) {
             const result: { token: string; user: object } = await this.model.signUp(req.body);
 
@@ -242,12 +246,14 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
+          const user = req.user;
+
           if (
-            this.ACL.updateLogin.length === 0 ||
-            (req.user && this.ACL.updateLogin.includes(req.user.group))
+            user instanceof User &&
+            (this.ACL.update.length === 0 || this.ACL.update.includes(user.group))
           ) {
             const { wsid, ...data } = req.body;
-            const result: P | null = await this.model.updateLogin(data, req.user.id, wsid);
+            const result: P | null = await this.model.updateLogin(data, user.id, wsid);
 
             if (result) {
               res.status(200).json(result.toJSSecure());
@@ -284,29 +290,33 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          const { wsid, ...data } = req.body;
-          const himSelfUpdate = data.id === req.user.id;
+          const user = req.user;
 
-          if (
-            himSelfUpdate ||
-            this.ACL.updatePassword.length === 0 ||
-            (req.user && this.ACL.updatePassword.includes(req.user.group))
-          ) {
-            const result: P | null = await this.model.updatePassword(data, req.user.id, wsid);
+          if (user instanceof User) {
+            const { wsid, ...data } = req.body;
+            const himSelfUpdate = data.id === user.id;
 
-            if (result) {
-              res.status(200).json(result.toJSSecure());
+            if (
+              himSelfUpdate ||
+              this.ACL.updatePassword.length === 0 ||
+              this.ACL.updatePassword.includes(user.group)
+            ) {
+              const result: P | null = await this.model.updatePassword(data, user.id, wsid);
+
+              if (result) {
+                res.status(200).json(result.toJSSecure());
+              } else {
+                res
+                  .status(404)
+                  .send(
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${
+                      data.id
+                    } ]`,
+                  );
+              }
             } else {
-              res
-                .status(404)
-                .send(
-                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${
-                    data.id
-                  } ]`,
-                );
+              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
-          } else {
-            res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
           }
         } catch (error) {
           res
@@ -329,28 +339,36 @@ export class UserService<
       passport.authenticate("jwt", { session: false }),
       async (req: express.Request, res: express.Response) => {
         try {
-          const { ids, group, wsid } = req.body;
-          const himSelfUpdate = ids.length === 1 && ids[0] === req.user.id;
+          const user = req.user;
 
-          if (req.user) {
-            if (
-              this.ACL.updateGroup.length === 0 ||
-              himSelfUpdate ||
-              this.ACL.updateGroup.includes(req.user.group)
-            ) {
-              const result: P[] = await this.model.updateGroup(ids, group, req.user.id, wsid);
+          if (user instanceof User) {
+            const { ids, group, wsid } = req.body;
+            const himSelfUpdate = ids.length === 1 && ids[0] === user.id;
 
-              if (result) {
-                res.status(200).json(result.map((r) => r.toJSSecure()));
+            if (req.user) {
+              if (
+                this.ACL.updateGroup.length === 0 ||
+                himSelfUpdate ||
+                this.ACL.updateGroup.includes(user.group)
+              ) {
+                const result: P[] = await this.model.updateGroup(ids, group, user.id, wsid);
+
+                if (result) {
+                  res.status(200).json(result.map((r) => r.toJSSecure()));
+                } else {
+                  res
+                    .status(404)
+                    .send(
+                      `[ ${
+                        this.constructor.name
+                      } ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`,
+                    );
+                }
               } else {
                 res
-                  .status(404)
-                  .send(
-                    `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`,
-                  );
+                  .status(403)
+                  .send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
               }
-            } else {
-              res.status(403).send(`[ ${this.constructor.name} ][ URL: ${URL} ][ ACCESS_DENIED ]`);
             }
           }
         } catch (error) {
