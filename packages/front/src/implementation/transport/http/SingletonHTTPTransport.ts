@@ -3,9 +3,11 @@ import { ISingletonHTTPTransport } from "../../../interfaces/transport/http/ISin
 import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
 import { HTTPTransport } from "./HTTPTransport";
 
-export class SingletonHTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
-  extends HTTPTransport<T, WS, ME>
-  implements ISingletonHTTPTransport<T> {
+export class SingletonHTTPTransport<
+  T,
+  WS extends IWSClient = IWSClient,
+  ME extends IMediator = IMediator
+> extends HTTPTransport<T, WS, ME> implements ISingletonHTTPTransport<T> {
   public readonly ACL: {
     read: string[];
     update: string[];

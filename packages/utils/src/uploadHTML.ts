@@ -1,12 +1,5 @@
-export function uploadHTML(
-  title: string,
-  body: string,
-  css: string[],
-  fileName: string,
-): void {
-  const styles = css
-    .map((style) => `<style type="text/css">${style}</style>`)
-    .join("\n\r");
+export function uploadHTML(title: string, body: string, css: string[], fileName: string): void {
+  const styles = css.map((style) => `<style type="text/css">${style}</style>`).join("\n\r");
 
   const html = `
       <!DOCTYPE html>

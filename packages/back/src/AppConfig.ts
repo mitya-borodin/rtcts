@@ -26,7 +26,10 @@ export class AppConfig implements IAppConfig {
     if (process.env.NODE_ENV !== "production") {
       console.log("");
       console.log(chalk.cyan.bold("[ APP_CONFIG ]"));
-      console.log(chalk.cyan.bold("production:    "), chalk.cyan(`${process.env.NODE_ENV === "production"}`));
+      console.log(
+        chalk.cyan.bold("production:    "),
+        chalk.cyan(`${process.env.NODE_ENV === "production"}`),
+      );
       console.log(chalk.cyan.bold("jwt.secret_key:"), chalk.cyan(`${process.env.JWT_SECRET_KEY}`));
       console.log(chalk.cyan.bold("db.name:       "), chalk.cyan(`${process.env.DB}`));
       console.log(chalk.cyan.bold("db.name:       "), chalk.cyan(`${process.env.DB_URL}`));

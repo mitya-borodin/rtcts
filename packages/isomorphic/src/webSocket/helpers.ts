@@ -17,7 +17,9 @@ export const recognizeMessage = (message: string): [string, { [key: string]: any
 
       return data;
     } else {
-      throw new Error("Message should include Array [channelName: string, payload: { [key: string]: any }]");
+      throw new Error(
+        "Message should include Array [channelName: string, payload: { [key: string]: any }]",
+      );
     }
   } catch (error) {
     return makeErrorMessage(getErrorMessage(error), { error, receive_message: message });
@@ -35,6 +37,9 @@ export const makeMessage = (channelName: string, payload: { [key: string]: any }
   return JSON.stringify([channelName, payload]);
 };
 
-export const makeErrorMessage = (message: string, payload: any): [string, { [key: string]: any }] => {
+export const makeErrorMessage = (
+  message: string,
+  payload: any,
+): [string, { [key: string]: any }] => {
   return [ErrorChannel, { message: `[ ERROR ] ${message}`, payload }];
 };

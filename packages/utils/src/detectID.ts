@@ -9,9 +9,7 @@ export function detectID(data?: any): string {
     } else if (data._id && data._id.toHexString) {
       return data._id.toHexString();
     } else {
-      throw new Error(
-        `[ detectID ][ id | _id ] must be a not empty string | ObjectId;`,
-      );
+      throw new Error(`[ detectID ][ id | _id ] must be a not empty string | ObjectId;`);
     }
   }
 

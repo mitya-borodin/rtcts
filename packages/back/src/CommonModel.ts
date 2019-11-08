@@ -5,12 +5,20 @@ import { ICommonModel } from "./interfaces/ICommonModel";
 import { IRepository } from "./interfaces/IRepository";
 import { toMongo } from "./toMongo";
 
-export class CommonModel<P extends IEntity, I extends IInsert, R extends IRepository<P> = IRepository<P>>
-  implements ICommonModel<P> {
+export class CommonModel<
+  P extends IEntity,
+  I extends IInsert,
+  R extends IRepository<P> = IRepository<P>
+> implements ICommonModel<P> {
   protected readonly repository: R;
   protected readonly Persist: new (data?: any) => P;
   protected readonly Insert: new (data?: any) => I;
-  protected readonly send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void;
+  protected readonly send: (
+    payload: object,
+    uid: string,
+    wsid: string,
+    excludeCurrentDevice?: boolean,
+  ) => void;
 
   constructor(
     repository: R,

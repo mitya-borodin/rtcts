@@ -76,7 +76,10 @@ export class UserHTTPTransport<
 
   public async signUp(data: object): Promise<{ token: string; user: object } | void> {
     try {
-      const output: { token: string; user: object } | void = await this.post(`/${this.name}/signUp`, data);
+      const output: { token: string; user: object } | void = await this.post(
+        `/${this.name}/signUp`,
+        data,
+      );
 
       if (output) {
         return output;
@@ -123,7 +126,10 @@ export class UserHTTPTransport<
   public async updateGroup(ids: string[], group: string): Promise<U[] | void> {
     try {
       if (this.ACL.updateGroup.includes(this.group)) {
-        const output: object[] | void = await this.post(`/${this.name}/updateGroup`, { ids, group });
+        const output: object[] | void = await this.post(`/${this.name}/updateGroup`, {
+          ids,
+          group,
+        });
 
         if (output) {
           return output.map((item) => new this.Class(item));

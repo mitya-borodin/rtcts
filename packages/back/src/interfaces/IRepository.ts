@@ -29,15 +29,25 @@ export interface IRepository<T> {
 
   findById(id: string, options?: FindOneOptions): Promise<T | null>;
 
-  findOneAndUpdate(query: object, update: object, options?: FindOneAndReplaceOption): Promise<T | null>;
+  findOneAndUpdate(
+    query: object,
+    update: object,
+    options?: FindOneAndReplaceOption,
+  ): Promise<T | null>;
 
   deleteOne(query: object, options?: CommonOptions): Promise<void>;
 
   deleteMany(query: object, options?: CommonOptions): Promise<void>;
 
-  findOneAndRemove(query: object, options?: { projection?: object; sort?: object }): Promise<T | null>;
+  findOneAndRemove(
+    query: object,
+    options?: { projection?: object; sort?: object },
+  ): Promise<T | null>;
 
-  findByIdAndRemove(id: string, options?: { projection?: object; sort?: object }): Promise<T | null>;
+  findByIdAndRemove(
+    id: string,
+    options?: { projection?: object; sort?: object },
+  ): Promise<T | null>;
 
   prepareId(data: any): T;
 }

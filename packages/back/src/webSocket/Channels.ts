@@ -26,10 +26,16 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
 
         console.log("");
         console.log(chalk.yellow(`[ CHANNELS ][ ADD_CONNECTION ]${id}`));
-        console.log(chalk.yellow(`[ CHANNELS ][ ADD_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`));
+        console.log(
+          chalk.yellow(
+            `[ CHANNELS ][ ADD_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`,
+          ),
+        );
       } else {
         console.log("");
-        console.log(chalk.redBright(`[ CHANNELS ][ ADD_CONNECTION ][ ERROR ][ ALLREADY_EXIST ] ${id}`));
+        console.log(
+          chalk.redBright(`[ CHANNELS ][ ADD_CONNECTION ][ ERROR ][ ALLREADY_EXIST ] ${id}`),
+        );
       }
     } catch (error) {
       console.error(error);
@@ -51,11 +57,15 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
         console.log("");
         console.log(chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ]${id}`));
         console.log(
-          chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`),
+          chalk.redBright(
+            `[ CHANNELS ][ DELETE_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`,
+          ),
         );
       } else {
         console.log("");
-        console.log(chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ][ ERROR ][ NOT_FOUND ] ${id}`));
+        console.log(
+          chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ][ ERROR ][ NOT_FOUND ] ${id}`),
+        );
       }
     } catch (error) {
       console.error(error);
@@ -76,7 +86,9 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
 
             console.log("");
             console.log(
-              chalk.yellow.bold(`[ CHANNELS ][ DONE_ON ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`),
+              chalk.yellow.bold(
+                `[ CHANNELS ][ DONE_ON ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`,
+              ),
             );
           }
         }
@@ -91,7 +103,9 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
 
             console.log("");
             console.log(
-              chalk.yellow.bold(`[ CHANNELS ][ ADD_CHANNEL ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`),
+              chalk.yellow.bold(
+                `[ CHANNELS ][ ADD_CHANNEL ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`,
+              ),
             );
           }
         }
@@ -110,7 +124,11 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
           channel.delete(Connection.getConnectionID(uid, wsid));
 
           console.log("");
-          console.log(chalk.red.bold(`[ CHANNELS ][ DONE_OFF ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`));
+          console.log(
+            chalk.red.bold(
+              `[ CHANNELS ][ DONE_OFF ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`,
+            ),
+          );
         }
       } else {
         console.log("");

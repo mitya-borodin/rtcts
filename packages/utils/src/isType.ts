@@ -33,6 +33,7 @@ export function isDate<T = Date>(test: any): test is T {
 
 export function isArray<T>(test: any): test is T[] {
   return (
-    Object.prototype.toString.call(test) === "[object Array]" || (test && isNumber(test.length) && isFunction(test.map))
+    Object.prototype.toString.call(test) === "[object Array]" ||
+    (test && isNumber(test.length) && isFunction(test.map))
   );
 }

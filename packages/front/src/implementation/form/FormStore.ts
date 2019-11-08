@@ -4,7 +4,8 @@ import { getErrorMessage, isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
 import { IFormStore } from "../../interfaces/form/IFormStore";
 
-export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implements IFormStore<FORM, CHANGE> {
+export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter
+  implements IFormStore<FORM, CHANGE> {
   @observable
   public pending: boolean;
   @observable
@@ -142,11 +143,17 @@ export class FormStore<FORM extends IForm, CHANGE> extends EventEmitter implemen
   }
 
   protected showValidation() {
-    runInAction(`[ ${this.constructor.name} ][ SHOW_VALIDAION ]`, () => (this.showValidationResult = true));
+    runInAction(
+      `[ ${this.constructor.name} ][ SHOW_VALIDAION ]`,
+      () => (this.showValidationResult = true),
+    );
   }
 
   protected hideValidation() {
-    runInAction(`[ ${this.constructor.name} ][ HILE_VALIDATION ]`, () => (this.showValidationResult = false));
+    runInAction(
+      `[ ${this.constructor.name} ][ HILE_VALIDATION ]`,
+      () => (this.showValidationResult = false),
+    );
   }
 
   protected async openForm(id?: string, ...args: any[]): Promise<FORM> {

@@ -15,7 +15,12 @@ import { overlaps } from "./overlaps";
  * @param {(Moment | void)} Y_1 - Date to;
  * @returns {boolean} - hasOverlap;
  */
-export function overlaps_RS(X_0: Moment, X_1: Moment | void, Y_0: Moment, Y_1: Moment | void): boolean {
+export function overlaps_RS(
+  X_0: Moment,
+  X_1: Moment | void,
+  Y_0: Moment,
+  Y_1: Moment | void,
+): boolean {
   let hasOverlap: boolean = false;
 
   if (isMoment(X_1)) {

@@ -37,7 +37,13 @@ export class Repository<
 
   protected isInit: boolean;
 
-  constructor(Entity: new (data?: any) => E, transport: T, mediator: ME, ws: WS, channelName: string) {
+  constructor(
+    Entity: new (data?: any) => E,
+    transport: T,
+    mediator: ME,
+    ws: WS,
+    channelName: string,
+  ) {
     super();
 
     // * DEPS
@@ -112,7 +118,9 @@ export class Repository<
               this.mediator.emit(mediatorChannelEnum.repository_init, this);
             });
           } else {
-            throw new Error(`COLLECTION IS NOT ARRAY - ${Object.prototype.toString.call(collection)}`);
+            throw new Error(
+              `COLLECTION IS NOT ARRAY - ${Object.prototype.toString.call(collection)}`,
+            );
           }
         } else {
           throw new Error(`ACCESS DENIED`);
@@ -137,7 +145,9 @@ export class Repository<
           const item: E | void = await this.transport.create(data);
 
           if (item instanceof this.Entity) {
-            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
+              this.collection.set(item.id, item),
+            );
 
             this.collectionDidUpdate([item]);
             this.emit(Repository.events.update, [item]);
@@ -145,7 +155,9 @@ export class Repository<
 
             return item;
           } else {
-            throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`);
+            throw new Error(
+              `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`,
+            );
           }
         } else {
           throw new Error(`ACCESS DENIED`);
@@ -172,7 +184,9 @@ export class Repository<
           const item: E | void = await this.transport.update(data);
 
           if (item instanceof this.Entity) {
-            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.set(item.id, item));
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
+              this.collection.set(item.id, item),
+            );
 
             this.collectionDidUpdate([item]);
             this.emit(Repository.events.update, [item]);
@@ -180,7 +194,9 @@ export class Repository<
 
             return item;
           } else {
-            throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`);
+            throw new Error(
+              `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`,
+            );
           }
         } else {
           throw new Error(`ACCESS DENIED`);
@@ -207,7 +223,9 @@ export class Repository<
           const item: E | void = await this.transport.remove(id);
 
           if (item instanceof this.Entity) {
-            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => this.collection.delete(item.id));
+            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
+              this.collection.delete(item.id),
+            );
 
             this.collectionDidRemove([item]);
             this.emit(Repository.events.remove, [item]);
@@ -215,7 +233,9 @@ export class Repository<
 
             return item;
           } else {
-            throw new Error(`ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`);
+            throw new Error(
+              `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(item)}`,
+            );
           }
         } else {
           throw new Error(`ACCESS DENIED`);
@@ -317,7 +337,10 @@ export class Repository<
         );
       }
     } else {
-      console.info(`%c[ ${this.constructor.name} ][ IS_NOT_INIT ]`, "color: rgba(255,255,255, 0.2);");
+      console.info(
+        `%c[ ${this.constructor.name} ][ IS_NOT_INIT ]`,
+        "color: rgba(255,255,255, 0.2);",
+      );
     }
   }
 
@@ -369,7 +392,9 @@ export class Repository<
 
       console.log(`[ ${this.constructor.name} ][ ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+      console.error(
+        `[ ${this.constructor.name} ][ ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`,
+      );
     }
   }
 
@@ -383,7 +408,11 @@ export class Repository<
 
       console.log(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
+      console.error(
+        `[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ERROR_MESSAGE: ${getErrorMessage(
+          error,
+        )} ]`,
+      );
     }
   }
 }

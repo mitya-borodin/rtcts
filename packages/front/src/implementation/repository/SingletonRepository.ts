@@ -33,7 +33,13 @@ export class SingletonRepository<
 
   protected isInit: boolean;
 
-  constructor(Entity: new (data?: any) => E, transport: T, ws: WS, channelName: string, mediator: ME) {
+  constructor(
+    Entity: new (data?: any) => E,
+    transport: T,
+    ws: WS,
+    channelName: string,
+    mediator: ME,
+  ) {
     super();
 
     // * DEPS
@@ -83,7 +89,9 @@ export class SingletonRepository<
               this.mediator.emit(mediatorChannelEnum.repository_init, this);
             });
           } else {
-            throw new Error(`ENTITY IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);
+            throw new Error(
+              `ENTITY IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
+            );
           }
         } else {
           throw new Error(`ACCESS DENIED`);
@@ -113,7 +121,9 @@ export class SingletonRepository<
 
             return entity;
           } else {
-            throw new Error(`ENTITY IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`);
+            throw new Error(
+              `ENTITY IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
+            );
           }
         } else {
           throw new Error(`ACCESS DENIED`);
@@ -162,7 +172,9 @@ export class SingletonRepository<
       } catch (error) {
         console.error(
           `[ ${this.constructor.name} ][ RECEIVE_MESSAGE ]` +
-            `[ ${channelName} ][ ${getErrorMessage(error)} ][ PAYLOAD: ${JSON.stringify(payload)} ]`,
+            `[ ${channelName} ][ ${getErrorMessage(error)} ][ PAYLOAD: ${JSON.stringify(
+              payload,
+            )} ]`,
         );
       }
     } else {
@@ -221,7 +233,9 @@ export class SingletonRepository<
 
       console.info(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ${getErrorMessage(error)} ]`);
+      console.error(
+        `[ ${this.constructor.name} ][ CANCEL_ASSIGMENT ][ ${getErrorMessage(error)} ]`,
+      );
     }
   }
 }

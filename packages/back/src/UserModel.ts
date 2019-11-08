@@ -33,7 +33,10 @@ export class UserModel<
 
   public async readAll(): Promise<P[]> {
     try {
-      return await super.read({}, { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } });
+      return await super.read(
+        {},
+        { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } },
+      );
     } catch (error) {
       console.error(error);
 
@@ -41,7 +44,11 @@ export class UserModel<
     }
   }
 
-  public async read(a_query: { [key: string]: any } = {}, options?: FindOneOptions, uid = ""): Promise<P[]> {
+  public async read(
+    a_query: { [key: string]: any } = {},
+    options?: FindOneOptions,
+    uid = "",
+  ): Promise<P[]> {
     try {
       const query = Object.assign({}, a_query);
 
@@ -49,7 +56,9 @@ export class UserModel<
         Object.assign(query, { _id: new ObjectId(uid) });
       }
 
-      return await super.read(query, { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } });
+      return await super.read(query, {
+        projection: { login: 1, group: 1, firstName: 1, lastName: 1 },
+      });
     } catch (error) {
       console.error(error);
 
@@ -131,7 +140,9 @@ export class UserModel<
           return Promise.reject(`[ USER_NOT_FOUND ][ login: ${data.login} ]`);
         }
       } else {
-        return Promise.reject(`[ INCORRECT_ARGS ][ login: ${data.login} ][ password: ${data.password} ]`);
+        return Promise.reject(
+          `[ INCORRECT_ARGS ][ login: ${data.login} ][ password: ${data.password} ]`,
+        );
       }
     } catch (error) {
       console.error(error);
@@ -140,7 +151,11 @@ export class UserModel<
     }
   }
 
-  public async updateLogin(data: { [key: string]: any }, uid: string, wsid: string): Promise<P | null> {
+  public async updateLogin(
+    data: { [key: string]: any },
+    uid: string,
+    wsid: string,
+  ): Promise<P | null> {
     try {
       if (isString(data.id) && isString(data.login)) {
         const result: object | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
@@ -160,13 +175,19 @@ export class UserModel<
     }
   }
 
-  public async updatePassword(data: { [key: string]: any }, uid: string, wsid: string): Promise<P | null> {
+  public async updatePassword(
+    data: { [key: string]: any },
+    uid: string,
+    wsid: string,
+  ): Promise<P | null> {
     try {
       if (isString(data.id) && isString(data.password) && isString(data.password_confirm)) {
         const isValidPassword = checkPassword(data.password, data.password_confirm);
 
         if (isValidPassword) {
-          const result: object | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+          const result: object | null = await this.repository.findOne({
+            _id: new ObjectId(data.id),
+          });
 
           if (result) {
             const salt = getSalt();
@@ -197,7 +218,12 @@ export class UserModel<
     }
   }
 
-  public async updateGroup(ids: string[], group: IUserGroup, uid: string, wsid: string): Promise<P[]> {
+  public async updateGroup(
+    ids: string[],
+    group: IUserGroup,
+    uid: string,
+    wsid: string,
+  ): Promise<P[]> {
     try {
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
 
@@ -229,7 +255,12 @@ export class UserModel<
         // console.log({ ...currentUser.toJS(), ...incomeUser.toJSSecure() });
 
         // Так как я заменяю весь объект мне нужно сохранить секретные поля, salt, hashed_password;
-        return await super.update({ ...currentUser.toJS(), ...incomeUser.toJSSecure() }, uid, wsid, options);
+        return await super.update(
+          { ...currentUser.toJS(), ...incomeUser.toJSSecure() },
+          uid,
+          wsid,
+          options,
+        );
       }
 
       return null;

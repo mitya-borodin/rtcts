@@ -10,7 +10,12 @@ export class Model<P extends IEntity, I extends IInsert, R extends IRepository<P
   protected readonly repository: R;
   protected readonly Persist: new (data?: any) => P;
   protected readonly Insert: new (data?: any) => I;
-  protected readonly send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void;
+  protected readonly send: (
+    payload: object,
+    uid: string,
+    wsid: string,
+    excludeCurrentDevice?: boolean,
+  ) => void;
 
   constructor(
     repository: R,
@@ -24,7 +29,11 @@ export class Model<P extends IEntity, I extends IInsert, R extends IRepository<P
     this.send = send;
   }
 
-  public async read(query: { [key: string]: any } = {}, options?: FindOneOptions, uid?: string): Promise<P[]> {
+  public async read(
+    query: { [key: string]: any } = {},
+    options?: FindOneOptions,
+    uid?: string,
+  ): Promise<P[]> {
     try {
       const items = await this.repository.find(
         query,
@@ -39,7 +48,11 @@ export class Model<P extends IEntity, I extends IInsert, R extends IRepository<P
     }
   }
 
-  public async readOne(query: { [key: string]: any } = {}, options?: FindOneOptions, uid?: string): Promise<P | null> {
+  public async readOne(
+    query: { [key: string]: any } = {},
+    options?: FindOneOptions,
+    uid?: string,
+  ): Promise<P | null> {
     try {
       const item = await this.repository.findOne(
         query,
@@ -77,7 +90,10 @@ export class Model<P extends IEntity, I extends IInsert, R extends IRepository<P
     }
   }
 
-  public async getMap(query: { [key: string]: any } = {}, options?: FindOneOptions): Promise<Map<string, P>> {
+  public async getMap(
+    query: { [key: string]: any } = {},
+    options?: FindOneOptions,
+  ): Promise<Map<string, P>> {
     try {
       const items: any[] = await this.read(
         query,

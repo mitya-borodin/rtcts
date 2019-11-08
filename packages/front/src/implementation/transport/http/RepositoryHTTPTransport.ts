@@ -3,9 +3,11 @@ import { IRepositoryHTTPTransport } from "../../../interfaces/transport/http/IRe
 import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
 import { HTTPTransport } from "./HTTPTransport";
 
-export class RepositoryHTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
-  extends HTTPTransport<T, WS, ME>
-  implements IRepositoryHTTPTransport<T> {
+export class RepositoryHTTPTransport<
+  T,
+  WS extends IWSClient = IWSClient,
+  ME extends IMediator = IMediator
+> extends HTTPTransport<T, WS, ME> implements IRepositoryHTTPTransport<T> {
   public readonly ACL: {
     collection: string[];
     read: string[];
