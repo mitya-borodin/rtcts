@@ -29,6 +29,9 @@
     "publish": "npx rearguard group publish",
     "refresh": "npx rearguard group refresh"
   },
+  "devDependencies": {
+    "husky": "^3.0.9"
+  },
   "keywords": [],
   "engines": {
     "node": ">=10 <13",
