@@ -59,6 +59,9 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "browserslist": [
+    "last 2 versions"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged",
@@ -93,6 +96,8 @@
       "noOverwriteLintConfig": false,
       "noOverwriteGitIgnore": false
     },
-    "postcss_plugins": "postcss.config.js"
+    "css": {
+      "postcssPlugins": "postcss.config.js"
+    }
   }
 }

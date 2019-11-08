@@ -50,6 +50,9 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "browserslist": [
+    "last 2 versions"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "pretty-quick --staged",
