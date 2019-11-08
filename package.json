@@ -1,0 +1,48 @@
+{
+  "name": "base-code",
+  "description": "The repository contains several libraries with reusable code on several projects.",
+  "license": "MIT",
+  "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
+  "homepage": "https://github.com/mitya-borodin/base-code#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mitya-borodin/base-code.git"
+  },
+  "bugs": {
+    "email": "dmitriy@borodin.site",
+    "url": "https://github.com/mitya-borodin/base-code/issues"
+  },
+  "version": "1.0.0",
+  "scripts": {
+    "bootstrap": "npx rearguard group bootstrap",
+    "clear": "npx rearguard group clear",
+    "install": "npx rearguard group install",
+    "link": "npx rearguard group link",
+    "lint": "npx rearguard group lint",
+    "lint-fix": "npx rearguard group lint-fix",
+    "typecheck": "npx rearguard group typecheck",
+    "validate-prettiness": "npx rearguard group validate-prettiness",
+    "validate": "npx rearguard group validate",
+    "make-prettier": "npx rearguard group make-prettier",
+    "build": "npx rearguard group build",
+    "test": "npx rearguard group test",
+    "publish": "npx rearguard group publish",
+    "refresh": "npx rearguard group refresh"
+  },
+  "keywords": [],
+  "engines": {
+    "node": ">=10 <13",
+    "npm": ">=6 <7"
+  },
+  "husky": {
+    "pre-push": "npm run validate"
+  },
+  "rearguard": {
+    "project": {
+      "type": "mono",
+      "components": [
+        "components/*"
+      ]
+    }
+  }
+}
