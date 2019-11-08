@@ -90,6 +90,6 @@ lib_bundle
 lib
 
 src/typings.d.ts
-.rearguardrc
+rearguard-dev.json
 examples
 list_for_load_on_demand.ts
