@@ -1,4 +1,4 @@
-import { IMediator } from "@borodindmitriy/isomorphic";
+import { Mediator } from "@borodindmitriy/isomorphic";
 import { ISingletonHTTPTransport } from "../../../interfaces/transport/http/ISingletonHTTPTransport";
 import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
 import { HTTPTransport } from "./HTTPTransport";
@@ -6,7 +6,7 @@ import { HTTPTransport } from "./HTTPTransport";
 export class SingletonHTTPTransport<
   T,
   WS extends IWSClient = IWSClient,
-  ME extends IMediator = IMediator
+  ME extends Mediator = Mediator
 > extends HTTPTransport<T, WS, ME> implements ISingletonHTTPTransport<T> {
   public readonly ACL: {
     read: string[];

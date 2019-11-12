@@ -16,16 +16,15 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
     this.channels = new Map();
   }
 
-  public addConnection(a_connection: C): void {
+  public addConnection(connection: C): void {
     try {
-      const id = a_connection.getConnectionID();
-      const connection = this.connections.get(id);
+      const connectionId = connection.getConnectionID();
 
-      if (!connection) {
-        this.connections.set(id, a_connection);
+      if (!this.connections.has(connectionId)) {
+        this.connections.set(connectionId, connection);
 
         console.log("");
-        console.log(chalk.yellow(`[ CHANNELS ][ ADD_CONNECTION ]${id}`));
+        console.log(chalk.yellow(`[ CHANNELS ][ ADD_CONNECTION ]${connectionId}`));
         console.log(
           chalk.yellow(
             `[ CHANNELS ][ ADD_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`,
@@ -34,7 +33,9 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
       } else {
         console.log("");
         console.log(
-          chalk.redBright(`[ CHANNELS ][ ADD_CONNECTION ][ ERROR ][ ALLREADY_EXIST ] ${id}`),
+          chalk.redBright(
+            `[ CHANNELS ][ ADD_CONNECTION ][ ERROR ][ ALLREADY_EXIST ] ${connectionId}`,
+          ),
         );
       }
     } catch (error) {
@@ -42,16 +43,16 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
     }
   }
 
-  public deleteConnection(a_connection: C): void {
+  public deleteConnection(connection: C): void {
     try {
-      const id = a_connection.getConnectionID();
-      const connection = this.connections.get(id);
+      const id = connection.getConnectionID();
+      const curConnection = this.connections.get(id);
 
-      if (connection) {
+      if (curConnection) {
         this.connections.delete(id);
 
         for (const chName of this.channels.keys()) {
-          this.off(chName, connection.uid || "", connection.wsid);
+          this.off(chName, curConnection.uid || "", curConnection.wsid);
         }
 
         console.log("");

@@ -23,8 +23,6 @@
     "start": "npx rearguard start",
     "build": "npx rearguard build",
     "test": "npx rearguard test",
-    "sync": "npx rearguard sync",
-    "check_deps_on_npm": "npx rearguard check_deps_on_npm",
     "lint": "npx rearguard lint",
     "lint-fix": "npx rearguard lint --fix",
     "typecheck": "tsc --noEmit",

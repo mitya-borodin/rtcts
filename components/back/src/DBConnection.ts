@@ -2,8 +2,8 @@ import { EventEmitter } from "@borodindmitriy/isomorphic";
 import { getErrorMessage } from "@borodindmitriy/utils";
 import chalk from "chalk";
 import { Db, MongoClient } from "mongodb";
-import { IAppConfig } from "./interfaces/IAppConfig";
 import { IDBConnection } from "./interfaces/IDBConnection";
+import { AppConfig } from "./AppConfig";
 
 enum Status {
   OPEN = "OPEN",
@@ -15,10 +15,10 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
   protected status: Status.OPEN | Status.CONNECTING | Status.CLOSED;
   protected client: MongoClient | undefined;
   protected DB: Db | undefined;
-  protected config: IAppConfig;
+  protected config: AppConfig;
   protected pingTimer: NodeJS.Timer;
 
-  constructor(config: IAppConfig, reconnectTimeOut: number = 2000) {
+  constructor(config: AppConfig) {
     super();
 
     this.config = config;

@@ -1,9 +1,9 @@
 import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import { Strategy } from "passport-jwt";
 import { Strategy as PassportStrategy } from "passport-strategy";
-import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
 import { IUserModel } from "./interfaces/IUserModel";
+import { AppConfig } from "./AppConfig";
 
 /*
  * Эта функция определяет авторизован ты или нет.
@@ -14,15 +14,15 @@ import { IUserModel } from "./interfaces/IUserModel";
 export class AuthStrategy<
   P extends IUser & IEntity = IUser & IEntity,
   M extends IUserModel<P> = IUserModel<P>,
-  AC extends IAppConfig = IAppConfig
+  AC extends AppConfig = AppConfig
 > implements IAuthStrategy {
   protected readonly strategy: PassportStrategy;
 
   constructor(config: AC, userModel: M) {
     this.strategy = new Strategy(
       {
-        jwtFromRequest: config.jwt.form_request,
-        secretOrKey: config.jwt.secret_key,
+        jwtFromRequest: config.jwt.formRequest,
+        secretOrKey: config.jwt.secretKey,
       },
       (jwtPayload, next) => {
         userModel

@@ -5,11 +5,11 @@ import express from "express";
 import * as http from "http";
 import { AddressInfo } from "net";
 import passport from "passport";
-import { IAppConfig } from "./interfaces/IAppConfig";
 import { IAPPServer } from "./interfaces/IAPPServer";
 import { IAuthStrategy } from "./interfaces/IAuthStrategy";
+import { AppConfig } from "./AppConfig";
 
-export class APPServer<C extends IAppConfig = IAppConfig, STR extends IAuthStrategy = IAuthStrategy>
+export class APPServer<C extends AppConfig = AppConfig, STR extends IAuthStrategy = IAuthStrategy>
   implements IAPPServer {
   private wasRun: boolean;
   private config: C;

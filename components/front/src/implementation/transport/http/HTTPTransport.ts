@@ -1,10 +1,10 @@
 import { userRepositoryEventEnum } from "@borodindmitriy/interfaces";
-import { IMediator } from "@borodindmitriy/isomorphic";
+import { Mediator } from "@borodindmitriy/isomorphic";
 import { isString } from "@borodindmitriy/utils";
 import { IHTTPTransport } from "../../../interfaces/transport/http/IHTTPTransport";
 import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
 
-export class HTTPTransport<T, WS extends IWSClient = IWSClient, ME extends IMediator = IMediator>
+export class HTTPTransport<T, WS extends IWSClient = IWSClient, ME extends Mediator = Mediator>
   implements IHTTPTransport {
   public readonly ACL: {
     onChannel: string[];

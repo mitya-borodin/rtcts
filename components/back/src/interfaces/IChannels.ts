@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { IConnection } from "./IConnection";
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IChannels<C extends IConnection = IConnection> {
   addConnection(a_connection: C): void;
 

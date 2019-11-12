@@ -1,6 +1,5 @@
 // INTERFACES
 export { IUserModel } from "./interfaces/IUserModel";
-export { IAppConfig } from "./interfaces/IAppConfig";
 export { IChannels } from "./interfaces/IChannels";
 export { IConnection } from "./interfaces/IConnection";
 export { IDBConnection } from "./interfaces/IDBConnection";

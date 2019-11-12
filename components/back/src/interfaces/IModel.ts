@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 import { CollectionInsertOneOptions, FindOneOptions } from "mongodb";
 
 export interface IModel<P> {

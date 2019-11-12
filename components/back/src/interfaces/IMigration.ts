@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 import { Moment } from "moment";
 
 export interface IMigration {

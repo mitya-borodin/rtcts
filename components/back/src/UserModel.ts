@@ -1,21 +1,22 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { IEntity, IUser, IUserGroup, userGroupEnum } from "@borodindmitriy/interfaces";
 import { checkPassword, isString } from "@borodindmitriy/utils";
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
 import { FindOneAndReplaceOption, FindOneOptions } from "mongodb";
-import { IAppConfig } from "./interfaces/IAppConfig";
 import { IRepository } from "./interfaces/IRepository";
 import { IUserModel } from "./interfaces/IUserModel";
 import { Model } from "./Model";
 import { authenticate } from "./utils/authenticate";
 import { encryptPassword } from "./utils/encryptPassword";
 import { getSalt } from "./utils/getSalt";
+import { AppConfig } from "./AppConfig";
 
 export class UserModel<
   P extends IUser & IEntity,
   I extends IUser,
   R extends IRepository<P> = IRepository<P>,
-  AC extends IAppConfig = IAppConfig
+  AC extends AppConfig = AppConfig
 > extends Model<P, I, R> implements IUserModel<P> {
   protected config: AC;
 
@@ -103,7 +104,7 @@ export class UserModel<
             const user: P = await this.repository.insertOne(insert.toJS());
 
             return {
-              token: jwt.sign({ _id: user.id }, this.config.jwt.secret_key),
+              token: jwt.sign({ _id: user.id }, this.config.jwt.secretKey),
               user: new this.Persist(user).toJSSecure(),
             };
           }
@@ -132,7 +133,7 @@ export class UserModel<
 
         if (user !== null) {
           if (authenticate(data.password, user.salt, user.hashed_password)) {
-            return jwt.sign({ id: user.id }, this.config.jwt.secret_key);
+            return jwt.sign({ id: user.id }, this.config.jwt.secretKey);
           } else {
             return Promise.reject(`[ PASSWORD_INCORRECT ][ password: ${data.password} ]`);
           }

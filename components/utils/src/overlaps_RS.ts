@@ -21,7 +21,7 @@ export function overlaps_RS(
   Y_0: Moment,
   Y_1: Moment | void,
 ): boolean {
-  let hasOverlap: boolean = false;
+  let hasOverlap = false;
 
   if (isMoment(X_1)) {
     if (isMoment(Y_1)) {

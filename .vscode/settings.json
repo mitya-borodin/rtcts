@@ -35,7 +35,7 @@
     { "language": "typescriptreact", "autoFix": true }
   ],
   "eslint.packageManager": "npm",
-  "eslint.workingDirectories": ["src", "bin", "tests"],
+  "eslint.workingDirectories": ["components/back/src"],
 
   "cSpell.words": ["borodindmitriy"],
   "cSpell.language": "en,ru",

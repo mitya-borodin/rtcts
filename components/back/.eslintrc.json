@@ -7,7 +7,6 @@
     "no-use-before-define": "warn",
     "object-literal-sort-keys": "off",
     "@typescript-eslint/no-use-before-define": "warn",
-    "no-unused-expressions": "error",
-    "no-underscore-dangle": "error"
+    "no-unused-expressions": "error"
   }
 }

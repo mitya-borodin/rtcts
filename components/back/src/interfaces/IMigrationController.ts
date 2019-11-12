@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 import * as express from "express";
 
 /* tslint:disable:object-literal-sort-keys */

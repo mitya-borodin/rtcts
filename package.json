@@ -44,7 +44,7 @@
     "project": {
       "type": "mono",
       "components": [
-        "components/*"
+        "components"
       ]
     }
   }

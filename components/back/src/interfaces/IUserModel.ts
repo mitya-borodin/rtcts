@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 import { IEntity } from "@borodindmitriy/interfaces";
 import { IModel } from "./IModel";
 

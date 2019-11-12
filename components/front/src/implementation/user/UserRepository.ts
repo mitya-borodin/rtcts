@@ -1,5 +1,5 @@
 import { IEntity, IUser, userGroupEnum, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
-import { IMediator } from "@borodindmitriy/isomorphic";
+import { Mediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isString } from "@borodindmitriy/utils";
 import { action, computed, observable, runInAction } from "mobx";
 import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
@@ -20,7 +20,7 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
     transport: T,
     wsClient: IWSClient,
     channelName: string,
-    mediator: IMediator,
+    mediator: Mediator,
   ) {
     super(Entity, transport, mediator, wsClient, channelName);
 

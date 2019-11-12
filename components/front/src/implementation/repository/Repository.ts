@@ -1,5 +1,5 @@
 import { IEntity, wsEventEnum } from "@borodindmitriy/interfaces";
-import { EventEmitter, IMediator } from "@borodindmitriy/isomorphic";
+import { EventEmitter, Mediator } from "@borodindmitriy/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@borodindmitriy/utils";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
 import { mediatorChannelEnum } from "../../enums/mediatorChannelEnum";
@@ -13,7 +13,7 @@ export class Repository<
   E extends IEntity,
   T extends IRepositoryHTTPTransport<E>,
   WS extends IWSClient = IWSClient,
-  ME extends IMediator = IMediator
+  ME extends Mediator = Mediator
 > extends EventEmitter implements IRepository<E> {
   public static events = {
     init: `[ Repository ][ INIT ]`,

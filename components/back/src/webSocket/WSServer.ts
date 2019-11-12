@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/camelcase */
 import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import {
   assigment_to_user_of_the_connection_channel,
@@ -12,13 +14,13 @@ import { getErrorMessage, isArray, isString, isUndefined } from "@borodindmitriy
 import chalk from "chalk";
 import * as express from "express";
 import * as WebSocket from "ws";
-import { IAppConfig } from "../interfaces/IAppConfig";
 import { IChannels } from "../interfaces/IChannels";
 import { IConnection } from "../interfaces/IConnection";
 import { IUserModel } from "../interfaces/IUserModel";
+import { AppConfig } from "../AppConfig";
 
 export class WSServer<U extends IUserModel<IUser & IEntity>> {
-  private config: IAppConfig;
+  private config: AppConfig;
   private server: WebSocket.Server;
   private connections: Set<IConnection>;
   private Connection: new (data: any) => IConnection;
@@ -30,7 +32,7 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
   constructor(
     Connection: new (data: any) => IConnection,
     channels: IChannels,
-    config: IAppConfig,
+    config: AppConfig,
     user: U,
   ) {
     this.Connection = Connection;

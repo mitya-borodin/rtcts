@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/interface-name-prefix */
 import * as WebSocket from "ws";
 
 export interface IConnection {

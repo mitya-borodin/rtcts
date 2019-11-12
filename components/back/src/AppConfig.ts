@@ -1,12 +1,11 @@
 import { isNumber } from "@borodindmitriy/utils";
 import chalk from "chalk";
 import { ExtractJwt, JwtFromRequestFunction } from "passport-jwt";
-import { IAppConfig } from "./interfaces/IAppConfig";
 
-export class AppConfig implements IAppConfig {
+export class AppConfig {
   public readonly jwt: {
-    readonly form_request: JwtFromRequestFunction;
-    readonly secret_key: string;
+    readonly formRequest: JwtFromRequestFunction;
+    readonly secretKey: string;
   };
   public readonly db: {
     readonly name: string;
@@ -41,8 +40,8 @@ export class AppConfig implements IAppConfig {
     }
 
     this.jwt = {
-      form_request: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secret_key: process.env.JWT_SECRET_KEY || "JWT_SECRET_KEY",
+      formRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretKey: process.env.JWT_SECRET_KEY || "JWT_SECRET_KEY",
     };
 
     this.db = {

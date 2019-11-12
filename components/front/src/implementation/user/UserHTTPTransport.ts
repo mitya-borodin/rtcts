@@ -1,5 +1,5 @@
 import { IEntity, IUser } from "@borodindmitriy/interfaces";
-import { IMediator } from "@borodindmitriy/isomorphic";
+import { Mediator } from "@borodindmitriy/isomorphic";
 import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
 import { IUserHTTPTransport } from "../../interfaces/user/IUserHTTPTransport";
 import { RepositoryHTTPTransport } from "../transport/http/RepositoryHTTPTransport";
@@ -7,7 +7,7 @@ import { RepositoryHTTPTransport } from "../transport/http/RepositoryHTTPTranspo
 export class UserHTTPTransport<
   U extends IUser & IEntity,
   WS extends IWSClient = IWSClient,
-  ME extends IMediator = IMediator
+  ME extends Mediator = Mediator
 > extends RepositoryHTTPTransport<U, WS> implements IUserHTTPTransport<U> {
   public ACL: {
     collection: string[];
