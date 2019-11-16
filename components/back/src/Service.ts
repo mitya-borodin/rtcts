@@ -112,9 +112,7 @@ export class Service<
                 res
                   .status(404)
                   .send(
-                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${
-                      req.query.id
-                    } ]`,
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.query.id} ]`,
                   );
               }
             } else {
@@ -195,9 +193,7 @@ export class Service<
                 res
                   .status(404)
                   .send(
-                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${
-                      req.body.id
-                    } ]`,
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`,
                   );
               }
             } else {
@@ -239,9 +235,7 @@ export class Service<
                 res
                   .status(404)
                   .send(
-                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${
-                      req.body.id
-                    } ]`,
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${req.body.id} ]`,
                   );
               }
             } else {

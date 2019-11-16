@@ -130,9 +130,7 @@ export class UserService<
               res
                 .status(404)
                 .send(
-                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${
-                    req.body.id
-                  } ]`,
+                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${req.body.id} ]`,
                 );
             }
           } else {
@@ -219,11 +217,7 @@ export class UserService<
           res
             .status(404)
             .send(
-              `[ ${
-                this.constructor.name
-              } ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN_AND_PASSWORD: { login: ${
-                req.body.login
-              }, password: ${req.body.password} } ]`,
+              `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN_AND_PASSWORD: { login: ${req.body.login}, password: ${req.body.password} } ]`,
             );
         }
       } catch (error) {
@@ -261,9 +255,7 @@ export class UserService<
               res
                 .status(404)
                 .send(
-                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN: ${
-                    data.login
-                  } ]`,
+                  `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_LOGIN: ${data.login} ]`,
                 );
             }
           } else {
@@ -309,9 +301,7 @@ export class UserService<
                 res
                   .status(404)
                   .send(
-                    `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${
-                      data.id
-                    } ]`,
+                    `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_ID: ${data.id} ]`,
                   );
               }
             } else {
@@ -359,9 +349,7 @@ export class UserService<
                   res
                     .status(404)
                     .send(
-                      `[ ${
-                        this.constructor.name
-                      } ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`,
+                      `[ ${this.constructor.name} ][ URL: ${URL} ][ USERS_NOT_FOUND_BY_IDs: ${ids} ]`,
                     );
                 }
               } else {

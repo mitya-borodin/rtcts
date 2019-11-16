@@ -69,9 +69,7 @@ export class APPServer<C extends AppConfig = AppConfig, STR extends IAuthStrateg
                 if (!isString(addressInfo) && addressInfo !== null) {
                   console.log(
                     chalk.blueBright.bold(
-                      `[ APP ][ SERVER ][ RUN ][ http://${addressInfo.address}:${
-                        addressInfo.port
-                      } ]`,
+                      `[ APP ][ SERVER ][ RUN ][ http://${addressInfo.address}:${addressInfo.port} ]`,
                     ),
                   );
                 }

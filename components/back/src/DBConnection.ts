@@ -49,9 +49,7 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
 
         console.log(
           chalk.blue.bold(
-            `[ ${this.name} ][ connect ][ ESTABLISHED: ${this.config.db.url}/${
-              this.config.db.name
-            } ]`,
+            `[ ${this.name} ][ connect ][ ESTABLISHED: ${this.config.db.url}/${this.config.db.name} ]`,
           ),
         );
 
@@ -108,9 +106,7 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
 
         console.log(
           chalk.magenta.bold(
-            `[ ${this.name} ][ disconnect ][ CLOSED: ${this.config.db.url}/${
-              this.config.db.name
-            } ]`,
+            `[ ${this.name} ][ disconnect ][ CLOSED: ${this.config.db.url}/${this.config.db.name} ]`,
           ),
         );
       } else {
