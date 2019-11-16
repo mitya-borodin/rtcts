@@ -1,6 +1,6 @@
 {
   "name": "base-code",
-  "description": "The repository contains several libraries with reusable code on several projects.",
+  "description": "The repository contains the necessary classes and functions to implement a real-time client-server application with a closed type system, which is supported by static code analysis in typescript language and type verification at runtime using javascript capabilities.",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://github.com/mitya-borodin/base-code#readme",
@@ -14,20 +14,20 @@
   },
   "version": "1.0.0",
   "scripts": {
-    "bootstrap": "npx rearguard group bootstrap",
-    "clear": "npx rearguard group clear",
-    "install": "npx rearguard group install",
-    "link": "npx rearguard group link",
-    "lint": "npx rearguard group lint",
-    "lint-fix": "npx rearguard group lint-fix",
-    "typecheck": "npx rearguard group typecheck",
-    "validate-prettiness": "npx rearguard group validate-prettiness",
-    "validate": "npx rearguard group validate",
-    "make-prettier": "npx rearguard group make-prettier",
-    "build": "npx rearguard group build",
-    "test": "npx rearguard group test",
-    "publish": "npx rearguard group publish",
-    "refresh": "npx rearguard group refresh"
+    "bootstrap": "rearguard group bootstrap",
+    "clear": "rearguard group clear",
+    "install": "rearguard group install",
+    "link": "rearguard group link",
+    "lint": "rearguard group lint",
+    "lint-fix": "rearguard group lint-fix",
+    "typecheck": "rearguard group typecheck",
+    "validate-prettiness": "rearguard group validate-prettiness",
+    "validate": "rearguard group validate",
+    "make-prettier": "rearguard group make-prettier",
+    "build": "rearguard group build",
+    "test": "rearguard group test",
+    "publish": "rearguard group publish",
+    "refresh": "rearguard group refresh"
   },
   "devDependencies": {
     "husky": "^3.0.9"
