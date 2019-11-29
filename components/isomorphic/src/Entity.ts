@@ -1,4 +1,4 @@
-import { ValidateResult } from "./ValidateResult";
+import { ValidateResult } from "./validate/ValidateResult";
 
 export interface ValueObject<Data> {
   toObject(): Data;

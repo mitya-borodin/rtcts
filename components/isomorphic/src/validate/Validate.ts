@@ -1,9 +1,7 @@
-import { ILog } from "@borodindmitriy/interfaces";
 import { isArray, isString, isUndefined } from "@borodindmitriy/utils";
-import { Log } from "./log/Log";
-import { ValueObject } from "./Entity";
+import { ValueObject } from "../Entity";
+import { Log } from "../log/Log";
 
-// tslint:disable-next-line:max-classes-per-file
 export class Validate extends Log implements ValueObject<any> {
   public readonly field: string | string[];
   public readonly title?: string;
@@ -48,13 +46,13 @@ export class Validate extends Log implements ValueObject<any> {
     Object.freeze(this);
   }
 
-  public get log(): ILog {
+  public get log(): Log {
     return new Log({ type: this.type, message: this.message });
   }
 
-  public toJS(): { [key: string]: any } {
+  public toObject(): any {
     return {
-      ...super.toJS(),
+      ...super.toObject(),
       field: this.field,
       title: this.title,
     };
