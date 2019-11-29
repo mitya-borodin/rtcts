@@ -10,7 +10,7 @@ export {
   ErrorChannel,
   PingChannel,
   PongChannel,
-  assigment_to_user_of_the_connection_channel,
-  cancel_assigment_to_user_of_the_connection_channel,
+  assignment_to_user_of_the_connection_channel,
+  cancel_assignment_to_user_of_the_connection_channel,
 } from "./webSocket/const";
 export { recognizeMessage, makeMessage, makeErrorMessage } from "./webSocket/helpers";

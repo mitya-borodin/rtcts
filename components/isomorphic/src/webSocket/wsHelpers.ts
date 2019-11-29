@@ -1,5 +1,23 @@
 import { getErrorMessage, isObject, isString } from "@borodindmitriy/utils";
-import { ErrorChannel } from "./const";
+import { ErrorChannel } from "../export";
+
+export const makeErrorMessage = (
+  message: string,
+  payload: any,
+): [string, { [key: string]: any }] => {
+  return [ErrorChannel, { message: `[ ERROR ] ${message}`, payload }];
+};
+
+export const makeMessage = (channelName: string, payload: { [key: string]: any }): string => {
+  if (!isString(channelName)) {
+    return JSON.stringify(makeErrorMessage("ChannelName should be a string", { channelName }));
+  }
+  if (!isObject(payload)) {
+    return JSON.stringify(makeErrorMessage("Payload should be a object", { channelName, payload }));
+  }
+
+  return JSON.stringify([channelName, payload]);
+};
 
 export const recognizeMessage = (message: string): [string, { [key: string]: any }] => {
   try {
@@ -24,22 +42,4 @@ export const recognizeMessage = (message: string): [string, { [key: string]: any
   } catch (error) {
     return makeErrorMessage(getErrorMessage(error), { error, receive_message: message });
   }
-};
-
-export const makeMessage = (channelName: string, payload: { [key: string]: any }): string => {
-  if (!isString(channelName)) {
-    return JSON.stringify(makeErrorMessage("ChannelName should be a string", { channelName }));
-  }
-  if (!isObject(payload)) {
-    return JSON.stringify(makeErrorMessage("Payload should be a object", { channelName, payload }));
-  }
-
-  return JSON.stringify([channelName, payload]);
-};
-
-export const makeErrorMessage = (
-  message: string,
-  payload: any,
-): [string, { [key: string]: any }] => {
-  return [ErrorChannel, { message: `[ ERROR ] ${message}`, payload }];
 };

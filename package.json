@@ -1,5 +1,5 @@
 {
-  "name": "base-code",
+  "name": "rtcts",
   "description": "The repository contains the necessary classes and functions to implement a real-time client-server application with a closed type system, which is supported by static code analysis in typescript language and type verification at runtime using javascript capabilities.",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -16,7 +16,6 @@
   "scripts": {
     "bootstrap": "rearguard group bootstrap",
     "clear": "rearguard group clear",
-    "install": "rearguard group install",
     "link": "rearguard group link",
     "lint": "rearguard group lint",
     "lint-fix": "rearguard group lint-fix",
@@ -30,7 +29,7 @@
     "refresh": "rearguard group refresh"
   },
   "devDependencies": {
-    "husky": "^3.0.9"
+    "husky": "^3.1.0"
   },
   "keywords": [],
   "engines": {

@@ -29,7 +29,7 @@ export class EventEmitter implements IEventEmitter {
   }
 
   public once(name: string, callBack: any): void {
-    const cb = (...args: any[]) => {
+    const cb = (...args: any[]): void => {
       callBack(...args);
       this.off(name, cb);
     };

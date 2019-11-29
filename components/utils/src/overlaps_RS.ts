@@ -2,7 +2,7 @@ import { isMoment, Moment } from "moment";
 import { overlaps } from "./overlaps";
 
 /**
- * overlaps_RS - opverlaps for ray and section;
+ * overlaps_RS - overlaps for ray and section;
  * Находит пересечение для:
  * 1) Двух отрезков;
  * 2) Отрезка и луча;

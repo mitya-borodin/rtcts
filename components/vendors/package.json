@@ -1,6 +1,6 @@
 {
-  "name": "@borodindmitriy/general-vendor",
-  "description": "Contains all around react library",
+  "name": "@rtcts/vendors",
+  "description": "Contains all basic dependencies for browser development (lib, app)",
   "license": "MIT",
   "author": "Borodin Dmitriy",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.7",
+  "version": "1.0.0",
   "main": "index.js",
   "bin": "",
   "files": [
@@ -43,7 +43,7 @@
     "react-helmet": "^5.2.1"
   },
   "engines": {
-    "node": ">=10 <11",
+    "node": ">=10 <13",
     "npm": ">=6 <7"
   },
   "publishConfig": {

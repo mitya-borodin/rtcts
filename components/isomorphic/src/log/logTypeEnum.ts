@@ -1,6 +1,8 @@
 export enum logTypeEnum {
   log = "log",
   info = "info",
-  warn = "warn",
+  success = "success",
+  warning = "warning",
   error = "error",
+  validating = "validating",
 }

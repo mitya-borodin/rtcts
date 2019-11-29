@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { isString } from "./isType";
 
 export function detectID(data?: any): string {

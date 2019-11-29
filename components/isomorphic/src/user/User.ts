@@ -1,27 +1,55 @@
-import { IEntity, IUser } from "@borodindmitriy/interfaces";
-import { detectID } from "@borodindmitriy/utils";
-import { UserInsert } from "./UserInsert";
+import { isString } from "@borodindmitriy/utils";
 
-export class User extends UserInsert implements IUser, IEntity {
-  public readonly id: string;
+type Mandatory = "login" | "group";
+type Optional = "id" | "salt" | "hashedPassword";
+type Data = Required<Pick<User, Mandatory>> & Pick<User, Optional>;
 
-  constructor(data?: any) {
-    super(data);
+const fields: string[] = ["id", "login", "group", "salt", "hashedPassword"];
 
-    this.id = detectID(data);
+export class User {
+  public static isEntity = (data: Data, insert = false): data is Required<Data> => {
+    for (const field of fields) {
+      if (insert && field === "id") {
+        continue;
+      }
+
+      if (!isString(data[field])) {
+        throw new Error(`User.${field} should be String`);
+      }
+    }
+
+    return true;
+  };
+
+  public readonly id?: string;
+  public readonly login: string;
+  public readonly group: string;
+  public readonly salt?: string;
+  public readonly hashedPassword?: string;
+
+  constructor(data: Data) {
+    if (data) {
+      for (const field of fields) {
+        if (isString(data[name])) {
+          this[field] = data[field];
+        }
+      }
+    } else {
+      throw new Error(`User(data) data should be defined`);
+    }
   }
 
-  public toJS(): { [key: string]: any } {
+  public toObject(): Data {
     return {
-      ...super.toJS(),
-      id: this.id,
+      ...(this.id ? { id: this.id } : {}),
+      login: this.login,
+      group: this.group,
+      ...(this.salt ? { salt: this.salt } : {}),
+      ...(this.hashedPassword ? { hashedPassword: this.hashedPassword } : {}),
     };
   }
 
-  public toJSSecure(): { [key: string]: any } {
-    return {
-      ...super.toJSSecure(),
-      id: this.id,
-    };
+  public toJSON(): Data {
+    return this.toObject();
   }
 }
