@@ -1,33 +1,20 @@
 import { isString } from "@borodindmitriy/utils";
+import { Entity } from "../Entity";
 
 type Mandatory = "login" | "group";
 type Optional = "id" | "salt" | "hashedPassword";
-type Data = Required<Pick<User, Mandatory>> & Pick<User, Optional>;
+export type UserData = Required<Pick<User, Mandatory>> & Pick<User, Optional>;
 
 const fields: string[] = ["id", "login", "group", "salt", "hashedPassword"];
 
-export class User {
-  public static isEntity = (data: Data, insert = false): data is Required<Data> => {
-    for (const field of fields) {
-      if (insert && field === "id") {
-        continue;
-      }
-
-      if (!isString(data[field])) {
-        throw new Error(`User.${field} should be String`);
-      }
-    }
-
-    return true;
-  };
-
+export class User implements Entity<UserData> {
   public readonly id?: string;
   public readonly login: string;
   public readonly group: string;
   public readonly salt?: string;
   public readonly hashedPassword?: string;
 
-  constructor(data: Data) {
+  constructor(data: UserData) {
     if (data) {
       for (const field of fields) {
         if (isString(data[name])) {
@@ -39,7 +26,21 @@ export class User {
     }
   }
 
-  public toObject(): Data {
+  public isEntity(insert = false): this is Required<UserData> {
+    for (const field of fields) {
+      if (insert && field === "id") {
+        continue;
+      }
+
+      if (!isString(this[field])) {
+        throw new Error(`User.${field} should be String`);
+      }
+    }
+
+    return true;
+  }
+
+  public toObject(): UserData {
     return {
       ...(this.id ? { id: this.id } : {}),
       login: this.login,
@@ -49,7 +50,7 @@ export class User {
     };
   }
 
-  public toJSON(): Data {
+  public toJSON(): UserData {
     return this.toObject();
   }
 }
