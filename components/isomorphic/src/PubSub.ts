@@ -1,3 +1,3 @@
 import { EventEmitter } from "./EventEmitter";
 
-export class Mediator extends EventEmitter {}
+export class PubSub extends EventEmitter {}

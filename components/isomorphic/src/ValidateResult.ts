@@ -1,9 +1,10 @@
 import { ILog, IValidate, IValidateResult, logTypeEnum } from "@borodindmitriy/interfaces";
 import { isArray, isObject, isString } from "@borodindmitriy/utils";
 import { Validate } from "./Validate";
+import { ValueObject } from "./Entity";
 
 // tslint:disable:object-literal-sort-keys
-export class ValidateResult implements IValidateResult<IValidate> {
+export class ValidateResult implements ValueObject<any> {
   public readonly results: IValidate[];
   public readonly isValid: boolean;
   public readonly hasError: boolean;

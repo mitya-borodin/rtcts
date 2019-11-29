@@ -1,9 +1,10 @@
-import { ILog, IValidate } from "@borodindmitriy/interfaces";
+import { ILog } from "@borodindmitriy/interfaces";
 import { isArray, isString, isUndefined } from "@borodindmitriy/utils";
-import { Log } from "./Log";
+import { Log } from "./log/Log";
+import { ValueObject } from "./Entity";
 
 // tslint:disable-next-line:max-classes-per-file
-export class Validate extends Log implements IValidate {
+export class Validate extends Log implements ValueObject<any> {
   public readonly field: string | string[];
   public readonly title?: string;
 

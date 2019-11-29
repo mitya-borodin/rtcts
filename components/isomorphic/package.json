@@ -35,8 +35,7 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@borodindmitriy/general-vendor": "^1.0.7",
-    "@borodindmitriy/interfaces": "^3.0.6",
+    "@borodindmitriy/vendors": "^1.0.0",
     "@borodindmitriy/utils": "^3.0.5",
     "tslib": "^1.10.0"
   },

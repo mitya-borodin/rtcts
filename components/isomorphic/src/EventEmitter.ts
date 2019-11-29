@@ -1,13 +1,9 @@
-import { IEventEmitter } from "@borodindmitriy/interfaces";
-
-export class EventEmitter implements IEventEmitter {
+export class EventEmitter {
   private subscriptions: Map<string, Set<(payload: any) => void>>;
 
   constructor() {
-    // INIT
     this.subscriptions = new Map();
 
-    // BINDINGS
     this.emit = this.emit.bind(this);
     this.once = this.once.bind(this);
     this.on = this.on.bind(this);
