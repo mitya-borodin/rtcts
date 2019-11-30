@@ -7,14 +7,15 @@ export type UserData = Required<Pick<User, Mandatory>> & Pick<User, Optional>;
 
 const fields: string[] = ["id", "login", "group", "salt", "hashedPassword"];
 
-export class User implements Entity<UserData> {
-  public readonly id?: string;
+export class User extends Entity<UserData> {
   public readonly login: string;
   public readonly group: string;
   public readonly salt?: string;
   public readonly hashedPassword?: string;
 
   constructor(data: UserData) {
+    super();
+
     if (data) {
       for (const field of fields) {
         if (isString(data[name])) {
@@ -26,9 +27,9 @@ export class User implements Entity<UserData> {
     }
   }
 
-  public isEntity(insert = false): this is Required<UserData> {
+  public isInsert(): this is Required<Omit<UserData, "id">> {
     for (const field of fields) {
-      if (insert && field === "id") {
+      if (field === "id") {
         continue;
       }
 
@@ -48,9 +49,5 @@ export class User implements Entity<UserData> {
       ...(this.salt ? { salt: this.salt } : {}),
       ...(this.hashedPassword ? { hashedPassword: this.hashedPassword } : {}),
     };
-  }
-
-  public toJSON(): UserData {
-    return this.toObject();
   }
 }
