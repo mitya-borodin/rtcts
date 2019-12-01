@@ -1,20 +1,20 @@
 import { isString } from "@borodindmitriy/utils";
-import { Entity } from "../Entity";
+import { Entity, EntityID } from "../Entity";
+import { ValidateResult } from "../validate/ValidateResult";
 
-type Mandatory = "login" | "group";
-type Optional = "id" | "salt" | "hashedPassword";
-export type UserData = Required<Pick<User, Mandatory>> & Pick<User, Optional>;
+export type UserData = Pick<User, "login" | "group" | "salt" | "hashedPassword">;
 
-const fields: string[] = ["id", "login", "group", "salt", "hashedPassword"];
+const fields: string[] = ["login", "group", "salt", "hashedPassword"];
 
 export class User extends Entity<UserData> {
-  public readonly login: string;
-  public readonly group: string;
+  public readonly login?: string;
+  public readonly group?: string;
   public readonly salt?: string;
   public readonly hashedPassword?: string;
 
-  constructor(data: UserData) {
-    super();
+  // The check in the constructor ensures that the correct fields will be written into the object
+  constructor(data: UserData & EntityID) {
+    super(data);
 
     if (data) {
       for (const field of fields) {
@@ -27,12 +27,9 @@ export class User extends Entity<UserData> {
     }
   }
 
-  public isInsert(): this is Required<Omit<UserData, "id">> {
+  // The canBeInsert method ensures that all mandatory fields are filled in and have the correct data type.
+  public canBeInsert(): this is Required<UserData> {
     for (const field of fields) {
-      if (field === "id") {
-        continue;
-      }
-
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);
       }
@@ -41,13 +38,18 @@ export class User extends Entity<UserData> {
     return true;
   }
 
-  public toObject(): UserData {
+  // The validate method allows you to implement the logic of checking the entered values in the object and to minimize the object describing the result of the check
+  public async validate(): Promise<ValidateResult> {
+    return new ValidateResult([]);
+  }
+
+  // The eject method returns an object with fields that are the object's content
+  protected eject(): UserData {
     return {
-      ...(this.id ? { id: this.id } : {}),
       login: this.login,
       group: this.group,
-      ...(this.salt ? { salt: this.salt } : {}),
-      ...(this.hashedPassword ? { hashedPassword: this.hashedPassword } : {}),
+      salt: this.salt,
+      hashedPassword: this.hashedPassword,
     };
   }
 }

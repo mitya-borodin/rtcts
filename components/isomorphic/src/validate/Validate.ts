@@ -1,12 +1,13 @@
 import { isArray, isString, isUndefined } from "@borodindmitriy/utils";
-import { ValueObject } from "../Entity";
-import { Log } from "../log/Log";
+import { Log, LogData } from "../log/Log";
 
-export class Validate extends Log implements ValueObject<any> {
+export type ValidateData = LogData & Required<Pick<Validate, "field">> & Pick<Validate, "title">;
+
+export class Validate extends Log {
   public readonly field: string | string[];
   public readonly title?: string;
 
-  constructor(data?: any) {
+  constructor(data: ValidateData) {
     super(data);
 
     this.field = "";
@@ -50,7 +51,7 @@ export class Validate extends Log implements ValueObject<any> {
     return new Log({ type: this.type, message: this.message });
   }
 
-  public toObject(): any {
+  public toObject(): ValidateData {
     return {
       ...super.toObject(),
       field: this.field,

@@ -1,5 +1,5 @@
 import { getErrorMessage, isObject, isString } from "@borodindmitriy/utils";
-import { ErrorChannel } from "../export";
+import { ErrorChannel } from "./wsChannels";
 
 export const makeErrorMessage = (
   message: string,

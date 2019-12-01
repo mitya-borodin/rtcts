@@ -3,33 +3,46 @@ import { isString } from "@borodindmitriy/utils";
 
 export interface ValueObject<Data> {
   toObject(): Data;
-  toJSON(): Data;
+  toJSON(): object;
 }
 
-export interface Form<Data extends { id?: string }, VR extends ValidateResult = ValidateResult>
-  extends ValueObject<Data> {
+export type EntityID = { id?: string };
+
+export abstract class Entity<Data, VA extends any[] = any[]> implements ValueObject<Data> {
   readonly id?: string;
 
-  validate(...args: any[]): Promise<VR>;
-}
+  constructor(data: Data & EntityID) {
+    if (data) {
+      if (isString(data.id)) {
+        this.id = data.id;
+      }
+    } else {
+      throw new Error(`Entity(data) data should be defined`);
+    }
+  }
 
-export abstract class Entity<Data extends { id?: string }> implements ValueObject<Data> {
-  readonly id?: string;
-
-  public isEntity(): this is Required<Data> {
-    this.isInsert();
-
+  public isEntity(): this is Required<Data & EntityID> {
     if (!isString(this.id)) {
       throw new Error(`${this.constructor.name}.id should be String`);
     }
 
+    this.canBeInsert();
+
     return true;
   }
 
-  public abstract isInsert(): this is Required<Omit<Data, "id">>;
-  public abstract toObject(): Data;
+  public abstract canBeInsert(): this is Required<Data>;
+  public abstract validate(...args: VA): Promise<ValidateResult>;
+  public toObject(): Data & EntityID {
+    return {
+      ...(isString(this.id) ? { id: this.id } : {}),
+      ...this.eject(),
+    };
+  }
 
-  public toJSON(): Data {
+  protected abstract eject(): Data;
+
+  public toJSON(): object {
     return this.toObject();
   }
 }

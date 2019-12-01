@@ -1,10 +1,9 @@
 import { isString } from "@borodindmitriy/utils";
-import { ValueObject } from "../Entity";
 import { LogType } from "./LogType";
 import { logTypeEnum } from "./logTypeEnum";
+import { ValueObject } from "../Entity";
 
-type Mandatory = "type" | "message";
-export type LogData = Required<Pick<Log, Mandatory>>;
+export type LogData = Required<Pick<Log, "type" | "message">>;
 
 const fields: string[] = ["type", "message"];
 
@@ -36,7 +35,7 @@ export class Log implements ValueObject<LogData> {
     };
   }
 
-  public toJSON(): LogData {
+  public toJSON(): object {
     return this.toObject();
   }
 }
