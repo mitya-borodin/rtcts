@@ -1,9 +1,10 @@
-import { isArray, isString } from "@borodindmitriy/utils";
+import { isArray, isObject, isString } from "@borodindmitriy/utils";
+import { SimpleObject } from "../Entity";
 import { Log } from "../log/Log";
 import { logTypeEnum } from "../log/logTypeEnum";
-import { Validate } from "./Validate";
+import { Validate, ValidateData } from "./Validate";
 
-export class ValidateResult {
+export class ValidateResult extends SimpleObject<ValidateData[]> {
   public readonly results: Validate[];
 
   public readonly isValid: boolean;
@@ -20,7 +21,15 @@ export class ValidateResult {
 
   private readonly cache: Map<string, any> = new Map();
 
-  constructor(data?: Array<ValidateResult | Validate> | ValidateResult | Validate) {
+  constructor(
+    data?:
+      | Array<ValidateResult | Validate | ValidateData>
+      | ValidateResult
+      | Validate
+      | ValidateData,
+  ) {
+    super();
+
     this.results = [];
 
     this.isValid = false;
@@ -56,6 +65,8 @@ export class ValidateResult {
             for (const validate of item.toValidate()) {
               results.push(validate);
             }
+          } else if (isObject(item)) {
+            results.push(new Validate(item));
           } else {
             throw new Error(
               `[ ${this.constructor.name} ][ unexpected item ][ ${JSON.stringify(item)} ]`,
@@ -68,6 +79,12 @@ export class ValidateResult {
         }
       } else if (data instanceof Validate) {
         results.push(data);
+      } else if (isObject(data)) {
+        results.push(new Validate(data));
+      } else {
+        throw new Error(
+          `[ ${this.constructor.name} ][ unexpected data ][ ${JSON.stringify(data)} ]`,
+        );
       }
     }
 
@@ -242,7 +259,7 @@ export class ValidateResult {
     return this.results.map((r) => r);
   }
 
-  public toObject(): Array<{ [key: string]: any }> {
+  public toObject(): ValidateData[] {
     return this.results.map((r) => r.toObject());
   }
 }

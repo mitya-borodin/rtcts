@@ -1,17 +1,26 @@
 import { ValidateResult } from "./validate/ValidateResult";
 import { isString } from "@borodindmitriy/utils";
 
-export interface ValueObject<Data> {
-  toObject(): Data;
-  toJSON(): object;
+export abstract class SimpleObject<Data> {
+  public abstract toObject(): Data;
+  public toJSON(): Data {
+    return this.toObject();
+  }
+}
+
+export abstract class ValueObject<Data, VA extends any[] = any[]> extends SimpleObject<Data> {
+  public abstract canBeInsert(): this is Required<Data>;
+  public abstract validate(...args: VA): Promise<ValidateResult>;
 }
 
 export type EntityID = { id?: string };
 
-export abstract class Entity<Data, VA extends any[] = any[]> implements ValueObject<Data> {
+export abstract class Entity<Data, VA extends any[] = any[]> extends ValueObject<Data, VA> {
   readonly id?: string;
 
   constructor(data: Data & EntityID) {
+    super();
+
     if (data) {
       if (isString(data.id)) {
         this.id = data.id;
@@ -31,8 +40,6 @@ export abstract class Entity<Data, VA extends any[] = any[]> implements ValueObj
     return true;
   }
 
-  public abstract canBeInsert(): this is Required<Data>;
-  public abstract validate(...args: VA): Promise<ValidateResult>;
   public toObject(): Data & EntityID {
     return {
       ...(isString(this.id) ? { id: this.id } : {}),
@@ -41,8 +48,4 @@ export abstract class Entity<Data, VA extends any[] = any[]> implements ValueObj
   }
 
   protected abstract eject(): Data;
-
-  public toJSON(): object {
-    return this.toObject();
-  }
 }

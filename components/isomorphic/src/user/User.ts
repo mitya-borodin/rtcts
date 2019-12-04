@@ -1,6 +1,8 @@
 import { isString } from "@borodindmitriy/utils";
 import { Entity, EntityID } from "../Entity";
 import { ValidateResult } from "../validate/ValidateResult";
+import { Validate } from "../validate/Validate";
+import { logTypeEnum } from "../log/logTypeEnum";
 
 export type UserData = Pick<User, "login" | "group" | "salt" | "hashedPassword">;
 
@@ -38,9 +40,41 @@ export class User extends Entity<UserData> {
     return true;
   }
 
+  public checkNoSecure(): this is Required<Omit<UserData, "salt" | "hashedPassword">> {
+    for (const field of ["login", "group"]) {
+      if (!isString(this[field])) {
+        throw new Error(`User.${field} should be String`);
+      }
+    }
+
+    return true;
+  }
+
   // The validate method allows you to implement the logic of checking the entered values in the object and to minimize the object describing the result of the check
   public async validate(): Promise<ValidateResult> {
-    return new ValidateResult([]);
+    const validates: Validate[] = [];
+
+    if (!isString(this.login)) {
+      validates.push(
+        new Validate({
+          field: "login",
+          message: `Login should be typed`,
+          type: logTypeEnum.error,
+        }),
+      );
+    }
+
+    if (!isString(this.group)) {
+      validates.push(
+        new Validate({
+          field: "group",
+          message: `Group should be selected`,
+          type: logTypeEnum.error,
+        }),
+      );
+    }
+
+    return new ValidateResult(validates);
   }
 
   // The eject method returns an object with fields that are the object's content
@@ -48,8 +82,8 @@ export class User extends Entity<UserData> {
     return {
       login: this.login,
       group: this.group,
-      salt: this.salt,
-      hashedPassword: this.hashedPassword,
+      ...(this.salt ? { salt: this.salt } : {}),
+      ...(this.hashedPassword ? { hashedPassword: this.hashedPassword } : {}),
     };
   }
 }

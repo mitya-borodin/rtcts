@@ -1,4 +1,4 @@
-export { ValueObject, Entity } from "./Entity";
+export { SimpleObject, ValueObject, Entity } from "./Entity";
 
 export { userRepositoryEventEnum } from "./user/userRepositoryEventEnum";
 export { User } from "./user/User";

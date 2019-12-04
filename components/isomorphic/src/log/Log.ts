@@ -1,17 +1,19 @@
 import { isString } from "@borodindmitriy/utils";
+import { SimpleObject } from "../Entity";
 import { LogType } from "./LogType";
 import { logTypeEnum } from "./logTypeEnum";
-import { ValueObject } from "../Entity";
 
-export type LogData = Required<Pick<Log, "type" | "message">>;
+export type LogData = Pick<Log, "type" | "message">;
 
 const fields: string[] = ["type", "message"];
 
-export class Log implements ValueObject<LogData> {
+export class Log extends SimpleObject<LogData> {
   public readonly type: LogType;
   public readonly message: string;
 
   constructor(data: LogData) {
+    super();
+
     this.type = logTypeEnum.log;
     this.message = "";
 
@@ -33,9 +35,5 @@ export class Log implements ValueObject<LogData> {
       type: this.type,
       message: this.message,
     };
-  }
-
-  public toJSON(): object {
-    return this.toObject();
   }
 }
