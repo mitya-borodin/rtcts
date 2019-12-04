@@ -34,8 +34,8 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@borodindmitriy/utils": "^3.0.5",
-    "@borodindmitriy/vendors": "^1.0.0",
+    "@framework/utils": "^1.0.0",
+    "@framework/vendors": "^1.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
@@ -51,6 +51,18 @@
     "pretty-quick": "^2.0.0",
     "typescript": "^3.6.4"
   },
+  "keywords": [
+    "entity",
+    "framework",
+    "isomorphic",
+    "library",
+    "log",
+    "rearguard",
+    "user",
+    "validates",
+    "value object",
+    "ws"
+  ],
   "engines": {
     "node": ">=10 <13",
     "npm": ">=6 <7"
@@ -99,17 +111,5 @@
     "css": {
       "postcssPlugins": "postcss.config.js"
     }
-  },
-  "keywords": [
-    "framework",
-    "isomorphic",
-    "entity",
-    "value object",
-    "library",
-    "rearguard",
-    "user",
-    "log",
-    "ws",
-    "validates"
-  ]
+  }
 }
