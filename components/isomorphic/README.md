@@ -53,4 +53,6 @@ npm i -g rearguard
 npm i
 
 npm run build
+
+npm link
 ```

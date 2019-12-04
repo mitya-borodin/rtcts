@@ -1,6 +1,6 @@
 {
-  "name": "@borodindmitriy/back-end-lib",
-  "description": "Back-end common classes's library.",
+  "name": "@framework/node-lib",
+  "description": "Contains basic abstractions and implementations for creating a node application",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
@@ -12,30 +12,29 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "3.0.8",
+  "version": "1.0.0",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
     "lib"
   ],
   "scripts": {
-    "start": "npx rearguard start",
-    "build": "npx rearguard build",
-    "test": "npx rearguard test",
-    "sync": "npx rearguard sync",
-    "check_deps_on_npm": "npx rearguard check_deps_on_npm",
-    "lint": "npx rearguard lint",
-    "lint-fix": "npx rearguard lint --fix",
+    "start": "rearguard start",
+    "build": "rearguard build",
+    "test": "rearguard test",
+    "lint": "rearguard lint",
+    "lint-fix": "rearguard lint --fix",
     "typecheck": "tsc --noEmit",
     "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
     "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
-    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
+    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'",
+    "postinstall": "npx typesync"
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@borodindmitriy/interfaces": "^3.0.6",
-    "@borodindmitriy/isomorphic": "^3.0.5",
-    "@borodindmitriy/utils": "^3.0.5",
+    "@framework/interfaces": "^1.0.0",
+    "@framework/isomorphic": "^1.0.0",
+    "@framework/utils": "^1.0.0",
     "body-parser": "^1.19.0",
     "bson": "^4.0.2",
     "chalk": "^2.4.2",

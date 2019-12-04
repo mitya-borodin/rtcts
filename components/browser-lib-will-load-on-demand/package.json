@@ -1,6 +1,6 @@
 {
-  "name": "@borodindmitriy/deferred_module_test",
-  "description": "Deferred_module_test.",
+  "name": "@framework/browser-lib-will-load-on-demand",
+  "description": "Example of a module that can be loaded on demand",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "3.0.7",
+  "version": "1.0.0",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -20,15 +20,16 @@
     "lib_bundle"
   ],
   "scripts": {
-    "start": "npx rearguard start",
-    "build": "npx rearguard build",
-    "test": "npx rearguard test",
-    "lint": "npx rearguard lint",
-    "lint-fix": "npx rearguard lint --fix",
+    "start": "rearguard start",
+    "build": "rearguard build",
+    "test": "rearguard test",
+    "lint": "rearguard lint",
+    "lint-fix": "rearguard lint --fix",
     "typecheck": "tsc --noEmit",
     "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
     "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
-    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
+    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'",
+    "postinstall": "npx typesync"
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
@@ -54,7 +55,7 @@
     "typescript": "3.4.1"
   },
   "engines": {
-    "node": ">=10 <11",
+    "node": ">=10 <13",
     "npm": ">=6 <7"
   },
   "publishConfig": {

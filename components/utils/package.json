@@ -1,5 +1,5 @@
 {
-  "name": "@rtcts/utils",
+  "name": "@framework/utils",
   "description": "Contains utility functions",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -20,22 +20,21 @@
     "lib_bundle"
   ],
   "scripts": {
-    "start": "npx rearguard start",
-    "start:ts_node_dev": "npx rearguard start --ts_node_dev",
-    "build": "npx rearguard build",
-    "test": "npx rearguard test",
-    "sync": "npx rearguard sync",
-    "check_deps_on_npm": "npx rearguard check_deps_on_npm",
-    "lint": "npx rearguard lint",
-    "lint-fix": "npx rearguard lint --fix",
+    "start": "rearguard start",
+    "start:ts_node_dev": "rearguard start --ts_node_dev",
+    "build": "rearguard build",
+    "test": "rearguard test",
+    "lint": "rearguard lint",
+    "lint-fix": "rearguard lint --fix",
     "typecheck": "tsc --noEmit",
     "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
     "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
-    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
+    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'",
+    "postinstall": "npx typesync"
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@rtcts/vendors": "^1.0.0",
+    "@framework/vendors": "^1.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

@@ -1,8 +1,8 @@
 {
-  "name": "@rtcts/vendors",
+  "name": "@framework/vendors",
   "description": "Contains all basic dependencies for browser development (lib, app)",
   "license": "MIT",
-  "author": "Borodin Dmitriy",
+  "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://gitlab.com/mitya-borodin/base-code",
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "dll_bundle"
   ],
   "scripts": {
-    "build": "npx rearguard build"
+    "build": "rearguard build"
   },
   "types": "",
   "dependencies": {

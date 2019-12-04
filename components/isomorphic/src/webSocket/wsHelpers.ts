@@ -1,4 +1,4 @@
-import { getErrorMessage, isObject, isString } from "@borodindmitriy/utils";
+import { getErrorMessage, isObject, isString } from "@framework/utils";
 import { ErrorChannel } from "./wsChannels";
 
 export const makeErrorMessage = (

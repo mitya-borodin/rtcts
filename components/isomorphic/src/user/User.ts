@@ -1,4 +1,4 @@
-import { isString } from "@borodindmitriy/utils";
+import { isString } from "@framework/utils";
 import { Entity, EntityID } from "../Entity";
 import { ValidateResult } from "../validate/ValidateResult";
 import { Validate } from "../validate/Validate";

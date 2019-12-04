@@ -1,4 +1,4 @@
-import { isString } from "@borodindmitriy/utils";
+import { isString } from "@framework/utils";
 import { SimpleObject } from "../Entity";
 import { LogType } from "./LogType";
 import { logTypeEnum } from "./logTypeEnum";
