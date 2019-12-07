@@ -1,5 +1,5 @@
 import { ValidateResult } from "./validate/ValidateResult";
-import { isString } from "@framework/utils";
+import { isString } from "@rtcts/utils";
 
 export abstract class SimpleObject<Data> {
   public abstract toObject(): Data;

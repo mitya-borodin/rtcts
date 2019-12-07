@@ -1,4 +1,4 @@
-import { isArray, isString, isUndefined } from "@framework/utils";
+import { isArray, isString, isUndefined } from "@rtcts/utils";
 import { Log, LogData } from "../log/Log";
 
 export type ValidateData = LogData & Required<Pick<Validate, "field">> & Pick<Validate, "title">;

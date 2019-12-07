@@ -1,4 +1,4 @@
-import { isString } from "@framework/utils";
+import { isString } from "@rtcts/utils";
 import { Entity, EntityID } from "../Entity";
 import { ValidateResult } from "../validate/ValidateResult";
 import { Validate } from "../validate/Validate";

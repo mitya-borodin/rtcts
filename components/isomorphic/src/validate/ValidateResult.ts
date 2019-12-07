@@ -1,4 +1,4 @@
-import { isArray, isObject, isString } from "@framework/utils";
+import { isArray, isObject, isString } from "@rtcts/utils";
 import { SimpleObject } from "../Entity";
 import { Log } from "../log/Log";
 import { logTypeEnum } from "../log/logTypeEnum";
