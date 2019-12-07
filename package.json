@@ -1,16 +1,16 @@
 {
-  "name": "framework",
+  "name": "rtcts",
   "description": "The repository contains the necessary classes and functions to implement a real-time client-server application with a closed type system, which is supported by static code analysis in typescript language and type verification at runtime using javascript capabilities.",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
-  "homepage": "https://github.com/mitya-borodin/base-code#readme",
+  "homepage": "https://github.com/mitya-borodin/rtcts#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mitya-borodin/base-code.git"
+    "url": "git+https://github.com/mitya-borodin/rtcts.git"
   },
   "bugs": {
     "email": "dmitriy@borodin.site",
-    "url": "https://github.com/mitya-borodin/base-code/issues"
+    "url": "https://github.com/mitya-borodin/rtcts/issues"
   },
   "version": "1.0.0",
   "scripts": {

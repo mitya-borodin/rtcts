@@ -1,4 +1,4 @@
-# @framework/utils
+# @rtcts/utils
 
 The package implements a set of utility functions for checking data types, working with time, forming files in the browser and others.
 

@@ -1,5 +1,5 @@
 {
-  "name": "@framework/browser-lib-will-load-on-demand",
+  "name": "@rtcts/browser-lib-will-load-on-demand",
   "description": "Example of a module that can be loaded on demand",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",

@@ -1,5 +1,5 @@
 {
-  "name": "@framework/vendors",
+  "name": "@rtcts/vendors",
   "description": "Contains all basic dependencies for browser development (lib, app)",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",

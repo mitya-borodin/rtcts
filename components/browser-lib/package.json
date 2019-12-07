@@ -1,5 +1,5 @@
 {
-  "name": "@framework/browser-lib",
+  "name": "@rtcts/browser-lib",
   "description": "Contains basic abstractions and implementations for creating a browser application",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -33,9 +33,9 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@framework/vendors": "^1.0.0",
-    "@framework/isomorphic": "^1.0.0",
-    "@framework/utils": "^1.0.0",
+    "@rtcts/vendors": "^1.0.0",
+    "@rtcts/isomorphic": "^1.0.0",
+    "@rtcts/utils": "^1.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

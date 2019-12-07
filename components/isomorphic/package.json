@@ -1,5 +1,5 @@
 {
-  "name": "@framework/isomorphic",
+  "name": "@rtcts/isomorphic",
   "description": "Isomorphic part of the framework, contains basic abstractions and implementations",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -34,8 +34,8 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@framework/utils": "^1.0.0",
-    "@framework/vendors": "^1.0.0",
+    "@rtcts/utils": "^1.0.0",
+    "@rtcts/vendors": "^1.0.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {

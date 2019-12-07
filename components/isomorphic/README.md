@@ -1,4 +1,4 @@
-# @framework/isomorphic
+# @rtcts/isomorphic
 
 Contains basic isomorphic abstractions and implementations of a framework that allows you to create a real-time client-server application.
 

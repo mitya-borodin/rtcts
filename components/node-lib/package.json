@@ -1,5 +1,5 @@
 {
-  "name": "@framework/node-lib",
+  "name": "@rtcts/node-lib",
   "description": "Contains basic abstractions and implementations for creating a node application",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -32,9 +32,9 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@framework/interfaces": "^1.0.0",
-    "@framework/isomorphic": "^1.0.0",
-    "@framework/utils": "^1.0.0",
+    "@rtcts/interfaces": "^1.0.0",
+    "@rtcts/isomorphic": "^1.0.0",
+    "@rtcts/utils": "^1.0.0",
     "body-parser": "^1.19.0",
     "bson": "^4.0.2",
     "chalk": "^2.4.2",

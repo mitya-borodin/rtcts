@@ -1,4 +1,4 @@
-# @framework/vendors
+# @rtcts/vendors
 
 The package implements the DLL bundle for webpack. Includes the necessary dependencies for the development of browser applications and libraries based on the React template engine and the Mobx state management system.
 

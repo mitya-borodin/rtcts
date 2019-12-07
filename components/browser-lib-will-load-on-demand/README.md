@@ -1,4 +1,4 @@
-# @framework/will_load_on_demand
+# @rtcts/will_load_on_demand
 
 This package illustrates how you can create a module that will not automatically connect to index.html, and will be available for download at runtime.
 
