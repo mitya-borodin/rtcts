@@ -1,25 +1,24 @@
-import { isString } from "@borodindmitriy/utils";
+import { isString } from "@rtcts/utils";
 import chalk from "chalk";
 import uuid from "uuid/v1";
-import * as WebSocket from "ws";
-import { IConnection } from "../interfaces/IConnection";
+import WebSocket from "ws";
 
-export class Connection implements IConnection {
+export class Connection {
   public static getConnectionID(uid: string, wsid: string): string {
     return `[ CONNECTION_ID ][ uid: ${uid} ][ wsid: ${wsid} ]`;
   }
+
+  public readonly ws: WebSocket;
   public wsid: string;
   public uid: string | void;
-  public readonly ws: WebSocket;
   private isAlive: boolean;
   private heartbeat: () => void;
 
   constructor(ws: WebSocket) {
     this.ws = ws;
-    this.isAlive = true;
     this.wsid = uuid();
     this.uid = undefined;
-
+    this.isAlive = true;
     this.heartbeat = (): void => {
       this.isAlive = true;
 
@@ -35,9 +34,10 @@ export class Connection implements IConnection {
         return Connection.getConnectionID(this.uid, this.wsid);
       }
 
-      console.log("");
       console.error(
-        chalk.redBright(`[ CONNECTION ][ ERROR ][ GET_CONNECTION_ID ][ UID_IS_NOT_DEFINED ]`),
+        chalk.red(
+          `[ CONNECTION ][ ERROR ][ uid is not defined, it is impossible to connectionID ]`,
+        ),
       );
 
       return "";
@@ -53,8 +53,7 @@ export class Connection implements IConnection {
       return this.uid === uid;
     }
 
-    console.log("");
-    console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ IS_OWNER ][ UID_IS_NOT_DEFINED ]`));
+    console.error(chalk.red(`[ CONNECTION ][ ERROR ][ uid is not defined ]`));
 
     return false;
   }
@@ -64,8 +63,7 @@ export class Connection implements IConnection {
       return this.uid === uid && this.wsid === wsid;
     }
 
-    console.log("");
-    console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ IS_ITSELF ][ UID_IS_NOT_DEFINED ]`));
+    console.error(chalk.red(`[ CONNECTION ][ ERROR ][ uid is not defined ]`));
 
     return false;
   }
@@ -74,8 +72,7 @@ export class Connection implements IConnection {
     if (!isString(this.uid)) {
       this.uid = uid;
     } else {
-      console.log("");
-      console.error(chalk.redBright(`[ CONNECTION ][ ERROR ][ USER_ID_ALREADY_EXIST ]`));
+      console.error(chalk.yellow(`[ CONNECTION ][ ERROR ][ uid is already defined ]`));
     }
   }
 
@@ -87,7 +84,7 @@ export class Connection implements IConnection {
     }
   }
 
-  public wasTermintate(): boolean {
+  public wasTerminate(): boolean {
     try {
       if (this.isAlive) {
         this.isAlive = false;
@@ -99,21 +96,22 @@ export class Connection implements IConnection {
             console.error(error);
           }
         });
-
-        return false;
       } else {
         this.terminate();
 
-        console.log("");
-        console.log(chalk.redBright(`[ CONNECTION ][ TERMINATE ][ CLIENT_DID_NOT_PONG ]`));
+        console.warn(
+          chalk.yellow(
+            `[ CONNECTION ][ the connection was terminated because the client did not respond to PING ]`,
+          ),
+        );
 
         return true;
       }
     } catch (error) {
       console.error(error);
-
-      return false;
     }
+
+    return false;
   }
 
   public close(message?: string): void {
@@ -122,8 +120,9 @@ export class Connection implements IConnection {
       this.ws.removeAllListeners();
       this.ws.close(1000, "[ CLOSE ] " + message);
 
-      console.log("");
-      console.log(chalk.blueBright(`[ CONNECTION ][ CLOSE ] ${message}`));
+      console.log(
+        chalk.white(`[ CONNECTION ][ the connection was closed with a message: ${message} ]`),
+      );
     } catch (error) {
       console.error(error);
     }
@@ -137,7 +136,9 @@ export class Connection implements IConnection {
       this.ws.terminate();
 
       console.log("");
-      console.log(chalk.blueBright(`[ CONNECTION ][ TERMINATE ] ${message || ""}`));
+      console.log(
+        chalk.white(`[ CONNECTION ][ the connection was terminated with a message: ${message} ]`),
+      );
     } catch (error) {
       console.error(error);
     }

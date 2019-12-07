@@ -1,4 +1,4 @@
-import * as crypto from "crypto";
+import crypto from "crypto";
 
 export function encryptPassword(password: string, salt: string): string {
   try {
@@ -6,7 +6,9 @@ export function encryptPassword(password: string, salt: string): string {
       .createHmac("sha256", salt)
       .update(password)
       .digest("hex");
-  } catch (err) {
+  } catch (error) {
+    console.error(error);
+
     return "";
   }
 }

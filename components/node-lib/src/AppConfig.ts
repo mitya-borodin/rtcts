@@ -1,4 +1,4 @@
-import { isNumber } from "@borodindmitriy/utils";
+import { isNumber } from "@rtcts/utils";
 import chalk from "chalk";
 import { ExtractJwt, JwtFromRequestFunction } from "passport-jwt";
 

@@ -1,48 +1,46 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-/* eslint-disable @typescript-eslint/camelcase */
-import { IEntity, IUser } from "@borodindmitriy/interfaces";
 import {
-  assigment_to_user_of_the_connection_channel,
-  cancel_assigment_to_user_of_the_connection_channel,
+  assignment_to_user_of_the_connection_channel,
+  cancel_assignment_to_user_of_the_connection_channel,
   makeErrorMessage,
   makeMessage,
   PingChannel,
   PongChannel,
   recognizeMessage,
-} from "@borodindmitriy/isomorphic";
-import { getErrorMessage, isArray, isString, isUndefined } from "@borodindmitriy/utils";
+} from "@rtcts/isomorphic";
+import { getErrorMessage, isArray, isString, isUndefined } from "@rtcts/utils";
 import chalk from "chalk";
-import * as express from "express";
-import * as WebSocket from "ws";
-import { IChannels } from "../interfaces/IChannels";
-import { IConnection } from "../interfaces/IConnection";
-import { IUserModel } from "../interfaces/IUserModel";
+import WebSocket from "ws";
 import { AppConfig } from "../AppConfig";
+import { Channels } from "./Channels";
+import { Connection } from "./Connection";
 
-export class WSServer<U extends IUserModel<IUser & IEntity>> {
+export class WebSocketServer {
+  private wasRun: boolean;
+
   private config: AppConfig;
   private server: WebSocket.Server;
-  private connections: Set<IConnection>;
-  private Connection: new (data: any) => IConnection;
-  private channels: IChannels;
-  private user: U;
-  private wasRun: boolean;
+  private connections: Set<Connection>;
+  private channels: Channels;
+
   private interval: NodeJS.Timer;
 
+  private Connection: new (ws: WebSocket) => Connection;
+
   constructor(
-    Connection: new (data: any) => IConnection,
-    channels: IChannels,
+    Connection: new (ws: WebSocket) => Connection,
+    channels: Channels,
     config: AppConfig,
-    user: U,
   ) {
-    this.Connection = Connection;
-    this.connections = new Set();
-    this.channels = channels;
-    this.config = config;
-    this.user = user;
-    this.server = new WebSocket.Server({ host: this.config.ws.host, port: this.config.ws.port });
     this.wasRun = false;
+
+    this.config = config;
+    this.server = new WebSocket.Server({ host: this.config.ws.host, port: this.config.ws.port });
+    this.Connection = Connection;
+    this.channels = channels;
+
     this.interval = setInterval(() => null, 1000 * 1000);
+
+    this.connections = new Set();
 
     this.run = this.run.bind(this);
     this.connectionHandler = this.connectionHandler.bind(this);
@@ -52,8 +50,8 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
     try {
       if (!this.wasRun) {
         console.log(
-          chalk.blueBright.bold(
-            `[ WS ][ SERVER ][ RUN ][ ws://${this.config.ws.host}:${this.config.ws.port} ]`,
+          chalk.green(
+            `[ WS ][ the connection is open at ws://${this.config.ws.host}:${this.config.ws.port} ]`,
           ),
         );
 
@@ -63,36 +61,37 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
           console.error(error);
 
           clearInterval(this.interval);
-          let connsectionToDelete: IConnection[] = [];
+
+          let connectionToDelete: Connection[] = [];
 
           for (const connection of this.connections) {
             this.channels.deleteConnection(connection);
 
-            connsectionToDelete.push(connection);
+            connectionToDelete.push(connection);
           }
 
-          for (const id of connsectionToDelete) {
+          for (const id of connectionToDelete) {
             this.connections.delete(id);
           }
 
-          connsectionToDelete = [];
+          connectionToDelete = [];
         });
 
         this.interval = setInterval(() => {
           for (const connection of this.connections) {
-            if (connection.wasTermintate()) {
+            if (connection.wasTerminate()) {
               this.channels.deleteConnection(connection);
               this.connections.delete(connection);
               this.server.clients.delete(connection.ws);
 
               console.log(
-                chalk.cyan.bold(
-                  "[ TERMINATE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size,
+                chalk.white(
+                  `[ TERMINATE ][ number of connections the application has ][ ${this.connections.size} ]`,
                 ),
               );
               console.log(
-                chalk.cyan.bold(
-                  "[ TERMINATE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size,
+                chalk.white(
+                  `[ TERMINATE ][ number of connections the server has ][ ${this.server.clients.size} ]`,
                 ),
               );
             }
@@ -104,20 +103,21 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
     }
   }
 
-  private connectionHandler(ws: WebSocket, req: express.Request): void {
+  private connectionHandler(ws: WebSocket): void {
     try {
       const connection = new this.Connection(ws);
       const messageHandler = this.messageHandler.bind(this, connection);
 
       this.connections.add(connection);
 
-      console.log("");
       console.log(
-        chalk.cyan.bold("[ NEW_CONNECTION ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size),
+        chalk.green(
+          `[ NEW_CONNECTION ][ number of connections the application has ][ ${this.connections.size} ]`,
+        ),
       );
       console.log(
-        chalk.cyan.bold(
-          "[ NEW_CONNECTION ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size,
+        chalk.green(
+          `[ NEW_CONNECTION ][ number of connections the server has ][ ${this.server.clients.size} ]`,
         ),
       );
 
@@ -132,14 +132,18 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
         this.server.clients.delete(connection.ws);
 
         console.log("");
-        console.log(chalk.grey.bold(`[ CLOSE ][ CODE ]: ${code}`));
-        console.log(chalk.grey.bold(`[ CLOSE ][ MESSAGE ]: ${message}`));
-        console.log(chalk.grey.bold(`[ CLOSE ]${connection.getConnectionID()}`));
+        console.log(chalk.grey(`[ CLOSE ][ CODE ]: ${code}`));
+        console.log(chalk.grey(`[ CLOSE ][ MESSAGE ]: ${message}`));
+        console.log(chalk.grey(`[ CLOSE ]${connection.getConnectionID()}`));
         console.log(
-          chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size),
+          chalk.grey(
+            `[ CLOSE ][ number of connections the application has ][ ${this.connections.size} ]`,
+          ),
         );
         console.log(
-          chalk.cyan.bold("[ CLOSE ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size),
+          chalk.grey(
+            `[ CLOSE ][ number of connections the server has ][ ${this.server.clients.size} ]`,
+          ),
         );
       });
 
@@ -153,13 +157,16 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
 
         console.log("");
         console.log(
-          chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ APP ]: " + this.connections.size),
+          chalk.red(
+            `[ ERROR ][ number of connections the application has ][ ${this.connections.size} ]`,
+          ),
         );
         console.log(
-          chalk.cyan.bold("[ ERROR ][ CONNECTION_COUNT ][ SERVER ]: " + this.server.clients.size),
+          chalk.red(
+            `[ ERROR ][ number of connections the server has ][ ${this.server.clients.size} ]`,
+          ),
         );
-        console.log(chalk.cyan.bold(`[ ERROR ]${connection.getConnectionID()}`));
-
+        console.log(chalk.red(`[ ERROR ]${connection.getConnectionID()}`));
         console.error(error);
       });
     } catch (error) {
@@ -168,48 +175,48 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
   }
 
   private messageHandler(
-    connection: IConnection,
+    connection: Connection,
     message?: string | Buffer | ArrayBuffer | Buffer[],
   ): void {
     try {
       if (!isUndefined(message)) {
         if (isString(message)) {
-          const recieveData = this.recognizeMessage(message);
+          const receiveData = this.recognizeMessage(message);
 
-          if (isArray(recieveData)) {
-            const [channelName, payload] = recieveData;
+          if (isArray(receiveData)) {
+            const [channelName, payload] = receiveData;
 
             if (channelName === PingChannel) {
               connection.send(this.makeMessage(PongChannel, {}));
             } else if (isString(payload.uid)) {
               if (
-                channelName === assigment_to_user_of_the_connection_channel ||
-                channelName === cancel_assigment_to_user_of_the_connection_channel
+                channelName === assignment_to_user_of_the_connection_channel ||
+                channelName === cancel_assignment_to_user_of_the_connection_channel
               ) {
                 this.user
                   .readById(payload.uid)
-                  .then((user: IUser & IEntity | null) => {
+                  .then((user: (IUser & IEntity) | null) => {
                     if (user) {
-                      if (channelName === assigment_to_user_of_the_connection_channel) {
+                      if (channelName === assignment_to_user_of_the_connection_channel) {
                         connection.setUserID(user.id);
 
                         this.channels.addConnection(connection);
 
                         connection.send(
                           this.makeMessage(channelName, {
-                            message: "[ ASSIGMENT ][ DONE ]",
+                            message: "[ ASSIGNMENT ][ DONE ]",
                             uid: connection.uid,
                             wsid: connection.wsid,
                           }),
                         );
                       }
 
-                      if (channelName === cancel_assigment_to_user_of_the_connection_channel) {
+                      if (channelName === cancel_assignment_to_user_of_the_connection_channel) {
                         this.channels.deleteConnection(connection);
 
                         connection.send(
                           this.makeMessage(channelName, {
-                            message: "[ CANCELING ][ ASSIGMENT ][ DONE ]",
+                            message: "[ CANCELING ][ ASSIGNMENT ][ DONE ]",
                             uid: connection.uid,
                             wsid: connection.wsid,
                           }),
@@ -218,7 +225,7 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
                     } else {
                       connection.send(
                         this.makeErrorMessage(
-                          `[ ASSIGMENT_ERROR ] user by id: ${payload.uid} not found`,
+                          `[ ASSIGNMENT_ERROR ] user by id: ${payload.uid} not found`,
                           {
                             channelName,
                             payload,
@@ -229,7 +236,7 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
                   })
                   .catch((error: any) => {
                     connection.send(
-                      this.makeErrorMessage(`[ ASSIGMENT_ERROR ] ${getErrorMessage(error)}`, {
+                      this.makeErrorMessage(`[ ASSIGNMENT_ERROR ] ${getErrorMessage(error)}`, {
                         error,
                         payload,
                       }),
@@ -237,7 +244,7 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
                   });
               } else {
                 connection.send(
-                  this.makeErrorMessage(`[ This channel: ${channelName} is not in service ]`, {
+                  this.makeErrorMessage(`[ This channel: ${channelName} is not serviced ]`, {
                     channelName,
                     payload,
                   }),
@@ -246,22 +253,22 @@ export class WSServer<U extends IUserModel<IUser & IEntity>> {
             } else {
               console.log("");
               console.log(
-                chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have userID;`),
+                chalk.redBright(`[ MESSAGE_HANDLING ][ DETECT_ID ] payload must have uid`),
               );
             }
           } else {
             console.log("");
             console.log(
               chalk.redBright(
-                `[ MESSAGE_HANDLING ][ RECIEVE_DATA ] must be [ String, { [ key: string ]: any } ]`,
+                `[ MESSAGE_HANDLING ][ RECEIVE_DATA ] must be [ string, { [ key: string ]: any } ]`,
               ),
             );
           }
         } else {
           console.log("");
-          console.log(
+          console.error(
             chalk.redBright(
-              `[ MESSAGE_HANDLING ] have NOT implement message hanler ` +
+              `[ MESSAGE_HANDLING ] have NOT implement message handler ` +
                 `for other data types Buffer | ArrayBuffer | Buffer[]`,
             ),
           );

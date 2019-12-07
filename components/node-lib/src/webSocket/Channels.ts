@@ -1,40 +1,35 @@
-import { makeMessage } from "@borodindmitriy/isomorphic";
+import { makeMessage } from "@rtcts/isomorphic";
 import chalk from "chalk";
-import { IChannels } from "../interfaces/IChannels";
-import { IConnection } from "../interfaces/IConnection";
 import { Connection } from "./Connection";
+import { isString } from "@rtcts/utils";
 
-export class Channels<C extends IConnection = IConnection> implements IChannels<C> {
+export class Channels<C extends Connection = Connection> {
   // Map<connectionID: string, Connection>
   private connections: Map<string, C>;
+
   // Map<channelName: string, Map<connectionID: string, Connection>>
   private channels: Map<string, Map<string, C>>;
 
   constructor() {
-    // INIT
     this.connections = new Map();
     this.channels = new Map();
   }
 
   public addConnection(connection: C): void {
     try {
-      const connectionId = connection.getConnectionID();
+      const connectionID = connection.getConnectionID();
 
-      if (!this.connections.has(connectionId)) {
-        this.connections.set(connectionId, connection);
+      if (!this.connections.has(connectionID)) {
+        this.connections.set(connectionID, connection);
 
-        console.log("");
-        console.log(chalk.yellow(`[ CHANNELS ][ ADD_CONNECTION ]${connectionId}`));
+        console.log(chalk.green(`[ CHANNELS ][ Connection with ID: ${connectionID} added ]`));
         console.log(
-          chalk.yellow(
-            `[ CHANNELS ][ ADD_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`,
-          ),
+          chalk.green(`[ CHANNELS ][ Current number of connections ][ ${this.connections.size} ]`),
         );
       } else {
-        console.log("");
-        console.log(
-          chalk.redBright(
-            `[ CHANNELS ][ ADD_CONNECTION ][ ERROR ][ ALLREADY_EXIST ] ${connectionId}`,
+        console.warn(
+          chalk.yellow(
+            `[ CHANNELS ][ The connection with ID: ${connectionID} has already been added ]`,
           ),
         );
       }
@@ -45,28 +40,28 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
 
   public deleteConnection(connection: C): void {
     try {
-      const id = connection.getConnectionID();
-      const curConnection = this.connections.get(id);
+      const connectionID = connection.getConnectionID();
+      const curConnection = this.connections.get(connectionID);
 
       if (curConnection) {
-        this.connections.delete(id);
+        this.connections.delete(connectionID);
 
         for (const chName of this.channels.keys()) {
-          this.off(chName, curConnection.uid || "", curConnection.wsid);
+          if (isString(curConnection.uid)) {
+            this.off(chName, curConnection.uid, curConnection.wsid);
+          } else {
+            console.warn(
+              chalk.yellow(`[ CHANNELS ][ An attempt was made to add a connection without an ID ]`),
+            );
+          }
         }
 
-        console.log("");
-        console.log(chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ]${id}`));
+        console.log(chalk.green(`[ CHANNELS ][ Connection with ID: ${connectionID} removed ]`));
         console.log(
-          chalk.redBright(
-            `[ CHANNELS ][ DELETE_CONNECTION ][ CONNECTION_COUNT ][ ${this.connections.size} ]`,
-          ),
+          chalk.green(`[ CHANNELS ][ Current number of connections ][ ${this.connections.size} ]`),
         );
       } else {
-        console.log("");
-        console.log(
-          chalk.redBright(`[ CHANNELS ][ DELETE_CONNECTION ][ ERROR ][ NOT_FOUND ] ${id}`),
-        );
+        console.warn(chalk.yellow(`[ CHANNELS ][ Connection with ID: ${connectionID} not found ]`));
       }
     } catch (error) {
       console.error(error);
@@ -85,30 +80,25 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
           if (!channel.has(connectionID)) {
             channel.set(connectionID, connection);
 
-            console.log("");
             console.log(
-              chalk.yellow.bold(
-                `[ CHANNELS ][ DONE_ON ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`,
+              chalk.green(
+                `[ CHANNELS ][ Added listener for channel: ${chName} ][ current number of listeners: ${channel.size} ]`,
               ),
             );
           }
         }
       } else {
         if (connection) {
-          this.channels.set(chName, new Map());
+          channel = new Map();
+          channel.set(connectionID, connection);
 
-          channel = this.channels.get(chName);
+          this.channels.set(chName, channel);
 
-          if (channel) {
-            channel.set(connectionID, connection);
-
-            console.log("");
-            console.log(
-              chalk.yellow.bold(
-                `[ CHANNELS ][ ADD_CHANNEL ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`,
-              ),
-            );
-          }
+          console.log(
+            chalk.green(
+              `[ CHANNELS ][ Added listener for channel: ${chName} ][ current number of listeners: ${channel.size} ]`,
+            ),
+          );
         }
       }
     } catch (error) {
@@ -118,22 +108,21 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
 
   public off(chName: string, uid: string, wsid: string): void {
     try {
+      const connectionID = Connection.getConnectionID(uid, wsid);
       const channel = this.channels.get(chName);
 
       if (channel) {
-        if (channel.has(Connection.getConnectionID(uid, wsid))) {
-          channel.delete(Connection.getConnectionID(uid, wsid));
+        if (channel.has(connectionID)) {
+          channel.delete(connectionID);
 
-          console.log("");
           console.log(
-            chalk.red.bold(
-              `[ CHANNELS ][ DONE_OFF ][ LISTENERS ][ ${channel.size} ][ ON ][ ${chName} ]`,
+            chalk.green(
+              `[ CHANNELS ][ Removed listener for channel: ${chName} ][ current number of listeners: ${channel.size} ]`,
             ),
           );
         }
       } else {
-        console.log("");
-        console.log(chalk.redBright(`[ CHANNELS ][ OFF ][ ERROR ][ ${chName} ][ NOT_FOUND ]`));
+        console.log(chalk.yellow(`[ CHANNELS ][ Channel with name: ${chName} not found ]`));
       }
     } catch (error) {
       console.error(error);
@@ -162,8 +151,7 @@ export class Channels<C extends IConnection = IConnection> implements IChannels<
           }
         }
       } else {
-        console.log("");
-        console.log(chalk.redBright(`[ CHANNELS ][ SEND ][ ERROR ][ ${chName} ][ NOT_FOUND ]`));
+        console.log(chalk.yellow(`[ CHANNELS ][ Channel with name: ${chName} not found ]`));
       }
     } catch (error) {
       console.error(error);
