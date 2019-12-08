@@ -1,5 +1,6 @@
-import { isString } from "@borodindmitriy/utils";
+import { ValueObject } from "@rtcts/isomorphic";
 import { ObjectId } from "bson";
+import omit from "lodash.omit";
 import {
   AggregationCursor,
   Collection,
@@ -16,40 +17,30 @@ import {
   InsertWriteOpResult,
   ReplaceOneOptions,
 } from "mongodb";
-import { IDBConnection } from "./interfaces/IDBConnection";
-import { IRepository } from "./interfaces/IRepository";
+import { MongoDBConnection } from "./MongoDBConnection";
 
-export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<Db>>
-  implements IRepository<T> {
+export class MongoDBRepository {
   private readonly name: string;
-  private readonly db: DBC;
+  private readonly db: MongoDBConnection;
   private readonly options?: CollectionCreateOptions;
   private collection?: Collection;
 
-  constructor(name: string, db: DBC, options?: CollectionCreateOptions) {
+  constructor(name: string, db: MongoDBConnection, options?: CollectionCreateOptions) {
     this.name = name;
-    this.options = options;
     this.db = db;
+    this.options = options;
   }
 
-  public async getCollection(): Promise<Collection<T>> {
-    try {
-      const db: Db = await this.db.getDB();
+  public async getCollection(): Promise<Collection<any>> {
+    const db: Db = await this.db.getDB();
 
-      if (!this.collection) {
-        this.collection = await db.createCollection<T>(this.name, this.options);
-
-        await this.onValidation();
-      }
-
-      await this.onValidation();
-
-      return this.collection;
-    } catch (error) {
-      console.error(error);
-
-      return Promise.reject(error);
+    if (!this.collection) {
+      this.collection = await db.createCollection<any>(this.name, this.options);
     }
+
+    await this.onValidation();
+
+    return this.collection;
   }
 
   public async onValidation(): Promise<void> {
@@ -66,8 +57,6 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
   }
 
@@ -78,120 +67,123 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
       await db.command({ collMod: this.name, validationLevel: "off" });
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
   }
 
-  public prepareId(data: any): T {
+  public async insertMany(
+    items: ValueObject<any>[],
+    options?: CollectionInsertManyOptions,
+  ): Promise<any[]> {
     try {
-      if (data._id) {
-        return { ...data, id: data._id.toHexString() };
+      const collection: Collection<any> = await this.getCollection();
+      const insert: InsertWriteOpResult<any> = await collection.insertMany(
+        items
+          .filter((item: ValueObject<any>) => item.canBeInsert())
+          .map((item) => this.removeID(item.toObject())),
+        options,
+      );
+
+      return insert.ops.map(this.objectIDtoEntityID);
+    } catch (error) {
+      console.error(error);
+    }
+
+    return [];
+  }
+
+  public async insertOne(
+    item: ValueObject<any>,
+    options?: CollectionInsertOneOptions,
+  ): Promise<any> {
+    try {
+      if (item.canBeInsert()) {
+        const collection: Collection<any> = await this.getCollection();
+        const insert: InsertOneWriteOpResult<any> = await collection.insertOne(
+          this.removeID(item.toObject()),
+          options,
+        );
+
+        return insert.ops.map((data: any) => this.objectIDtoEntityID(data))[0];
       }
-
-      return data;
     } catch (error) {
       console.error(error);
-
-      return data;
     }
   }
 
-  public async insertMany(docs: object[], options?: CollectionInsertManyOptions): Promise<T[]> {
+  // https://docs.mongodb.com/manual/tutorial/query-documents/
+  public async find(query: object, options?: FindOneOptions): Promise<any[]> {
     try {
-      const collection: Collection<T> = await this.getCollection();
-      const insert: InsertWriteOpResult<any> = await collection.insertMany(docs as any, options);
-
-      return insert.ops.map((data: any) => this.prepareId(data));
-    } catch (error) {
-      console.error(error);
-
-      return Promise.reject(error);
-    }
-  }
-
-  public async insertOne(doc: object, options?: CollectionInsertOneOptions): Promise<T> {
-    try {
-      const collection: Collection<T> = await this.getCollection();
-      const insert: InsertOneWriteOpResult<any> = await collection.insertOne(doc as any, options);
-
-      return insert.ops.map((data: any) => this.prepareId(data))[0];
-    } catch (error) {
-      console.error(error);
-
-      return Promise.reject(error);
-    }
-  }
-
-  public async find(query: object, options?: FindOneOptions): Promise<T[]> {
-    try {
-      const collection: Collection<T> = await this.getCollection();
+      const collection: Collection<any> = await this.getCollection();
 
       if (options) {
         const $project = { _id: true, ...options.projection };
         const cursor: AggregationCursor = collection.aggregate([
-          { $match: this.prepareObjectId(query) },
+          { $match: this.adjustmentObjectID(query) },
           { $project },
         ]);
 
         const items = await cursor.toArray();
 
-        return items.map((data: any) => this.prepareId(data));
+        return items.map(this.objectIDtoEntityID);
       } else {
-        const cursor: Cursor = await collection.find(this.prepareObjectId(query));
+        const cursor: Cursor = await collection.find(this.adjustmentObjectID(query));
         const items = await cursor.toArray();
 
-        return items.map((data: any) => this.prepareId(data));
+        return items.map(this.objectIDtoEntityID);
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return [];
   }
 
-  public async findOne(query: object, options?: FindOneOptions): Promise<T | null> {
+  // https://docs.mongodb.com/manual/tutorial/query-documents/
+  public async findOne(query: object, options?: FindOneOptions): Promise<object | null> {
     try {
       const collection: Collection = await this.getCollection();
-      const item = await collection.findOne(this.prepareObjectId(query), options);
+      const item: any = await collection.findOne(this.adjustmentObjectID(query), options);
 
       if (item !== null) {
-        return this.prepareId(item);
+        return this.objectIDtoEntityID(item);
       }
-
-      return null;
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
-  public async findById(id: string, options?: FindOneOptions): Promise<T | null> {
+  public async findById(id: string, options?: FindOneOptions): Promise<object | null> {
     try {
-      return await this.findOne({ _id: new ObjectId(id) }, options);
+      const result = await this.findOne({ _id: new ObjectId(id) }, options);
+
+      if (result) {
+        return this.objectIDtoEntityID(result);
+      }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
+  // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async findOneAndUpdate(
     query: object,
     update: object,
     options?: FindOneAndReplaceOption,
-  ): Promise<T | null> {
+  ): Promise<object | null> {
     try {
-      const collection: Collection<T> = await this.getCollection();
+      const collection: Collection<any> = await this.getCollection();
       const result: FindAndModifyWriteOpResultObject = await collection.findOneAndUpdate(
-        this.prepareObjectId(query),
-        update,
+        this.adjustmentObjectID(query),
+        this.removeID(update),
         options,
       );
 
       if (result.ok === 1 && result.value) {
-        return this.prepareId(result.value);
+        return this.objectIDtoEntityID(result.value);
       }
 
       return null;
@@ -202,40 +194,39 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     }
   }
 
+  // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async findOneAndRemove(
     query: object,
     options?: { projection?: object; sort?: object },
-  ): Promise<T | null> {
+  ): Promise<object | null> {
     try {
-      const collection: Collection<T> = await this.getCollection();
+      const collection: Collection<any> = await this.getCollection();
       const result: FindAndModifyWriteOpResultObject = await collection.findOneAndDelete(
-        this.prepareObjectId(query),
+        this.adjustmentObjectID(query),
         options,
       );
 
       if (result.ok === 1 && result.value) {
-        return this.prepareId(result.value);
+        return this.objectIDtoEntityID(result.value);
       }
-
-      return null;
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
   public async findByIdAndRemove(
     id: string,
     options?: { projection?: object; sort?: object },
-  ): Promise<T | null> {
+  ): Promise<object | null> {
     try {
       return await this.findOneAndRemove({ _id: new ObjectId(id) }, options);
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
   public async updateOne(
@@ -244,71 +235,72 @@ export class MongoDBRepository<T, DBC extends IDBConnection<Db> = IDBConnection<
     options?: ReplaceOneOptions,
   ): Promise<void> {
     try {
-      const collection: Collection<T> = await this.getCollection();
+      const collection: Collection<any> = await this.getCollection();
 
-      await collection.updateOne(this.prepareObjectId(query), update, options);
+      await collection.updateOne(this.adjustmentObjectID(query), this.removeID(update), options);
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
   }
 
+  // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async updateMany(
     query: object,
     update: object,
     options?: ReplaceOneOptions,
   ): Promise<void> {
     try {
-      const collection: Collection<T> = await this.getCollection();
+      const collection: Collection<any> = await this.getCollection();
 
-      await collection.updateMany(this.prepareObjectId(query), update, options);
+      await collection.updateMany(this.adjustmentObjectID(query), this.removeID(update), options);
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
   }
 
+  // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async deleteOne(query: object, options?: CommonOptions): Promise<void> {
     try {
-      const collection: Collection<T> = await this.getCollection();
+      const collection: Collection<any> = await this.getCollection();
 
-      await collection.deleteOne(this.prepareObjectId(query), options);
+      await collection.deleteOne(this.adjustmentObjectID(query), options);
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
   }
 
+  // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async deleteMany(query: object, options?: CommonOptions): Promise<void> {
     try {
-      const collection: Collection<T> = await this.getCollection();
+      const collection: Collection<any> = await this.getCollection();
 
-      await collection.deleteMany(this.prepareObjectId(query), options);
+      await collection.deleteMany(this.adjustmentObjectID(query), options);
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
   }
 
-  private prepareObjectId(data: any) {
-    try {
-      if (isString(data._id) && data._id.length === 24) {
-        return { ...data, _id: new ObjectId(data._id) };
-      }
-
-      if (isString(data.id) && data.id.length === 24) {
-        return { ...data, _id: new ObjectId(data.id) };
-      }
-
-      return data;
-    } catch (error) {
-      console.error(error);
-
-      return data;
+  private adjustmentObjectID(data: any): any {
+    if (ObjectId.isValid(data._id)) {
+      return { ...data, _id: new ObjectId(data._id) };
     }
+
+    if (ObjectId.isValid(data.id)) {
+      return { ...data, _id: new ObjectId(data.id) };
+    }
+
+    return data;
+  }
+
+  private objectIDtoEntityID({ _id, ...data }: { [key: string]: any }): any {
+    if (ObjectId.isValid(_id)) {
+      return { ...data, id: _id.toHexString() };
+    }
+
+    throw new Error("The identifier is not an ObjectId");
+  }
+
+  private removeID(data: any): any {
+    return omit(data, ["id", "_id"]);
   }
 }

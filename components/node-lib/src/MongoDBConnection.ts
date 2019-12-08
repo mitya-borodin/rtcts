@@ -1,8 +1,7 @@
-import { EventEmitter } from "@borodindmitriy/isomorphic";
-import { getErrorMessage } from "@borodindmitriy/utils";
+import EventEmitter from "eventemitter3";
+import { getErrorMessage } from "@rtcts/utils";
 import chalk from "chalk";
 import { Db, MongoClient } from "mongodb";
-import { IDBConnection } from "./interfaces/IDBConnection";
 import { AppConfig } from "./AppConfig";
 
 enum Status {
@@ -11,19 +10,21 @@ enum Status {
   CLOSED = "CLOSED",
 }
 
-export class DBConnection extends EventEmitter implements IDBConnection<Db> {
+export class MongoDBConnection extends EventEmitter {
   protected status: Status.OPEN | Status.CONNECTING | Status.CLOSED;
-  protected client: MongoClient | undefined;
-  protected DB: Db | undefined;
   protected config: AppConfig;
   protected pingTimer: NodeJS.Timer;
+
+  protected client: MongoClient | undefined;
+  protected db: Db | undefined;
 
   constructor(config: AppConfig) {
     super();
 
-    this.config = config;
     this.status = Status.CLOSED;
+    this.config = config;
     this.pingTimer = setInterval(() => null, 1000 * 1000);
+
     this.connect = this.connect.bind(this);
   }
 
@@ -102,7 +103,7 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
         await this.client.close();
 
         this.client = undefined;
-        this.DB = undefined;
+        this.db = undefined;
 
         console.log(
           chalk.magenta.bold(
@@ -129,24 +130,24 @@ export class DBConnection extends EventEmitter implements IDBConnection<Db> {
   public async getDB(): Promise<Db> {
     return new Promise<Db>(async (resolve, reject) => {
       try {
-        if (this.DB instanceof Db) {
-          resolve(this.DB);
+        if (this.db instanceof Db) {
+          resolve(this.db);
         } else if (this.client instanceof MongoClient) {
-          this.DB = this.client.db(this.config.db.name);
+          this.db = this.client.db(this.config.db.name);
 
-          await this.DB.executeDbAdminCommand({ setFeatureCompatibilityVersion: "3.6" });
+          await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "3.6" });
 
-          resolve(this.DB);
+          resolve(this.db);
         } else {
           this.once(Status.OPEN, async () => {
             if (this.client instanceof MongoClient) {
-              this.DB = this.client.db(this.config.db.name);
+              this.db = this.client.db(this.config.db.name);
 
-              await this.DB.executeDbAdminCommand({ setFeatureCompatibilityVersion: "3.6" });
+              await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "3.6" });
 
-              resolve(this.DB);
+              resolve(this.db);
             } else {
-              throw new Error(`connction object is not instanceof MongoClient`);
+              throw new Error(`Connection object is not instanceof MongoClient`);
             }
           });
 

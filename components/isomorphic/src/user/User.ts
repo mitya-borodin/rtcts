@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { isString } from "@rtcts/utils";
 import { Entity, EntityID } from "../Entity";
 import { ValidateResult } from "../validate/ValidateResult";
@@ -8,7 +10,7 @@ export type UserData = Pick<User, "login" | "group" | "salt" | "hashedPassword">
 
 const fields: string[] = ["login", "group", "salt", "hashedPassword"];
 
-export class User extends Entity<UserData> {
+export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
   public readonly login?: string;
   public readonly group?: string;
   public readonly salt?: string;
@@ -51,7 +53,7 @@ export class User extends Entity<UserData> {
   }
 
   // The validate method allows you to implement the logic of checking the entered values in the object and to minimize the object describing the result of the check
-  public async validate(): Promise<ValidateResult> {
+  public async validate(...args: VA): Promise<ValidateResult> {
     const validates: Validate[] = [];
 
     if (!isString(this.login)) {

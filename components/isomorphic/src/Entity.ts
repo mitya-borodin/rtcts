@@ -30,7 +30,7 @@ export abstract class Entity<Data, VA extends any[] = any[]> extends ValueObject
     }
   }
 
-  public isEntity(): this is Required<Data & EntityID> {
+  public isEntity(): this is Required<EntityID> & Required<Data> {
     if (!isString(this.id)) {
       throw new Error(`${this.constructor.name}.id should be String`);
     }

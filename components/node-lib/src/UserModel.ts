@@ -1,48 +1,54 @@
-/* eslint-disable @typescript-eslint/camelcase */
-import { IEntity, IUser, IUserGroup, userGroupEnum } from "@borodindmitriy/interfaces";
-import { checkPassword, isString } from "@borodindmitriy/utils";
+import { User, UserData } from "@rtcts/isomorphic";
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
 import { FindOneAndReplaceOption, FindOneOptions } from "mongodb";
-import { IRepository } from "./interfaces/IRepository";
-import { IUserModel } from "./interfaces/IUserModel";
+import { AppConfig } from "./AppConfig";
 import { Model } from "./Model";
+import { MongoDBRepository } from "./MongoDBRepository";
 import { authenticate } from "./utils/authenticate";
 import { encryptPassword } from "./utils/encryptPassword";
 import { getSalt } from "./utils/getSalt";
-import { AppConfig } from "./AppConfig";
+import { isString, checkPassword } from "@rtcts/utils";
 
 export class UserModel<
-  P extends IUser & IEntity,
-  I extends IUser,
-  R extends IRepository<P> = IRepository<P>,
+  UE extends User<VA>,
+  VA extends any[] = any[],
   AC extends AppConfig = AppConfig
-> extends Model<P, I, R> implements IUserModel<P> {
+> extends Model<UE, UserData, VA> {
   protected config: AC;
 
   constructor(
-    repository: R,
-    Persist: new (data?: any) => P,
-    Insert: new (data?: any) => I,
-    send: (payload: object, uid: string, wsid: string, excludeCurrentDevice?: boolean) => void,
+    repository: MongoDBRepository,
+    Entity: new (data: any) => UE,
+    send: (
+      payload: { [key: string]: any },
+      uid: string,
+      wsid: string,
+      excludeCurrentDevice?: boolean,
+    ) => void,
     config: AC,
   ) {
-    super(repository, Persist, Insert, send);
+    super(repository, Entity, send);
 
     this.config = config;
   }
 
-  public async readAll(): Promise<P[]> {
+  public async readAll(): Promise<Required<Pick<UE, "id" | "login" | "group">>[]> {
     try {
-      return await super.read(
-        {},
-        { projection: { login: 1, group: 1, firstName: 1, lastName: 1 } },
-      );
+      const items: UE[] = await super.read();
+
+      return items.map((item) => {
+        if (item.isEntity()) {
+          return { id: item.id, login: item.login, group: item.group };
+        }
+
+        throw new Error("User data is not correct");
+      });
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return [];
   }
 
   public async read(

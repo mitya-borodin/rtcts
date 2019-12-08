@@ -1,7 +1,7 @@
 export { SimpleObject, ValueObject, Entity } from "./Entity";
 
 export { userRepositoryEventEnum } from "./user/userRepositoryEventEnum";
-export { User } from "./user/User";
+export { User, UserData } from "./user/User";
 
 export { Log } from "./log/Log";
 export { LogType } from "./log/LogType";
