@@ -29,8 +29,7 @@
     "typecheck": "tsc --noEmit",
     "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
     "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
-    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'",
-    "postinstall": "npx typesync"
+    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'"
   },
   "types": "./lib/export.d.ts",
   "dependencies": {

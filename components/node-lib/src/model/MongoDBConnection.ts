@@ -2,7 +2,7 @@ import EventEmitter from "eventemitter3";
 import { getErrorMessage } from "@rtcts/utils";
 import chalk from "chalk";
 import { Db, MongoClient } from "mongodb";
-import { AppConfig } from "./AppConfig";
+import { AppConfig } from "../app/AppConfig";
 
 enum Status {
   OPEN = "OPEN",

@@ -1,14 +1,11 @@
-import { User, UserData } from "@rtcts/isomorphic";
+import { User, UserData, userGroupEnum } from "@rtcts/isomorphic";
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
 import { FindOneAndReplaceOption, FindOneOptions } from "mongodb";
-import { AppConfig } from "./AppConfig";
 import { Model } from "./Model";
 import { MongoDBRepository } from "./MongoDBRepository";
-import { authenticate } from "./utils/authenticate";
-import { encryptPassword } from "./utils/encryptPassword";
-import { getSalt } from "./utils/getSalt";
 import { isString, checkPassword } from "@rtcts/utils";
+import { AppConfig } from "../app/AppConfig";
 
 export class UserModel<
   UE extends User<VA>,
@@ -18,7 +15,7 @@ export class UserModel<
   protected config: AC;
 
   constructor(
-    repository: MongoDBRepository,
+    repository: MongoDBRepository<UE, UserData, VA>,
     Entity: new (data: any) => UE,
     send: (
       payload: { [key: string]: any },
@@ -33,7 +30,7 @@ export class UserModel<
     this.config = config;
   }
 
-  public async readAll(): Promise<Required<Pick<UE, "id" | "login" | "group">>[]> {
+  public async getUsers(): Promise<Required<Pick<UE, "id" | "login" | "group">>[]> {
     try {
       const items: UE[] = await super.read();
 
@@ -42,7 +39,7 @@ export class UserModel<
           return { id: item.id, login: item.login, group: item.group };
         }
 
-        throw new Error("User data is not correct");
+        throw new Error("The User object data is incorrect");
       });
     } catch (error) {
       console.error(error);
@@ -51,31 +48,25 @@ export class UserModel<
     return [];
   }
 
-  public async read(
-    a_query: { [key: string]: any } = {},
-    options?: FindOneOptions,
-    uid = "",
-  ): Promise<P[]> {
+  public async getUserById(
+    id: string,
+  ): Promise<Required<Pick<UE, "id" | "login" | "group"> | null>> {
     try {
-      const query = Object.assign({}, a_query);
+      const item = await super.readById(id);
 
-      if (isString(uid) && uid.length > 0) {
-        Object.assign(query, { _id: new ObjectId(uid) });
+      if (item && item.isEntity()) {
+        return { id: item.id, login: item.login, group: item.group };
       }
-
-      return await super.read(query, {
-        projection: { login: 1, group: 1, firstName: 1, lastName: 1 },
-      });
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
   public async init(): Promise<void> {
     try {
-      const result: any | null = await this.repository.findOne({});
+      const result: UE | null = await this.repository.findOne({});
 
       if (result === null) {
         await this.signUp({
@@ -87,8 +78,6 @@ export class UserModel<
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
   }
 

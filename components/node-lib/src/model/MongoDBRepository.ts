@@ -1,4 +1,4 @@
-import { ValueObject } from "@rtcts/isomorphic";
+import { ValueObject, Entity } from "@rtcts/isomorphic";
 import { ObjectId } from "bson";
 import omit from "lodash.omit";
 import {
@@ -18,17 +18,28 @@ import {
   ReplaceOneOptions,
 } from "mongodb";
 import { MongoDBConnection } from "./MongoDBConnection";
+import { isObject } from "@rtcts/utils";
 
-export class MongoDBRepository {
+export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   private readonly name: string;
   private readonly db: MongoDBConnection;
   private readonly options?: CollectionCreateOptions;
   private collection?: Collection;
 
-  constructor(name: string, db: MongoDBConnection, options?: CollectionCreateOptions) {
+  protected readonly Entity: new (data?: any) => E;
+
+  constructor(
+    name: string,
+    db: MongoDBConnection,
+    Entity: new (data: any) => E,
+    options?: CollectionCreateOptions,
+  ) {
     this.name = name;
     this.db = db;
+    this.Entity = Entity;
     this.options = options;
+
+    this.createEntity = this.createEntity.bind(this);
   }
 
   public async getCollection(): Promise<Collection<any>> {
@@ -71,19 +82,20 @@ export class MongoDBRepository {
   }
 
   public async insertMany(
-    items: ValueObject<any>[],
+    items: ValueObject<DATA>[],
     options?: CollectionInsertManyOptions,
-  ): Promise<any[]> {
+  ): Promise<E[]> {
     try {
       const collection: Collection<any> = await this.getCollection();
+
       const insert: InsertWriteOpResult<any> = await collection.insertMany(
         items
-          .filter((item: ValueObject<any>) => item.canBeInsert())
+          .filter((item: ValueObject<DATA>) => item.canBeInsert())
           .map((item) => this.removeID(item.toObject())),
-        options,
+        this.getOptions(options),
       );
 
-      return insert.ops.map(this.objectIDtoEntityID);
+      return insert.ops.map(this.createEntity);
     } catch (error) {
       console.error(error);
     }
@@ -92,44 +104,47 @@ export class MongoDBRepository {
   }
 
   public async insertOne(
-    item: ValueObject<any>,
+    item: ValueObject<DATA>,
     options?: CollectionInsertOneOptions,
-  ): Promise<any> {
+  ): Promise<E | null> {
     try {
       if (item.canBeInsert()) {
         const collection: Collection<any> = await this.getCollection();
+
         const insert: InsertOneWriteOpResult<any> = await collection.insertOne(
           this.removeID(item.toObject()),
-          options,
+          this.getOptions(options),
         );
 
-        return insert.ops.map((data: any) => this.objectIDtoEntityID(data))[0];
+        return insert.ops.map((item: any) => this.createEntity(item))[0];
       }
     } catch (error) {
       console.error(error);
     }
+
+    return null;
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async find(query: object, options?: FindOneOptions): Promise<any[]> {
+  public async find(query: object, options?: FindOneOptions): Promise<E[]> {
     try {
       const collection: Collection<any> = await this.getCollection();
 
       if (options) {
         const $project = { _id: true, ...options.projection };
         const cursor: AggregationCursor = collection.aggregate([
-          { $match: this.adjustmentObjectID(query) },
+          { $match: this.normalizeObjectID(query) },
           { $project },
         ]);
 
         const items = await cursor.toArray();
 
-        return items.map(this.objectIDtoEntityID);
+        return items.map(this.createEntity);
       } else {
-        const cursor: Cursor = await collection.find(this.adjustmentObjectID(query));
+        const cursor: Cursor = await collection.find(this.normalizeObjectID(query));
         const items = await cursor.toArray();
 
-        return items.map(this.objectIDtoEntityID);
+        return items.map(this.createEntity);
       }
     } catch (error) {
       console.error(error);
@@ -139,13 +154,16 @@ export class MongoDBRepository {
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async findOne(query: object, options?: FindOneOptions): Promise<object | null> {
+  public async findOne(query: object, options?: FindOneOptions): Promise<E | null> {
     try {
       const collection: Collection = await this.getCollection();
-      const item: any = await collection.findOne(this.adjustmentObjectID(query), options);
+      const item: object | null = await collection.findOne(
+        this.normalizeObjectID(query),
+        this.getOptions(options),
+      );
 
       if (item !== null) {
-        return this.objectIDtoEntityID(item);
+        return this.createEntity(item);
       }
     } catch (error) {
       console.error(error);
@@ -154,12 +172,15 @@ export class MongoDBRepository {
     return null;
   }
 
-  public async findById(id: string, options?: FindOneOptions): Promise<object | null> {
+  public async findById(id: string, options?: FindOneOptions): Promise<E | null> {
     try {
-      const result = await this.findOne({ _id: new ObjectId(id) }, options);
+      const item: object | null = await this.findOne(
+        { _id: new ObjectId(id) },
+        this.getOptions(options),
+      );
 
-      if (result) {
-        return this.objectIDtoEntityID(result);
+      if (item) {
+        return this.createEntity(item);
       }
     } catch (error) {
       console.error(error);
@@ -173,41 +194,40 @@ export class MongoDBRepository {
     query: object,
     update: object,
     options?: FindOneAndReplaceOption,
-  ): Promise<object | null> {
+  ): Promise<E | null> {
     try {
       const collection: Collection<any> = await this.getCollection();
       const result: FindAndModifyWriteOpResultObject = await collection.findOneAndUpdate(
-        this.adjustmentObjectID(query),
+        this.normalizeObjectID(query),
         this.removeID(update),
-        options,
+        this.getOptions(options),
       );
 
       if (result.ok === 1 && result.value) {
-        return this.objectIDtoEntityID(result.value);
+        return this.createEntity(result.value);
       }
-
-      return null;
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async findOneAndRemove(
     query: object,
     options?: { projection?: object; sort?: object },
-  ): Promise<object | null> {
+  ): Promise<E | null> {
     try {
       const collection: Collection<any> = await this.getCollection();
+
       const result: FindAndModifyWriteOpResultObject = await collection.findOneAndDelete(
-        this.adjustmentObjectID(query),
-        options,
+        this.normalizeObjectID(query),
+        this.getOptions(options),
       );
 
       if (result.ok === 1 && result.value) {
-        return this.objectIDtoEntityID(result.value);
+        return this.createEntity(result.value);
       }
     } catch (error) {
       console.error(error);
@@ -219,9 +239,9 @@ export class MongoDBRepository {
   public async findByIdAndRemove(
     id: string,
     options?: { projection?: object; sort?: object },
-  ): Promise<object | null> {
+  ): Promise<E | null> {
     try {
-      return await this.findOneAndRemove({ _id: new ObjectId(id) }, options);
+      return await this.findOneAndRemove({ _id: new ObjectId(id) }, this.getOptions(options));
     } catch (error) {
       console.error(error);
     }
@@ -237,7 +257,7 @@ export class MongoDBRepository {
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      await collection.updateOne(this.adjustmentObjectID(query), this.removeID(update), options);
+      await collection.updateOne(this.normalizeObjectID(query), this.removeID(update), options);
     } catch (error) {
       console.error(error);
     }
@@ -252,7 +272,7 @@ export class MongoDBRepository {
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      await collection.updateMany(this.adjustmentObjectID(query), this.removeID(update), options);
+      await collection.updateMany(this.normalizeObjectID(query), this.removeID(update), options);
     } catch (error) {
       console.error(error);
     }
@@ -263,7 +283,7 @@ export class MongoDBRepository {
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      await collection.deleteOne(this.adjustmentObjectID(query), options);
+      await collection.deleteOne(this.normalizeObjectID(query), options);
     } catch (error) {
       console.error(error);
     }
@@ -274,13 +294,13 @@ export class MongoDBRepository {
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      await collection.deleteMany(this.adjustmentObjectID(query), options);
+      await collection.deleteMany(this.normalizeObjectID(query), options);
     } catch (error) {
       console.error(error);
     }
   }
 
-  private adjustmentObjectID(data: any): any {
+  private normalizeObjectID(data: any): any {
     if (ObjectId.isValid(data._id)) {
       return { ...data, _id: new ObjectId(data._id) };
     }
@@ -289,18 +309,26 @@ export class MongoDBRepository {
       return { ...data, _id: new ObjectId(data.id) };
     }
 
-    return data;
+    throw new Error("The incoming object does not contain a suitable ObjectID");
   }
 
-  private objectIDtoEntityID({ _id, ...data }: { [key: string]: any }): any {
+  private createEntity({ _id, ...data }: { [key: string]: any }): E {
     if (ObjectId.isValid(_id)) {
-      return { ...data, id: _id.toHexString() };
+      const entity = new this.Entity({ ...data, id: _id.toHexString() });
+
+      if (entity.isEntity()) {
+        return entity;
+      }
     }
 
-    throw new Error("The identifier is not an ObjectId");
+    throw new Error("The incoming object does not contain a suitable ObjectID");
   }
 
   private removeID(data: any): any {
     return omit(data, ["id", "_id"]);
+  }
+
+  protected getOptions(options?: object): object | undefined {
+    return isObject(options) && Object.keys(options).length > 0 ? options : undefined;
   }
 }

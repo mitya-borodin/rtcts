@@ -1,4 +1,4 @@
-export enum userRepositoryEventEnum {
+export enum userEventEnum {
   LOGIN = "LOGIN",
   LOGIN_FAIL = "LOGIN_FAIL",
   LOGOUT = "LOGOUT",

@@ -1,6 +1,6 @@
 import {
-  assignment_to_user_of_the_connection_channel,
-  cancel_assignment_to_user_of_the_connection_channel,
+  BindConnectionToUser,
+  UnbindConnectionToUser,
   makeErrorMessage,
   makeMessage,
   PingChannel,
@@ -189,15 +189,12 @@ export class WebSocketServer {
             if (channelName === PingChannel) {
               connection.send(this.makeMessage(PongChannel, {}));
             } else if (isString(payload.uid)) {
-              if (
-                channelName === assignment_to_user_of_the_connection_channel ||
-                channelName === cancel_assignment_to_user_of_the_connection_channel
-              ) {
+              if (channelName === BindConnectionToUser || channelName === UnbindConnectionToUser) {
                 this.user
                   .readById(payload.uid)
                   .then((user: (IUser & IEntity) | null) => {
                     if (user) {
-                      if (channelName === assignment_to_user_of_the_connection_channel) {
+                      if (channelName === BindConnectionToUser) {
                         connection.setUserID(user.id);
 
                         this.channels.addConnection(connection);
@@ -211,7 +208,7 @@ export class WebSocketServer {
                         );
                       }
 
-                      if (channelName === cancel_assignment_to_user_of_the_connection_channel) {
+                      if (channelName === UnbindConnectionToUser) {
                         this.channels.deleteConnection(connection);
 
                         connection.send(
