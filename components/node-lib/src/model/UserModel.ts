@@ -1,11 +1,15 @@
 import { User, UserData, userGroupEnum } from "@rtcts/isomorphic";
 import { ObjectId } from "bson";
 import * as jwt from "jsonwebtoken";
-import { FindOneAndReplaceOption, FindOneOptions } from "mongodb";
+import { FindOneAndReplaceOption } from "mongodb";
 import { Model } from "./Model";
 import { MongoDBRepository } from "./MongoDBRepository";
 import { isString, checkPassword } from "@rtcts/utils";
 import { AppConfig } from "../app/AppConfig";
+import { getSalt } from "../utils/getSalt";
+import { encryptPassword } from "../utils/encryptPassword";
+import omit from "lodash.omit";
+import { authenticate } from "../utils/authenticate";
 
 export class UserModel<
   UE extends User<VA>,
@@ -30,38 +34,12 @@ export class UserModel<
     this.config = config;
   }
 
-  public async getUsers(): Promise<Required<Pick<UE, "id" | "login" | "group">>[]> {
-    try {
-      const items: UE[] = await super.read();
-
-      return items.map((item) => {
-        if (item.isEntity()) {
-          return { id: item.id, login: item.login, group: item.group };
-        }
-
-        throw new Error("The User object data is incorrect");
-      });
-    } catch (error) {
-      console.error(error);
-    }
-
-    return [];
+  public async getUsers(): Promise<UE[]> {
+    return await super.read();
   }
 
-  public async getUserById(
-    id: string,
-  ): Promise<Required<Pick<UE, "id" | "login" | "group"> | null>> {
-    try {
-      const item = await super.readById(id);
-
-      if (item && item.isEntity()) {
-        return { id: item.id, login: item.login, group: item.group };
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
-    return null;
+  public async getUserById(id: string): Promise<UE | null> {
+    return await super.readById(id);
   }
 
   public async init(): Promise<void> {
@@ -81,7 +59,9 @@ export class UserModel<
     }
   }
 
-  public async signUp(data: { [key: string]: any }): Promise<{ token: string; user: object }> {
+  public async signUp(data: {
+    [key: string]: any;
+  }): Promise<{ token: string; user: object } | null> {
     try {
       const { login, password, password_confirm, group, ...other } = data;
 
@@ -93,133 +73,128 @@ export class UserModel<
 
           if (isValidPassword) {
             const salt = getSalt();
-            const hashed_password = encryptPassword(password, salt);
-            const insert = new this.Insert({ login, group, salt, hashed_password, ...other });
+            const hashedPassword = encryptPassword(password, salt);
+            const insert = new this.Entity({ login, group, salt, hashedPassword, ...other });
 
-            const user: P = await this.repository.insertOne(insert.toJS());
+            if (insert.canBeInsert()) {
+              const user: UE | null = await this.repository.insertOne(insert);
 
-            return {
-              token: jwt.sign({ _id: user.id }, this.config.jwt.secretKey),
-              user: new this.Persist(user).toJSSecure(),
-            };
+              if (user && user.isEntity()) {
+                return {
+                  token: jwt.sign({ _id: user.id }, this.config.jwt.secretKey),
+                  user: omit(user.toObject(), ["salt", "hashedPassword"]),
+                };
+              }
+            }
           }
 
-          return Promise.reject(isValidPassword);
+          throw new Error(
+            `Password incorrect, { password: ${password}, password_confirm: ${password_confirm} }`,
+          );
         } else {
-          return Promise.reject(`[ USER_ALREADY_EXIST][ login: ${data.login} ]`);
+          throw new Error(`[ USER_ALREADY_EXIST ][ login: ${data.login} ]`);
         }
       } else {
-        return Promise.reject(
+        throw new Error(
           `[ INCORRECT_ARGS ][ login: ${data.login} ][ password: ${data.password} ]` +
             `[ password_confirm: ${data.password_confirm} ][ group: ${data.group} ]`,
         );
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
   public async signIn(data: { [key: string]: any }): Promise<string | null> {
     try {
       if (isString(data.login) && isString(data.password)) {
-        const user: P | null = await this.repository.findOne({ login: data.login });
+        const user: UE | null = await this.repository.findOne({ login: data.login });
 
-        if (user !== null) {
-          if (authenticate(data.password, user.salt, user.hashed_password)) {
+        if (user !== null && user.canBeInsert()) {
+          if (authenticate(data.password, user.salt, user.hashedPassword)) {
             return jwt.sign({ id: user.id }, this.config.jwt.secretKey);
           } else {
-            return Promise.reject(`[ PASSWORD_INCORRECT ][ password: ${data.password} ]`);
+            throw new Error(`[ PASSWORD_INCORRECT ][ password: ${data.password} ]`);
           }
         } else {
-          return Promise.reject(`[ USER_NOT_FOUND ][ login: ${data.login} ]`);
+          throw new Error(`[ USER_NOT_FOUND ][ login: ${data.login} ]`);
         }
       } else {
-        return Promise.reject(
-          `[ INCORRECT_ARGS ][ login: ${data.login} ][ password: ${data.password} ]`,
-        );
+        throw new Error(`[ INCORRECT_ARGS ][ login: ${data.login} ][ password: ${data.password} ]`);
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
   public async updateLogin(
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<P | null> {
+  ): Promise<UE | null> {
     try {
       if (isString(data.id) && isString(data.login)) {
-        const result: object | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+        const result: UE | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
         if (result) {
           return await super.update({ ...result, login: data.login }, uid, wsid);
         } else {
-          return Promise.reject(`[ USER_NOT_FOUND ][ ID: ${data.id} ][ login: ${data.login} ]`);
+          throw new Error(`[ USER_NOT_FOUND ][ ID: ${data.id} ][ login: ${data.login} ]`);
         }
       } else {
-        return Promise.reject(`[ INCORRECT_PROPS ][ ID: ${data.id} ][ login: ${data.login} ]`);
+        throw new Error(`[ INCORRECT_PROPS ][ ID: ${data.id} ][ login: ${data.login} ]`);
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
   public async updatePassword(
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<P | null> {
+  ): Promise<UE | null> {
     try {
       if (isString(data.id) && isString(data.password) && isString(data.password_confirm)) {
         const isValidPassword = checkPassword(data.password, data.password_confirm);
 
         if (isValidPassword) {
-          const result: object | null = await this.repository.findOne({
-            _id: new ObjectId(data.id),
-          });
+          const result: UE | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
           if (result) {
             const salt = getSalt();
-            const hashed_password = encryptPassword(data.password, salt);
+            const hashedPassword = encryptPassword(data.password, salt);
 
-            return await super.update({ ...result, salt, hashed_password }, uid, wsid, {
-              projection: { salt: 0, hashed_password: 0 },
+            return await super.update({ ...result, salt, hashedPassword }, uid, wsid, {
+              projection: { salt: 0, hashedPassword: 0 },
             });
           }
-
-          return null;
         } else {
-          return Promise.reject(
+          throw new Error(
             `[ INCORRECT_PASSWORD ][ ID: ${data.id} ][ password: ${data.password} ]` +
               `[ password_confirm: ${data.password_confirm} ]`,
           );
         }
       } else {
-        return Promise.reject(
+        throw new Error(
           `[ INCORRECT_PROPS ][ ID: ${data.id} ][ password: ${data.password} ]` +
             `[ password_confirm: ${data.password_confirm} ]`,
         );
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 
-  public async updateGroup(
-    ids: string[],
-    group: IUserGroup,
-    uid: string,
-    wsid: string,
-  ): Promise<P[]> {
+  public async updateGroup(ids: string[], group: string, uid: string, wsid: string): Promise<UE[]> {
     try {
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
 
@@ -227,7 +202,19 @@ export class UserModel<
 
       const users = await super.read(query);
 
-      this.send({ bulkUpdate: users.map((u) => u.toJSSecure()) }, uid, wsid);
+      this.send(
+        {
+          bulkUpdate: users.map((user) => {
+            if (user.canBeInsert()) {
+              return { id: user.id, login: user.login, group: user.group };
+            }
+
+            return user;
+          }),
+        },
+        uid,
+        wsid,
+      );
 
       return users;
     } catch (error) {
@@ -242,28 +229,29 @@ export class UserModel<
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
-  ): Promise<P | null> {
+  ): Promise<UE | null> {
     try {
-      const incomeUser: P = new this.Persist(data);
-      const currentUser = await this.readById(incomeUser.id);
+      const insert: UE = new this.Entity(data);
 
-      if (currentUser instanceof this.Persist) {
-        // console.log({ ...currentUser.toJS(), ...incomeUser.toJSSecure() });
+      if (insert.isEntity()) {
+        const currentUser: UE | null = await this.readById(insert.id);
 
-        // Так как я заменяю весь объект мне нужно сохранить секретные поля, salt, hashed_password;
-        return await super.update(
-          { ...currentUser.toJS(), ...incomeUser.toJSSecure() },
-          uid,
-          wsid,
-          options,
-        );
+        if (currentUser) {
+          return await super.update(
+            {
+              ...currentUser.toObject(),
+              ...omit(insert.toObject(), "salt", "hashedPassword"),
+            },
+            uid,
+            wsid,
+            options,
+          );
+        }
       }
-
-      return null;
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return null;
   }
 }
