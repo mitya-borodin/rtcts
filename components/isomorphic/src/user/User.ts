@@ -1,14 +1,14 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { isString } from "@rtcts/utils";
 import { Entity, EntityID } from "../Entity";
 import { ValidateResult } from "../validate/ValidateResult";
 import { Validate } from "../validate/Validate";
 import { logTypeEnum } from "../log/logTypeEnum";
+import omit from "lodash.omit";
 
 export type UserData = Pick<User, "login" | "group" | "salt" | "hashedPassword">;
 
-const fields: string[] = ["login", "group", "salt", "hashedPassword"];
+const fields: string[] = ["login", "group"];
+const secureFields: string[] = ["salt", "hashedPassword"];
 
 export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
   public readonly login?: string;
@@ -43,7 +43,17 @@ export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
   }
 
   public checkNoSecure(): this is Required<Omit<UserData, "salt" | "hashedPassword">> {
-    for (const field of ["login", "group"]) {
+    for (const field of fields) {
+      if (!isString(this[field])) {
+        throw new Error(`User.${field} should be String`);
+      }
+    }
+
+    return true;
+  }
+
+  public checkSecureFields(): this is Required<Pick<UserData, "salt" | "hashedPassword">> {
+    for (const field of secureFields) {
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);
       }
@@ -77,6 +87,10 @@ export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
     }
 
     return new ValidateResult(validates);
+  }
+
+  public getUnSecureData(): Omit<UserData, "salt" | "hashedPassword"> {
+    return omit(this.toObject(), ["salt", "hashedPassword"]);
   }
 
   // The eject method returns an object with fields that are the object's content

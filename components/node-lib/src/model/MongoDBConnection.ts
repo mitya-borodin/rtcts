@@ -1,8 +1,8 @@
-import EventEmitter from "eventemitter3";
 import { getErrorMessage } from "@rtcts/utils";
 import chalk from "chalk";
+import EventEmitter from "eventemitter3";
 import { Db, MongoClient } from "mongodb";
-import { AppConfig } from "../app/AppConfig";
+import { Config } from "../app/Config";
 
 enum Status {
   OPEN = "OPEN",
@@ -12,13 +12,13 @@ enum Status {
 
 export class MongoDBConnection extends EventEmitter {
   protected status: Status.OPEN | Status.CONNECTING | Status.CLOSED;
-  protected config: AppConfig;
+  protected config: Config;
   protected pingTimer: NodeJS.Timer;
 
   protected client: MongoClient | undefined;
   protected db: Db | undefined;
 
-  constructor(config: AppConfig) {
+  constructor(config: Config) {
     super();
 
     this.status = Status.CLOSED;

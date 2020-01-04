@@ -6,18 +6,24 @@ import {
   PingChannel,
   PongChannel,
   recognizeMessage,
+  User,
 } from "@rtcts/isomorphic";
 import { getErrorMessage, isArray, isString, isUndefined } from "@rtcts/utils";
 import chalk from "chalk";
 import WebSocket from "ws";
-import { AppConfig } from "../AppConfig";
 import { Channels } from "./Channels";
 import { Connection } from "./Connection";
+import { Config } from "../app/Config";
+import { UserModel } from "../model/UserModel";
 
-export class WebSocketServer {
+export class WebSocketServer<
+  C extends Config = Config,
+  USER extends User = User,
+  USER_MODEL extends UserModel<USER> = UserModel<USER>
+> {
   private wasRun: boolean;
 
-  private config: AppConfig;
+  private config: C;
   private server: WebSocket.Server;
   private connections: Set<Connection>;
   private channels: Channels;
@@ -26,14 +32,18 @@ export class WebSocketServer {
 
   private Connection: new (ws: WebSocket) => Connection;
 
+  private userModel: USER_MODEL;
+
   constructor(
     Connection: new (ws: WebSocket) => Connection,
     channels: Channels,
-    config: AppConfig,
+    config: C,
+    userModel: USER_MODEL,
   ) {
     this.wasRun = false;
 
     this.config = config;
+    this.userModel = userModel;
     this.server = new WebSocket.Server({ host: this.config.ws.host, port: this.config.ws.port });
     this.Connection = Connection;
     this.channels = channels;
@@ -190,10 +200,10 @@ export class WebSocketServer {
               connection.send(this.makeMessage(PongChannel, {}));
             } else if (isString(payload.uid)) {
               if (channelName === BindConnectionToUser || channelName === UnbindConnectionToUser) {
-                this.user
+                this.userModel
                   .readById(payload.uid)
-                  .then((user: (IUser & IEntity) | null) => {
-                    if (user) {
+                  .then((user: USER | null) => {
+                    if (user && user.isEntity()) {
                       if (channelName === BindConnectionToUser) {
                         connection.setUserID(user.id);
 

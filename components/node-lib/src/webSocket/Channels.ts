@@ -13,6 +13,12 @@ export class Channels<C extends Connection = Connection> {
   constructor() {
     this.connections = new Map();
     this.channels = new Map();
+
+    this.addConnection = this.addConnection.bind(this);
+    this.deleteConnection = this.deleteConnection.bind(this);
+    this.on = this.on.bind(this);
+    this.off = this.off.bind(this);
+    this.send = this.send.bind(this);
   }
 
   public addConnection(connection: C): void {
@@ -131,7 +137,14 @@ export class Channels<C extends Connection = Connection> {
 
   public send(
     chName: string,
-    payload: { [key: string]: any },
+    payload: {
+      create?: any;
+      update?: any;
+      remove?: any;
+      bulkCreate?: any;
+      bulkUpdate?: any;
+      bulkRemove?: any;
+    },
     uid: string,
     wsid: string,
     excludeCurrentDevice = true,

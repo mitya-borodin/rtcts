@@ -1,26 +1,16 @@
-import { Entity } from "@rtcts/isomorphic";
+import { Entity, Send } from "@rtcts/isomorphic";
 import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
 export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   protected readonly repository: MongoDBRepository<E, DATA, VA>;
-  protected readonly Entity: new (data?: any) => E;
-  protected readonly send: (
-    payload: { [key: string]: any },
-    uid: string,
-    wsid: string,
-    excludeCurrentDevice?: boolean,
-  ) => void;
+  protected readonly Entity: new (data: any) => E;
+  protected readonly send: Send;
 
   constructor(
     repository: MongoDBRepository<E, DATA, VA>,
     Entity: new (data: any) => E,
-    send: (
-      payload: { [key: string]: any },
-      uid: string,
-      wsid: string,
-      excludeCurrentDevice?: boolean,
-    ) => void,
+    send: Send,
   ) {
     this.repository = repository;
     this.Entity = Entity;

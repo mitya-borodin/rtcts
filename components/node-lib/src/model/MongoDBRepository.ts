@@ -1,4 +1,5 @@
-import { ValueObject, Entity } from "@rtcts/isomorphic";
+import { Entity, ValueObject } from "@rtcts/isomorphic";
+import { isObject } from "@rtcts/utils";
 import { ObjectId } from "bson";
 import omit from "lodash.omit";
 import {
@@ -18,7 +19,6 @@ import {
   ReplaceOneOptions,
 } from "mongodb";
 import { MongoDBConnection } from "./MongoDBConnection";
-import { isObject } from "@rtcts/utils";
 
 export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   private readonly name: string;

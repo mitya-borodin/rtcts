@@ -21,3 +21,4 @@ export {
 } from "./webSocket/wsChannels";
 export { wsEventEnum } from "./webSocket/wsEventEnum";
 export { makeErrorMessage, makeMessage, recognizeMessage } from "./webSocket/wsHelpers";
+export { Send } from "./webSocket/Send";

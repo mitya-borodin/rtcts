@@ -26,6 +26,15 @@ export class Connection {
     };
 
     this.ws.on("pong", this.heartbeat);
+
+    this.getConnectionID = this.getConnectionID.bind(this);
+    this.isOwner = this.isOwner.bind(this);
+    this.isItSelf = this.isItSelf.bind(this);
+    this.setUserID = this.setUserID.bind(this);
+    this.send = this.send.bind(this);
+    this.wasTerminate = this.wasTerminate.bind(this);
+    this.close = this.close.bind(this);
+    this.terminate = this.terminate.bind(this);
   }
 
   public getConnectionID(): string {

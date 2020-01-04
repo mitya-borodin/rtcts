@@ -1,33 +1,28 @@
-import { User, UserData, userGroupEnum } from "@rtcts/isomorphic";
+import { Send, User, UserData, userGroupEnum } from "@rtcts/isomorphic";
+import { checkPassword, isString } from "@rtcts/utils";
 import { ObjectId } from "bson";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import omit from "lodash.omit";
 import { FindOneAndReplaceOption } from "mongodb";
+import { Config } from "../app/Config";
+import { authenticate } from "../utils/authenticate";
+import { encryptPassword } from "../utils/encryptPassword";
+import { getSalt } from "../utils/getSalt";
 import { Model } from "./Model";
 import { MongoDBRepository } from "./MongoDBRepository";
-import { isString, checkPassword } from "@rtcts/utils";
-import { AppConfig } from "../app/AppConfig";
-import { getSalt } from "../utils/getSalt";
-import { encryptPassword } from "../utils/encryptPassword";
-import omit from "lodash.omit";
-import { authenticate } from "../utils/authenticate";
 
 export class UserModel<
   UE extends User<VA>,
-  VA extends any[] = any[],
-  AC extends AppConfig = AppConfig
+  VA extends any[] = any[], // Validate Arguments
+  C extends Config = Config
 > extends Model<UE, UserData, VA> {
-  protected config: AC;
+  protected config: C;
 
   constructor(
     repository: MongoDBRepository<UE, UserData, VA>,
     Entity: new (data: any) => UE,
-    send: (
-      payload: { [key: string]: any },
-      uid: string,
-      wsid: string,
-      excludeCurrentDevice?: boolean,
-    ) => void,
-    config: AC,
+    send: Send,
+    config: C,
   ) {
     super(repository, Entity, send);
 
@@ -59,9 +54,7 @@ export class UserModel<
     }
   }
 
-  public async signUp(data: {
-    [key: string]: any;
-  }): Promise<{ token: string; user: object } | null> {
+  public async signUp(data: { [key: string]: any }): Promise<string | null> {
     try {
       const { login, password, password_confirm, group, ...other } = data;
 
@@ -80,10 +73,9 @@ export class UserModel<
               const user: UE | null = await this.repository.insertOne(insert);
 
               if (user && user.isEntity()) {
-                return {
-                  token: jwt.sign({ _id: user.id }, this.config.jwt.secretKey),
-                  user: omit(user.toObject(), ["salt", "hashedPassword"]),
-                };
+                return jwt.sign({ _id: user.id }, this.config.jwt.secretKey, {
+                  expiresIn: "12h",
+                });
               }
             }
           }
@@ -114,7 +106,9 @@ export class UserModel<
 
         if (user !== null && user.canBeInsert()) {
           if (authenticate(data.password, user.salt, user.hashedPassword)) {
-            return jwt.sign({ id: user.id }, this.config.jwt.secretKey);
+            return jwt.sign({ id: user.id }, this.config.jwt.secretKey, {
+              expiresIn: "12h",
+            });
           } else {
             throw new Error(`[ PASSWORD_INCORRECT ][ password: ${data.password} ]`);
           }
@@ -194,7 +188,13 @@ export class UserModel<
     return null;
   }
 
-  public async updateGroup(ids: string[], group: string, uid: string, wsid: string): Promise<UE[]> {
+  public async updateGroup(
+    ids: string[],
+    group: string,
+    uid: string,
+    wsid: string,
+    excludeCurrentDevice: boolean = true,
+  ): Promise<UE[]> {
     try {
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
 
@@ -214,6 +214,7 @@ export class UserModel<
         },
         uid,
         wsid,
+        excludeCurrentDevice,
       );
 
       return users;
@@ -224,6 +225,7 @@ export class UserModel<
     }
   }
 
+  // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
   public async update(
     data: { [key: string]: any },
     uid: string,
@@ -233,14 +235,14 @@ export class UserModel<
     try {
       const insert: UE = new this.Entity(data);
 
-      if (insert.isEntity()) {
+      if (insert.checkNoSecure() && isString(insert.id)) {
         const currentUser: UE | null = await this.readById(insert.id);
 
         if (currentUser) {
           return await super.update(
             {
               ...currentUser.toObject(),
-              ...omit(insert.toObject(), "salt", "hashedPassword"),
+              ...omit(insert.getUnSecureData(), ["group"]),
             },
             uid,
             wsid,
