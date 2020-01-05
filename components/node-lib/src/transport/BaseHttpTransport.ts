@@ -89,7 +89,7 @@ export abstract class BaseHttpTransport<CH extends Channels = Channels> {
     if (switcher) {
       try {
         // ! ctx.state.user - provided by getAuthenticateStrategyMiddleware
-        // ! components/node-lib/src/app/auth.ts L:8-35
+        // ! components/node-lib/src/app/auth.ts
         const user = ctx.state.user;
 
         // ! ctx.body.wsid -  provided by webSocketMiddleware -> { ctx.body.wsid = ctx.headers["x-ws-id"]; }

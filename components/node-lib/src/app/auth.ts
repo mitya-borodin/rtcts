@@ -21,6 +21,8 @@ export const getAuthenticateStrategyMiddleware = <
   return async (ctx: Koa.Context, next: Koa.Next): Promise<void> => {
     const token = ctx.cookies.get("jwt", { signed: true });
 
+    ctx.state.user = null;
+
     if (isString(token)) {
       const userId = jwt.verify(token, config.jwt.secretKey, { maxAge: "12h" });
 

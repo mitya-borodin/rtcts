@@ -59,7 +59,7 @@ export class UserModel<
       const { login, password, password_confirm, group, ...other } = data;
 
       if (isString(login) && isString(password) && isString(password_confirm) && isString(group)) {
-        const existingUser: any | null = await this.repository.findOne({ login });
+        const existingUser: UE | null = await this.repository.findOne({ login });
 
         if (existingUser === null) {
           const isValidPassword = checkPassword(password, password_confirm);
@@ -73,9 +73,9 @@ export class UserModel<
               const user: UE | null = await this.repository.insertOne(insert);
 
               if (user && user.isEntity()) {
-                return jwt.sign({ _id: user.id }, this.config.jwt.secretKey, {
-                  expiresIn: "12h",
-                });
+                const { secretKey } = this.config.jwt;
+
+                return jwt.sign(user.id, secretKey, { expiresIn: "12h" });
               }
             }
           }
@@ -84,11 +84,11 @@ export class UserModel<
             `Password incorrect, { password: ${password}, password_confirm: ${password_confirm} }`,
           );
         } else {
-          throw new Error(`[ USER_ALREADY_EXIST ][ login: ${data.login} ]`);
+          throw new Error(`[ USER ALREADY EXIST ][ login: ${data.login} ]`);
         }
       } else {
         throw new Error(
-          `[ INCORRECT_ARGS ][ login: ${data.login} ][ password: ${data.password} ]` +
+          `[ INCORRECT ARGS ][ login: ${data.login} ][ password: ${data.password} ]` +
             `[ password_confirm: ${data.password_confirm} ][ group: ${data.group} ]`,
         );
       }
@@ -104,20 +104,20 @@ export class UserModel<
       if (isString(data.login) && isString(data.password)) {
         const user: UE | null = await this.repository.findOne({ login: data.login });
 
-        if (user !== null && user.canBeInsert()) {
+        if (user && user.isEntity()) {
           if (authenticate(data.password, user.salt, user.hashedPassword)) {
-            return jwt.sign({ id: user.id }, this.config.jwt.secretKey, {
-              expiresIn: "12h",
-            });
-          } else {
-            throw new Error(`[ PASSWORD_INCORRECT ][ password: ${data.password} ]`);
+            const { secretKey } = this.config.jwt;
+
+            return jwt.sign(user.id, secretKey, { expiresIn: "12h" });
           }
-        } else {
-          throw new Error(`[ USER_NOT_FOUND ][ login: ${data.login} ]`);
+
+          throw new Error(`[ PASSWORD INCORRECT ][ password: ${data.password} ]`);
         }
-      } else {
-        throw new Error(`[ INCORRECT_ARGS ][ login: ${data.login} ][ password: ${data.password} ]`);
+
+        throw new Error(`[ USER NOT FOUND ][ login: ${data.login} ]`);
       }
+
+      throw new Error(`[ INCORRECT ARGS ][ login: ${data.login} ][ password: ${data.password} ]`);
     } catch (error) {
       console.error(error);
     }
@@ -134,14 +134,14 @@ export class UserModel<
       if (isString(data.id) && isString(data.login)) {
         const result: UE | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
-        if (result) {
+        if (result && result.isEntity()) {
           return await super.update({ ...result, login: data.login }, uid, wsid);
-        } else {
-          throw new Error(`[ USER_NOT_FOUND ][ ID: ${data.id} ][ login: ${data.login} ]`);
         }
-      } else {
-        throw new Error(`[ INCORRECT_PROPS ][ ID: ${data.id} ][ login: ${data.login} ]`);
+
+        throw new Error(`[ USER NOT FOUND ][ ID: ${data.id} ][ login: ${data.login} ]`);
       }
+
+      throw new Error(`[ INCORRECT_PROPS ][ ID: ${data.id} ][ login: ${data.login} ]`);
     } catch (error) {
       console.error(error);
     }
@@ -161,26 +161,28 @@ export class UserModel<
         if (isValidPassword) {
           const result: UE | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
-          if (result) {
+          if (result && result.isEntity()) {
             const salt = getSalt();
             const hashedPassword = encryptPassword(data.password, salt);
-
-            return await super.update({ ...result, salt, hashedPassword }, uid, wsid, {
+            const query = { ...result, salt, hashedPassword };
+            const options = {
               projection: { salt: 0, hashedPassword: 0 },
-            });
+            };
+
+            return await super.update(query, uid, wsid, options);
           }
-        } else {
-          throw new Error(
-            `[ INCORRECT_PASSWORD ][ ID: ${data.id} ][ password: ${data.password} ]` +
-              `[ password_confirm: ${data.password_confirm} ]`,
-          );
         }
-      } else {
+
         throw new Error(
-          `[ INCORRECT_PROPS ][ ID: ${data.id} ][ password: ${data.password} ]` +
+          `[ INCORRECT_PASSWORD ][ ID: ${data.id} ][ password: ${data.password} ]` +
             `[ password_confirm: ${data.password_confirm} ]`,
         );
       }
+
+      throw new Error(
+        `[ INCORRECT_PROPS ][ ID: ${data.id} ][ password: ${data.password} ]` +
+          `[ password_confirm: ${data.password_confirm} ]`,
+      );
     } catch (error) {
       console.error(error);
     }
@@ -197,15 +199,16 @@ export class UserModel<
   ): Promise<UE[]> {
     try {
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
+      const update = { $set: { group } };
 
-      await this.repository.updateMany(query, { $set: { group } });
+      await this.repository.updateMany(query, update);
 
-      const users = await super.read(query);
+      const users: UE[] = await super.read(query);
 
       this.send(
         {
           bulkUpdate: users.map((user) => {
-            if (user.canBeInsert()) {
+            if (user.isEntity()) {
               return { id: user.id, login: user.login, group: user.group };
             }
 
@@ -220,9 +223,9 @@ export class UserModel<
       return users;
     } catch (error) {
       console.error(error);
-
-      return Promise.reject(error);
     }
+
+    return [];
   }
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
