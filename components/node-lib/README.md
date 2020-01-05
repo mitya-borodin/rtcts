@@ -1,6 +1,6 @@
 # @rtcts/node-lib
 
-The package contains basic abstractions and implementations for developing a server application on node.
+The package contains basic implementations for developing a server application on node.
 
 ## Build
 

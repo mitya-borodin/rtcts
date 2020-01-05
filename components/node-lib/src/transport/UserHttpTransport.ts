@@ -7,7 +7,7 @@ import { UserModel } from "../model/UserModel";
 import { Channels } from "../webSocket/Channels";
 import { HttpTransport } from "./HttpTransport";
 
-export class UserService<
+export class UserHttpTransport<
   E extends User<VA>,
   M extends UserModel<E, VA, C>,
   VA extends any[] = any[],
