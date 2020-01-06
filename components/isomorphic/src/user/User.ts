@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import { isString } from "@rtcts/utils";
 import { Entity, EntityID } from "../Entity";
 import { ValidateResult } from "../validate/ValidateResult";
