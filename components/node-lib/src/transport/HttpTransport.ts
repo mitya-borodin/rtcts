@@ -15,19 +15,19 @@ export class HttpTransport<
   protected readonly Entity: new (data: any) => E;
   protected readonly model: M;
   protected readonly ACL: {
-    readonly collection: string[];
-    readonly read: string[];
+    readonly getList: string[];
+    readonly getItem: string[];
     readonly create: string[];
     readonly remove: string[];
     readonly update: string[];
     readonly channel: string[];
   };
   protected readonly switchers: {
-    readonly collection: boolean;
+    readonly getList: boolean;
+    readonly getItem: boolean;
     readonly create: boolean;
-    readonly read: boolean;
-    readonly remove: boolean;
     readonly update: boolean;
+    readonly remove: boolean;
     readonly channel: boolean;
   };
 
@@ -37,26 +37,26 @@ export class HttpTransport<
     model: M,
     channels: CH,
     ACL: {
-      collection: string[];
+      getList: string[];
+      getItem: string[];
       create: string[];
-      read: string[];
-      remove: string[];
       update: string[];
+      remove: string[];
       channel: string[];
     },
     switchers: {
-      collection: boolean;
+      getList: boolean;
+      getItem: boolean;
       create: boolean;
-      read: boolean;
-      remove: boolean;
       update: boolean;
+      remove: boolean;
       channel: boolean;
     } = {
-      collection: true,
+      getList: true,
+      getItem: true,
       create: true,
-      read: true,
-      remove: true,
       update: true,
+      remove: true,
       channel: true,
     },
   ) {
@@ -65,46 +65,46 @@ export class HttpTransport<
     this.Entity = Entity;
     this.model = model;
 
-    this.collection();
-    this.read();
+    this.getList();
+    this.getItem();
     this.create();
     this.update();
     this.remove();
   }
 
-  protected collection(): void {
-    const URL = `/${this.name}/collection`;
+  protected getList(): void {
+    const URL = `/${this.name}`;
 
     this.router.get(
       URL,
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
-        await this.executor(ctx, URL, this.ACL.collection, this.switchers.collection, async () => {
-          const collection = await this.model.read({});
+        await this.executor(ctx, URL, this.ACL.getList, this.switchers.getList, async () => {
+          const listResponse = await this.model.getListResponse(ctx.query.offset, ctx.query.limit);
 
           ctx.status = 200;
           ctx.type = "application/json";
-          ctx.body = JSON.stringify(collection.map((item) => item.toObject()));
+          ctx.body = JSON.stringify(listResponse);
         });
       },
     );
   }
 
-  protected read(): void {
-    const URL = `/${this.name}/read`;
+  protected getItem(): void {
+    const URL = `/${this.name}/:id`;
 
     this.router.get(
       URL,
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
-        await this.executor(ctx, URL, this.ACL.read, this.switchers.read, async () => {
-          const { id } = ctx.query;
-          const entity: E | null = await this.model.readById(id);
+        await this.executor(ctx, URL, this.ACL.getItem, this.switchers.getItem, async () => {
+          const { id } = ctx.params;
+          const response = await this.model.getItemResponse(id);
 
-          if (entity) {
+          if (response.result) {
             ctx.status = 200;
             ctx.type = "application/json";
-            ctx.body = JSON.stringify(entity.toObject());
+            ctx.body = JSON.stringify(response);
           } else {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${id} ]`;
 
@@ -116,7 +116,7 @@ export class HttpTransport<
   }
 
   protected create(): void {
-    const URL = `/${this.name}/create`;
+    const URL = `/${this.name}`;
 
     this.router.put(
       URL,
@@ -128,12 +128,12 @@ export class HttpTransport<
           this.ACL.create,
           this.switchers.create,
           async (userId: string, wsid: string) => {
-            const entity: E | null = await this.model.create(ctx.body, userId, wsid);
+            const response = await this.model.createResponse(ctx.body, userId, wsid);
 
-            if (entity) {
+            if (response.result) {
               ctx.status = 200;
               ctx.type = "application/json";
-              ctx.body = JSON.stringify(entity.toObject());
+              ctx.body = JSON.stringify(response);
             } else {
               throw new Error("The model is not creating");
             }
@@ -144,7 +144,7 @@ export class HttpTransport<
   }
 
   protected update(): void {
-    const URL = `/${this.name}/update`;
+    const URL = `/${this.name}`;
 
     this.router.post(
       URL,
@@ -156,12 +156,12 @@ export class HttpTransport<
           this.ACL.update,
           this.switchers.update,
           async (userId: string, wsid: string) => {
-            const entity: E | null = await this.model.update(ctx.body, userId, wsid);
+            const response = await this.model.updateResponse(ctx.body, userId, wsid);
 
-            if (entity) {
+            if (response.result) {
               ctx.status = 200;
               ctx.type = "application/json";
-              ctx.body = JSON.stringify(entity.toObject());
+              ctx.body = JSON.stringify(response);
             } else {
               throw new Error("The model is not updating");
             }
@@ -172,7 +172,7 @@ export class HttpTransport<
   }
 
   protected remove(): void {
-    const URL = `/${this.name}/remove`;
+    const URL = `/${this.name}`;
 
     this.router.delete(
       URL,
@@ -185,12 +185,12 @@ export class HttpTransport<
           this.switchers.remove,
           async (userId: string, wsid: string) => {
             const { id } = ctx.body;
-            const entity: E | null = await this.model.remove(id, userId, wsid);
+            const response = await this.model.removeResponse(id, userId, wsid);
 
-            if (entity) {
+            if (response.result) {
               ctx.status = 200;
               ctx.type = "application/json";
-              ctx.body = JSON.stringify(entity.toObject());
+              ctx.body = JSON.stringify(response);
             } else {
               const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${ctx.body.id} ]`;
 

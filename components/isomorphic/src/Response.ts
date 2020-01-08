@@ -1,31 +1,18 @@
-import { isArray, isNumber, isObject, isString } from "@rtcts/utils";
+import { isArray, isNumber, isUndefined } from "@rtcts/utils";
+import { ValidateData } from "./validate/Validate";
 import { ValidateResult } from "./validate/ValidateResult";
 
 export class ListResponse {
   readonly count: number;
-  readonly previous: string | null;
-  readonly next: string | null;
   readonly results: any[];
   readonly validates: ValidateResult;
 
-  constructor(data?: any) {
+  constructor(data?: Omit<ListResponse, "toJSON">) {
     if (data) {
       if (isNumber(data.count)) {
         this.count = data.count;
       } else {
         throw new Error("ListResponse.count isn't valid");
-      }
-
-      if (isString(data.previous) || data.previous === null) {
-        this.previous = data.previous;
-      } else {
-        throw new Error("ListResponse.previous isn't valid");
-      }
-
-      if (isString(data.next) || data.next === null) {
-        this.next = data.next;
-      } else {
-        throw new Error("ListResponse.next isn't valid");
       }
 
       if (isArray(data.results)) {
@@ -34,7 +21,7 @@ export class ListResponse {
         throw new Error("ListResponse.results isn't valid");
       }
 
-      if (isArray(data.validates)) {
+      if (isArray<ValidateData>(data.validates)) {
         this.validates = new ValidateResult(data.validates);
       } else {
         throw new Error("ListResponse.validates isn't valid");
@@ -43,15 +30,23 @@ export class ListResponse {
       throw new Error("ListResponse isn't valid");
     }
   }
+
+  public toJSON(): object {
+    return {
+      count: this.count,
+      results: this.results,
+      validates: this.validates.toJSON(),
+    };
+  }
 }
 
 export class Response {
   readonly result: any;
   readonly validates: ValidateResult;
 
-  constructor(data?: any) {
+  constructor(data?: Omit<Response, "toJSON">) {
     if (data) {
-      if (isObject(data.result)) {
+      if (!isUndefined(data.result)) {
         this.result = data.result;
       } else {
         throw new Error("Response.result isn't valid");
@@ -65,5 +60,12 @@ export class Response {
     } else {
       throw new Error("Response isn't valid");
     }
+  }
+
+  public toJSON(): object {
+    return {
+      result: this.result,
+      validates: this.validates.toJSON(),
+    };
   }
 }

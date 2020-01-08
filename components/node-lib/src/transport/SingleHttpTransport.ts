@@ -15,12 +15,12 @@ export class SingleHttpTransport<
   protected readonly Entity: new (data: any) => E;
   protected readonly model: M;
   protected readonly ACL: {
-    readonly read: string[];
+    readonly getItem: string[];
     readonly update: string[];
     readonly channel: string[];
   };
   protected readonly switchers: {
-    readonly read: boolean;
+    readonly getItem: boolean;
     readonly update: boolean;
     readonly channel: boolean;
   };
@@ -31,16 +31,16 @@ export class SingleHttpTransport<
     model: M,
     channels: CH,
     ACL: {
-      read: string[];
+      getItem: string[];
       update: string[];
       channel: string[];
     },
     switchers: {
-      read: boolean;
+      getItem: boolean;
       update: boolean;
       channel: boolean;
     } = {
-      read: true,
+      getItem: true,
       update: true,
       channel: true,
     },
@@ -50,24 +50,24 @@ export class SingleHttpTransport<
     this.Entity = Entity;
     this.model = model;
 
-    this.read();
+    this.getItem();
     this.update();
   }
 
-  protected read(): void {
-    const URL = `/${this.name}/read`;
+  protected getItem(): void {
+    const URL = `/${this.name}/getItem`;
 
     this.router.get(
       URL,
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
-        await this.executor(ctx, URL, this.ACL.read, this.switchers.read, async () => {
-          const entity: E[] | null = await this.model.read();
+        await this.executor(ctx, URL, this.ACL.getItem, this.switchers.getItem, async () => {
+          const listResponse = await this.model.getListResponse(ctx.query.offset, ctx.query.limit);
 
-          if (entity && entity.length > 0) {
+          if (listResponse.results.length > 0) {
             ctx.status = 200;
             ctx.type = "application/json";
-            ctx.body = JSON.stringify(entity[0].toObject());
+            ctx.body = JSON.stringify(listResponse);
           } else {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ MODELS_NOT_FOUND ]`;
 
@@ -91,12 +91,12 @@ export class SingleHttpTransport<
           this.ACL.update,
           this.switchers.update,
           async (userId: string, wsid: string) => {
-            const entity: E | null = await this.model.update(ctx.body, userId, wsid);
+            const response = await this.model.updateResponse(ctx.body, userId, wsid);
 
-            if (entity) {
+            if (response.result) {
               ctx.status = 200;
               ctx.type = "application/json";
-              ctx.body = JSON.stringify(entity.toObject());
+              ctx.body = JSON.stringify(response);
             } else {
               throw new Error("The model is not updating");
             }

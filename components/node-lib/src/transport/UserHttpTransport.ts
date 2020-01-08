@@ -15,12 +15,12 @@ export class UserHttpTransport<
   CH extends Channels = Channels
 > extends HttpTransport<E, UserData, VA, M, CH> {
   protected readonly ACL: {
-    readonly collection: string[];
-    readonly read: string[];
+    readonly getList: string[];
+    readonly getItem: string[];
     readonly channel: string[];
     readonly create: string[];
-    readonly remove: string[];
     readonly update: string[];
+    readonly remove: string[];
     readonly updateLogin: string[];
     readonly updatePassword: string[];
     readonly updateGroup: string[];
@@ -28,11 +28,11 @@ export class UserHttpTransport<
   };
 
   protected readonly switchers: {
-    readonly collection: boolean;
+    readonly getList: boolean;
+    readonly getItem: boolean;
     readonly create: boolean;
-    readonly read: boolean;
-    readonly remove: boolean;
     readonly update: boolean;
+    readonly remove: boolean;
     readonly channel: boolean;
     readonly updateLogin: boolean;
     readonly updatePassword: boolean;
@@ -46,22 +46,22 @@ export class UserHttpTransport<
     model: M,
     channels: CH,
     ACL: {
-      collection: string[];
-      read: string[];
+      getList: string[];
+      getItem: string[];
       create: string[];
-      remove: string[];
       update: string[];
+      remove: string[];
       channel: string[];
       updateLogin: string[];
       updatePassword: string[];
       updateGroup: string[];
       signUp: string[];
     } = {
-      collection: [userGroupEnum.admin],
-      read: [userGroupEnum.admin],
+      getList: [userGroupEnum.admin],
+      getItem: [userGroupEnum.admin],
       create: [userGroupEnum.admin],
-      remove: [userGroupEnum.admin],
       update: [],
+      remove: [userGroupEnum.admin],
       channel: [],
       updateLogin: [userGroupEnum.admin],
       updatePassword: [userGroupEnum.admin],
@@ -69,22 +69,22 @@ export class UserHttpTransport<
       signUp: [userGroupEnum.admin],
     },
     switchers: {
-      collection: boolean;
-      read: boolean;
+      getList: boolean;
+      getItem: boolean;
       create: boolean;
-      remove: boolean;
       update: boolean;
+      remove: boolean;
       channel: boolean;
       updateLogin: boolean;
       updatePassword: boolean;
       updateGroup: boolean;
       signUp: boolean;
     } = {
-      collection: true,
-      read: false,
+      getList: true,
+      getItem: false,
       create: false,
-      remove: true,
       update: true,
+      remove: true,
       channel: true,
       updateLogin: true,
       updatePassword: true,
@@ -102,8 +102,8 @@ export class UserHttpTransport<
     this.updateGroup();
   }
 
-  protected collection(): void {
-    const URL = `/${this.name}/collection`;
+  protected getList(): void {
+    const URL = `/${this.name}/getList`;
 
     this.router.get(
       URL,
@@ -112,24 +112,24 @@ export class UserHttpTransport<
         await this.executor(
           ctx,
           URL,
-          this.ACL.collection,
-          this.switchers.collection,
+          this.ACL.getList,
+          this.switchers.getList,
           async (userId: string) => {
-            let collection: E[] = [];
+            let getList: E[] = [];
 
             if (ctx.state.user.group === userGroupEnum.admin) {
-              collection = await this.model.getUsers();
+              getList = await this.model.getUsers();
             } else {
               const result = await this.model.getUserById(userId);
 
               if (result) {
-                collection = [result];
+                getList = [result];
               }
             }
 
             ctx.status = 200;
             ctx.type = "application/json";
-            ctx.body = JSON.stringify(collection.map((item) => item.getUnSecureData()));
+            ctx.body = JSON.stringify(getList.map((item) => item.getUnSecureData()));
           },
         );
       },

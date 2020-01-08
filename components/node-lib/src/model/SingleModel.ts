@@ -1,4 +1,4 @@
-import { Entity, Send } from "@rtcts/isomorphic";
+import { Entity, Send, ValidateResult, Response } from "@rtcts/isomorphic";
 import { isObject } from "@rtcts/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
@@ -18,7 +18,35 @@ export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = an
     this.send = send;
   }
 
-  public async read(): Promise<E | null> {
+  // ! Response API
+
+  public async getItemResponse(): Promise<Response> {
+    const result: E | null = await this.getItem();
+
+    return new Response({
+      result: result !== null ? result.toJSON() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async updateResponse(
+    data: object,
+    uid: string,
+    wsid: string,
+    options?: FindOneAndReplaceOption,
+    excludeCurrentDevice: boolean = true,
+  ): Promise<Response> {
+    const result: E | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
+
+    return new Response({
+      result: result !== null ? result.toJSON() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  // ! Model API
+
+  public async getItem(): Promise<E | null> {
     try {
       return await this.repository.findOne({});
     } catch (error) {
@@ -40,7 +68,7 @@ export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = an
     excludeCurrentDevice: boolean = true,
   ): Promise<E | null> {
     try {
-      const currentEntity: E | null = await this.read();
+      const currentEntity: E | null = await this.getItem();
 
       if (currentEntity === null) {
         const insert: E = new this.Entity(data);

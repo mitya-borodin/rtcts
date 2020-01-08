@@ -9,7 +9,6 @@ import {
   CollectionInsertManyOptions,
   CollectionInsertOneOptions,
   CommonOptions,
-  Cursor,
   Db,
   FindAndModifyWriteOpResultObject,
   FindOneAndReplaceOption,
@@ -126,26 +125,22 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async find(query: object, options?: FindOneOptions): Promise<E[]> {
+  public async find(query: object, offset = 0, limit = 20, options?: FindOneOptions): Promise<E[]> {
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      if (options) {
-        const $project = { _id: true, ...options.projection };
-        const cursor: AggregationCursor = collection.aggregate([
-          { $match: this.normalizeObjectID(query) },
-          { $project },
-        ]);
+      const cursor: AggregationCursor = collection.aggregate([
+        {
+          $skip: offset,
+          $limit: limit,
+          $match: this.normalizeObjectID(query),
+        },
+        ...(options ? [{ $project: { _id: true, ...options.projection } }] : []),
+      ]);
 
-        const items = await cursor.toArray();
+      const items = await cursor.toArray();
 
-        return items.map(this.createEntity);
-      } else {
-        const cursor: Cursor = await collection.find(this.normalizeObjectID(query));
-        const items = await cursor.toArray();
-
-        return items.map(this.createEntity);
-      }
+      return items.map(this.createEntity);
     } catch (error) {
       console.error(error);
     }

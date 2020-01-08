@@ -29,12 +29,16 @@ export class UserModel<
     this.config = config;
   }
 
-  public async getUsers(): Promise<UE[]> {
-    return await super.read();
+  // ! Response API
+
+  // ! Model API
+
+  public async getUsers(offset = 0, limit = 20): Promise<UE[]> {
+    return await await this.repository.find({}, offset, limit);
   }
 
   public async getUserById(id: string): Promise<UE | null> {
-    return await super.readById(id);
+    return await this.repository.findById(id);
   }
 
   public async init(): Promise<void> {
@@ -196,6 +200,8 @@ export class UserModel<
     uid: string,
     wsid: string,
     excludeCurrentDevice: boolean = true,
+    offset = 0,
+    limit = 1000,
   ): Promise<UE[]> {
     try {
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
@@ -203,7 +209,7 @@ export class UserModel<
 
       await this.repository.updateMany(query, update);
 
-      const users: UE[] = await super.read(query);
+      const users: UE[] = await super.repository.find(query, offset, limit);
 
       this.send(
         {
@@ -230,7 +236,7 @@ export class UserModel<
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
   public async update(
-    data: { [key: string]: any },
+    data: object,
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
@@ -239,7 +245,7 @@ export class UserModel<
       const insert: UE = new this.Entity(data);
 
       if (insert.checkNoSecure() && isString(insert.id)) {
-        const currentUser: UE | null = await this.readById(insert.id);
+        const currentUser: UE | null = await this.repository.findById(insert.id);
 
         if (currentUser) {
           return await super.update(
