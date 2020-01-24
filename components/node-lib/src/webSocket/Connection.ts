@@ -85,6 +85,7 @@ export class Connection {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public send(data: any): void {
     try {
       this.ws.send(data);

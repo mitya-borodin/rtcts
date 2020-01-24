@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Entity, ValueObject } from "@rtcts/isomorphic";
 import { isObject } from "@rtcts/utils";
 import { ObjectId } from "bson";

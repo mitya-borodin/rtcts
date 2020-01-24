@@ -17,32 +17,15 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.updateImportsOnFileMove.enabled": "never",
   "eslint.alwaysShowStatus": true,
-  "eslint.autoFixOnSave": true,
   "eslint.enable": true,
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    {
-      "language": "typescript",
-      "autoFix": true
-    },
-    {
-      "language": "typescriptreact",
-      "autoFix": true
-    }
-  ],
   "eslint.packageManager": "npm",
   "eslint.workingDirectories": [
     {
-      "directory": "./components/deferred_module_test",
+      "directory": "./components/vendors",
       "changeProcessCWD": true
     },
     {
-      "directory": "./components/general-vendor",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/interfaces",
+      "directory": "./components/browser-lib-will-load-on-demand",
       "changeProcessCWD": true
     },
     {
@@ -50,15 +33,15 @@
       "changeProcessCWD": true
     },
     {
+      "directory": "./components/node-lib",
+      "changeProcessCWD": true
+    },
+    {
       "directory": "./components/isomorphic",
       "changeProcessCWD": true
     },
     {
-      "directory": "./components/back",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/front",
+      "directory": "./components/browser-lib",
       "changeProcessCWD": true
     }
   ],

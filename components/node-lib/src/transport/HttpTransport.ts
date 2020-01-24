@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Entity } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";

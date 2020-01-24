@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BindConnectionToUser,
   UnbindConnectionToUser,
@@ -56,7 +57,7 @@ export class WebSocketServer<
     this.connectionHandler = this.connectionHandler.bind(this);
   }
 
-  public run() {
+  public run(): void {
     try {
       if (!this.wasRun) {
         console.log(
@@ -201,7 +202,7 @@ export class WebSocketServer<
             } else if (isString(payload.uid)) {
               if (channelName === BindConnectionToUser || channelName === UnbindConnectionToUser) {
                 this.userModel
-                  .readById(payload.uid)
+                  .getUserById(payload.uid)
                   .then((user: USER | null) => {
                     if (user && user.isEntity()) {
                       if (channelName === BindConnectionToUser) {

@@ -6,14 +6,14 @@ import { isString } from "util";
 import { UserModel } from "../model/UserModel";
 import { Config } from "./Config";
 
-export const setCookieForAuthenticate = (ctx: Koa.Context, token: string) => {
+export const setCookieForAuthenticate = (ctx: Koa.Context, token: string): void => {
   ctx.cookies.set("jwt", token, { maxAge: ms("12h"), signed: true, secure: true, httpOnly: true });
 };
 
 export const getAuthenticateStrategyMiddleware = <
   C extends Config = Config,
-  UE extends User = User,
-  M extends UserModel<UE> = UserModel<UE>
+  E extends User = User,
+  M extends UserModel<E> = UserModel<E>
 >(
   config: C,
   userModel: M,
@@ -27,7 +27,7 @@ export const getAuthenticateStrategyMiddleware = <
       const userId = jwt.verify(token, config.jwt.secretKey, { maxAge: "12h" });
 
       if (isString(userId)) {
-        const user: UE | null = await userModel.readById(userId);
+        const user: E | null = await userModel.getUserById(userId);
 
         if (user) {
           ctx.state.user = user;

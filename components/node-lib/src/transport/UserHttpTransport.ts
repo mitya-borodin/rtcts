@@ -1,4 +1,5 @@
-import { User, UserData, userGroupEnum } from "@rtcts/isomorphic";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { User, UserData, userGroupEnum, Response, ValidateResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import Koa from "koa";
 import { getAuthenticateMiddleware, setCookieForAuthenticate } from "../app/auth";
@@ -102,40 +103,6 @@ export class UserHttpTransport<
     this.updateGroup();
   }
 
-  protected getList(): void {
-    const URL = `/${this.name}/getList`;
-
-    this.router.get(
-      URL,
-      getAuthenticateMiddleware(),
-      async (ctx: Koa.Context): Promise<void> => {
-        await this.executor(
-          ctx,
-          URL,
-          this.ACL.getList,
-          this.switchers.getList,
-          async (userId: string) => {
-            let getList: E[] = [];
-
-            if (ctx.state.user.group === userGroupEnum.admin) {
-              getList = await this.model.getUsers();
-            } else {
-              const result = await this.model.getUserById(userId);
-
-              if (result) {
-                getList = [result];
-              }
-            }
-
-            ctx.status = 200;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(getList.map((item) => item.getUnSecureData()));
-          },
-        );
-      },
-    );
-  }
-
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
   protected update(): void {
     const URL = `/${this.name}/update`;
@@ -154,14 +121,14 @@ export class UserHttpTransport<
               throw new Error("The model isn't updating");
             }
 
-            const entity: E | null = await this.model.update(ctx.body, userId, wsid);
+            const response = await this.model.updateResponse(ctx.body, userId, wsid);
 
-            if (entity) {
+            if (response.result) {
               ctx.status = 200;
               ctx.type = "application/json";
-              ctx.body = JSON.stringify(entity.toObject());
+              ctx.body = JSON.stringify(response);
             } else {
-              throw new Error("The user model isn't updating");
+              throw new Error("The model is not updating");
             }
           },
         );
@@ -177,9 +144,16 @@ export class UserHttpTransport<
       const user = new this.Entity(ctx.state.user);
 
       if (user.isEntity()) {
+        const response = new Response({
+          result: user.getUnSecureData(),
+          validates: new ValidateResult(),
+        });
+
         ctx.status = 200;
         ctx.type = "application/json";
-        ctx.body = JSON.stringify(user.getUnSecureData());
+        ctx.body = JSON.stringify(response);
+      } else {
+        ctx.throw(404);
       }
     });
   }
@@ -241,12 +215,12 @@ export class UserHttpTransport<
         this.ACL.updateLogin,
         this.switchers.updateLogin,
         async (userId: string, wsid: string) => {
-          const user: E | null = await this.model.updateLogin(ctx.body, userId, wsid);
+          const response: Response = await this.model.updateLoginResponse(ctx.body, userId, wsid);
 
-          if (user) {
+          if (response.result) {
             ctx.status = 200;
             ctx.type = "application/json";
-            ctx.body = JSON.stringify(user.getUnSecureData());
+            ctx.body = JSON.stringify(response);
           } else {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ login isn't updating ]`;
 

@@ -1,16 +1,18 @@
 import { isString } from "@rtcts/utils";
 import chalk from "chalk";
+import { Server } from "http";
 import Koa from "koa";
-import Router from "koa-router";
 import koaBody from "koa-body";
-import koaLogger from "koa-logger";
 import koaCompress from "koa-compress";
+import koaLogger from "koa-logger";
+import Router from "koa-router";
 import { AddressInfo } from "net";
 import { Config } from "./Config";
 
 export class KoaServer {
   private haveBeenRun: boolean;
   private config: Config;
+  private httpServer: Server | undefined;
   private app: Koa;
 
   constructor(config: Config) {
@@ -19,11 +21,11 @@ export class KoaServer {
     this.app = new Koa();
   }
 
-  public setMiddleware(middleware: Koa.Middleware) {
+  public setMiddleware(middleware: Koa.Middleware): void {
     this.app.use(middleware);
   }
 
-  public setRouter(router: Router) {
+  public setRouter(router: Router): void {
     this.app.use(router.routes());
     this.app.use(router.allowedMethods());
   }
@@ -40,11 +42,15 @@ export class KoaServer {
         this.app.use(koaCompress());
 
         await new Promise((resolve) => {
-          const httpServer = this.app.listen(
+          this.httpServer = this.app.listen(
             this.config.server.port,
             this.config.server.host,
             () => {
-              const addressInfo: AddressInfo | string | null = httpServer.address();
+              if (!this.httpServer) {
+                return;
+              }
+
+              const addressInfo: AddressInfo | string | null = this.httpServer.address();
 
               if (!isString(addressInfo) && addressInfo !== null) {
                 console.log(
@@ -62,6 +68,12 @@ export class KoaServer {
       }
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  public async stop(): Promise<void> {
+    if (this.httpServer) {
+      this.httpServer.close();
     }
   }
 }

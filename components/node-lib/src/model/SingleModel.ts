@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Entity, Send, ValidateResult, Response } from "@rtcts/isomorphic";
 import { isObject } from "@rtcts/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
@@ -6,16 +7,16 @@ import { MongoDBRepository } from "./MongoDBRepository";
 export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   protected readonly repository: MongoDBRepository<E, DATA, VA>;
   protected readonly Entity: new (data: any) => E;
-  protected readonly send: Send;
+  protected readonly sendThroughWebSocket: Send;
 
   constructor(
     repository: MongoDBRepository<E, DATA, VA>,
     Entity: new (data: any) => E,
-    send: Send,
+    sendThroughWebSocket: Send,
   ) {
     this.repository = repository;
     this.Entity = Entity;
-    this.send = send;
+    this.sendThroughWebSocket = sendThroughWebSocket;
   }
 
   // ! Response API
@@ -34,7 +35,7 @@ export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = an
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<Response> {
     const result: E | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
 
@@ -65,7 +66,7 @@ export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = an
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<E | null> {
     try {
       const currentEntity: E | null = await this.getItem();
@@ -77,7 +78,12 @@ export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = an
           const entity: E | null = await this.repository.insertOne(insert, options);
 
           if (entity) {
-            this.send({ create: entity.toObject() }, uid, wsid, excludeCurrentDevice);
+            this.sendThroughWebSocket(
+              { create: entity.toObject() },
+              uid,
+              wsid,
+              excludeCurrentDevice,
+            );
 
             return entity;
           }
@@ -98,7 +104,12 @@ export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = an
           );
 
           if (updatedEntity !== null) {
-            this.send({ update: updatedEntity.toObject() }, uid, wsid, excludeCurrentDevice);
+            this.sendThroughWebSocket(
+              { update: updatedEntity.toObject() },
+              uid,
+              wsid,
+              excludeCurrentDevice,
+            );
 
             return updatedEntity;
           }

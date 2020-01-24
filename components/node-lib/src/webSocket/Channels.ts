@@ -138,12 +138,12 @@ export class Channels<C extends Connection = Connection> {
   public send(
     chName: string,
     payload: {
-      create?: any;
-      update?: any;
-      remove?: any;
-      bulkCreate?: any;
-      bulkUpdate?: any;
-      bulkRemove?: any;
+      create?: object;
+      update?: object;
+      remove?: object;
+      bulkCreate?: object[];
+      bulkUpdate?: object[];
+      bulkRemove?: object[];
     },
     uid: string,
     wsid: string,

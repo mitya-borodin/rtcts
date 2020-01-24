@@ -37,7 +37,7 @@ export class MongoDBConnection extends EventEmitter {
       console.log("");
       console.log(
         chalk.blue.bold(
-          `[ ${this.name} ][ connect ][ TRY: ${this.config.db.url}/${this.config.db.name} ]`,
+          `[ ${this.name} ][ Started trying to connect on: ${this.config.db.url}/${this.config.db.name} ]`,
         ),
       );
 
@@ -50,7 +50,7 @@ export class MongoDBConnection extends EventEmitter {
 
         console.log(
           chalk.blue.bold(
-            `[ ${this.name} ][ connect ][ ESTABLISHED: ${this.config.db.url}/${this.config.db.name} ]`,
+            `[ ${this.name} ][ The connection is established on: ${this.config.db.url}/${this.config.db.name} ]`,
           ),
         );
 
@@ -81,7 +81,11 @@ export class MongoDBConnection extends EventEmitter {
         );
       } finally {
         if (!(this.client instanceof MongoClient)) {
-          console.log(chalk.yellow.bold(`[ ${this.name} ][ RECONNECT ][ WILL_THROUGHT: 2500 ms ]`));
+          console.log(
+            chalk.yellow.bold(
+              `[ ${this.name} ][ The reconnection will take place after: 2500 ms ]`,
+            ),
+          );
 
           setTimeout(() => {
             this.status = Status.CLOSED;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Entity, Send, ListResponse, Response, ValidateResult } from "@rtcts/isomorphic";
 import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
@@ -5,16 +6,16 @@ import { MongoDBRepository } from "./MongoDBRepository";
 export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   protected readonly repository: MongoDBRepository<E, DATA, VA>;
   protected readonly Entity: new (data: any) => E;
-  protected readonly send: Send;
+  protected readonly sendThroughWebSocket: Send;
 
   constructor(
     repository: MongoDBRepository<E, DATA, VA>,
     Entity: new (data: any) => E,
-    send: Send,
+    sendThroughWebSocket: Send,
   ) {
     this.repository = repository;
     this.Entity = Entity;
-    this.send = send;
+    this.sendThroughWebSocket = sendThroughWebSocket;
   }
 
   // ! Response API
@@ -43,7 +44,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     uid: string,
     wsid: string,
     options?: CollectionInsertOneOptions,
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<Response> {
     const result: E | null = await this.create(data, uid, wsid, options, excludeCurrentDevice);
 
@@ -58,7 +59,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     uid: string,
     wsid: string,
     options?: CollectionInsertOneOptions,
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<Response> {
     const result: E | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
 
@@ -73,7 +74,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     uid: string,
     wsid: string,
     options?: { projection?: object; sort?: object },
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<Response> {
     const result: E | null = await this.remove(id, uid, wsid, options, excludeCurrentDevice);
 
@@ -108,7 +109,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     uid: string,
     wsid: string,
     options?: CollectionInsertOneOptions,
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<E | null> {
     try {
       const insert = new this.Entity(data);
@@ -117,7 +118,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
         const result: E | null = await this.repository.insertOne(insert, options);
 
         if (result) {
-          this.send({ create: result.toObject() }, uid, wsid, excludeCurrentDevice);
+          this.sendThroughWebSocket({ create: result.toObject() }, uid, wsid, excludeCurrentDevice);
 
           return result;
         }
@@ -134,7 +135,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<E | null> {
     try {
       const entity = new this.Entity(data);
@@ -151,7 +152,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
         );
 
         if (result !== null) {
-          this.send({ update: result.toObject() }, uid, wsid, excludeCurrentDevice);
+          this.sendThroughWebSocket({ update: result.toObject() }, uid, wsid, excludeCurrentDevice);
 
           return result;
         }
@@ -168,13 +169,13 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     uid: string,
     wsid: string,
     options?: { projection?: object; sort?: object },
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
   ): Promise<E | null> {
     try {
       const result: E | null = await this.repository.findByIdAndRemove(id, options);
 
       if (result !== null) {
-        this.send({ remove: result.toObject() }, uid, wsid, excludeCurrentDevice);
+        this.sendThroughWebSocket({ remove: result.toObject() }, uid, wsid, excludeCurrentDevice);
 
         return result;
       }

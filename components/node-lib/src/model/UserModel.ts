@@ -1,9 +1,19 @@
-import { Send, User, UserData, userGroupEnum } from "@rtcts/isomorphic";
+/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  Send,
+  User,
+  UserData,
+  userGroupEnum,
+  ListResponse,
+  Response,
+  ValidateResult,
+} from "@rtcts/isomorphic";
 import { checkPassword, isString } from "@rtcts/utils";
 import { ObjectId } from "bson";
 import jwt from "jsonwebtoken";
 import omit from "lodash.omit";
-import { FindOneAndReplaceOption } from "mongodb";
+import { FindOneAndReplaceOption, FindOneOptions, CollectionInsertOneOptions } from "mongodb";
 import { Config } from "../app/Config";
 import { authenticate } from "../utils/authenticate";
 import { encryptPassword } from "../utils/encryptPassword";
@@ -12,38 +22,153 @@ import { Model } from "./Model";
 import { MongoDBRepository } from "./MongoDBRepository";
 
 export class UserModel<
-  UE extends User<VA>,
+  E extends User<VA>,
   VA extends any[] = any[], // Validate Arguments
   C extends Config = Config
-> extends Model<UE, UserData, VA> {
+> extends Model<E, UserData, VA> {
   protected config: C;
 
   constructor(
-    repository: MongoDBRepository<UE, UserData, VA>,
-    Entity: new (data: any) => UE,
-    send: Send,
+    repository: MongoDBRepository<E, UserData, VA>,
+    Entity: new (data: any) => E,
+    sendThroughWebSocket: Send,
     config: C,
   ) {
-    super(repository, Entity, send);
+    super(repository, Entity, sendThroughWebSocket);
 
     this.config = config;
   }
 
   // ! Response API
+  public async getListResponse(offset = 0, limit = 20): Promise<ListResponse> {
+    const results: E[] = await this.repository.find({}, offset, limit);
+
+    return new ListResponse({
+      count: results.length,
+      results: results.map((item) => item.getUnSecureData()),
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async getItemResponse(id: string, options?: FindOneOptions): Promise<Response> {
+    const result: E | null = await this.repository.findById(id, options);
+
+    return new Response({
+      result: result !== null ? result.getUnSecureData() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async createResponse(
+    data: object,
+    uid: string,
+    wsid: string,
+    options?: CollectionInsertOneOptions,
+    excludeCurrentDevice = true,
+  ): Promise<Response> {
+    const result: E | null = await super.create(data, uid, wsid, options, excludeCurrentDevice);
+
+    return new Response({
+      result: result !== null ? result.getUnSecureData() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async updateResponse(
+    data: object,
+    uid: string,
+    wsid: string,
+    options?: CollectionInsertOneOptions,
+    excludeCurrentDevice = true,
+  ): Promise<Response> {
+    const result: E | null = await super.update(data, uid, wsid, options, excludeCurrentDevice);
+
+    return new Response({
+      result: result !== null ? result.getUnSecureData() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async removeResponse(
+    id: string,
+    uid: string,
+    wsid: string,
+    options?: { projection?: object; sort?: object },
+    excludeCurrentDevice = true,
+  ): Promise<Response> {
+    const result: E | null = await super.remove(id, uid, wsid, options, excludeCurrentDevice);
+
+    return new Response({
+      result: result !== null ? result.getUnSecureData() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async updateLoginResponse(
+    data: { [key: string]: any },
+    uid: string,
+    wsid: string,
+  ): Promise<Response> {
+    const result: E | null = await this.updateLogin(data, uid, wsid);
+
+    return new Response({
+      result: result !== null ? result.getUnSecureData() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async updatePasswordResponse(
+    data: { [key: string]: any },
+    uid: string,
+    wsid: string,
+  ): Promise<Response> {
+    const result: E | null = await this.updatePassword(data, uid, wsid);
+
+    return new Response({
+      result: result !== null ? result.getUnSecureData() : result,
+      validates: new ValidateResult(),
+    });
+  }
+
+  public async updateGroupResponse(
+    ids: string[],
+    group: string,
+    uid: string,
+    wsid: string,
+    excludeCurrentDevice = true,
+    offset = 0,
+    limit = 1000,
+  ): Promise<ListResponse> {
+    const results: E[] | null = await this.updateGroup(
+      ids,
+      group,
+      uid,
+      wsid,
+      excludeCurrentDevice,
+      offset,
+      limit,
+    );
+
+    return new ListResponse({
+      count: results.length,
+      results: results.map((result) => result.getUnSecureData()),
+      validates: new ValidateResult(),
+    });
+  }
 
   // ! Model API
 
-  public async getUsers(offset = 0, limit = 20): Promise<UE[]> {
+  public async getUsers(offset = 0, limit = 20): Promise<E[]> {
     return await await this.repository.find({}, offset, limit);
   }
 
-  public async getUserById(id: string): Promise<UE | null> {
+  public async getUserById(id: string): Promise<E | null> {
     return await this.repository.findById(id);
   }
 
   public async init(): Promise<void> {
     try {
-      const result: UE | null = await this.repository.findOne({});
+      const result: E | null = await this.repository.findOne({});
 
       if (result === null) {
         await this.signUp({
@@ -63,7 +188,7 @@ export class UserModel<
       const { login, password, password_confirm, group, ...other } = data;
 
       if (isString(login) && isString(password) && isString(password_confirm) && isString(group)) {
-        const existingUser: UE | null = await this.repository.findOne({ login });
+        const existingUser: E | null = await this.repository.findOne({ login });
 
         if (existingUser === null) {
           const isValidPassword = checkPassword(password, password_confirm);
@@ -74,7 +199,7 @@ export class UserModel<
             const insert = new this.Entity({ login, group, salt, hashedPassword, ...other });
 
             if (insert.canBeInsert()) {
-              const user: UE | null = await this.repository.insertOne(insert);
+              const user: E | null = await this.repository.insertOne(insert);
 
               if (user && user.isEntity()) {
                 const { secretKey } = this.config.jwt;
@@ -106,7 +231,7 @@ export class UserModel<
   public async signIn(data: { [key: string]: any }): Promise<string | null> {
     try {
       if (isString(data.login) && isString(data.password)) {
-        const user: UE | null = await this.repository.findOne({ login: data.login });
+        const user: E | null = await this.repository.findOne({ login: data.login });
 
         if (user && user.isEntity()) {
           if (authenticate(data.password, user.salt, user.hashedPassword)) {
@@ -133,13 +258,13 @@ export class UserModel<
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<UE | null> {
+  ): Promise<E | null> {
     try {
       if (isString(data.id) && isString(data.login)) {
-        const result: UE | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+        const result: E | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
         if (result && result.isEntity()) {
-          return await super.update({ ...result, login: data.login }, uid, wsid);
+          return await super.update({ ...result.toObject(), login: data.login }, uid, wsid);
         }
 
         throw new Error(`[ USER NOT FOUND ][ ID: ${data.id} ][ login: ${data.login} ]`);
@@ -157,23 +282,20 @@ export class UserModel<
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<UE | null> {
+  ): Promise<E | null> {
     try {
       if (isString(data.id) && isString(data.password) && isString(data.password_confirm)) {
         const isValidPassword = checkPassword(data.password, data.password_confirm);
 
         if (isValidPassword) {
-          const result: UE | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+          const result: E | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
           if (result && result.isEntity()) {
             const salt = getSalt();
             const hashedPassword = encryptPassword(data.password, salt);
-            const query = { ...result, salt, hashedPassword };
-            const options = {
-              projection: { salt: 0, hashedPassword: 0 },
-            };
+            const query = { ...result.toObject(), salt, hashedPassword };
 
-            return await super.update(query, uid, wsid, options);
+            return await super.update(query, uid, wsid);
           }
         }
 
@@ -199,19 +321,19 @@ export class UserModel<
     group: string,
     uid: string,
     wsid: string,
-    excludeCurrentDevice: boolean = true,
+    excludeCurrentDevice = true,
     offset = 0,
     limit = 1000,
-  ): Promise<UE[]> {
+  ): Promise<E[]> {
     try {
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
       const update = { $set: { group } };
 
       await this.repository.updateMany(query, update);
 
-      const users: UE[] = await super.repository.find(query, offset, limit);
+      const users: E[] = await super.repository.find(query, offset, limit);
 
-      this.send(
+      this.sendThroughWebSocket(
         {
           bulkUpdate: users.map((user) => {
             if (user.isEntity()) {
@@ -240,12 +362,12 @@ export class UserModel<
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
-  ): Promise<UE | null> {
+  ): Promise<E | null> {
     try {
-      const insert: UE = new this.Entity(data);
+      const insert: E = new this.Entity(data);
 
       if (insert.checkNoSecure() && isString(insert.id)) {
-        const currentUser: UE | null = await this.repository.findById(insert.id);
+        const currentUser: E | null = await this.repository.findById(insert.id);
 
         if (currentUser) {
           return await super.update(
