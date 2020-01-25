@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  BindConnectionToUser,
-  UnbindConnectionToUser,
+  BindUserToConnection,
+  UnbindUserFromConnection,
   makeErrorMessage,
   makeMessage,
   PingChannel,
@@ -200,31 +200,34 @@ export class WebSocketServer<
             if (channelName === PingChannel) {
               connection.send(this.makeMessage(PongChannel, {}));
             } else if (isString(payload.uid)) {
-              if (channelName === BindConnectionToUser || channelName === UnbindConnectionToUser) {
+              if (
+                channelName === BindUserToConnection ||
+                channelName === UnbindUserFromConnection
+              ) {
                 this.userModel
                   .getUserById(payload.uid)
                   .then((user: USER | null) => {
                     if (user && user.isEntity()) {
-                      if (channelName === BindConnectionToUser) {
+                      if (channelName === BindUserToConnection) {
                         connection.setUserID(user.id);
 
                         this.channels.addConnection(connection);
 
                         connection.send(
                           this.makeMessage(channelName, {
-                            message: "[ ASSIGNMENT ][ DONE ]",
+                            message: "BIND_USER_TO_CONNECTION [ DONE ]",
                             uid: connection.uid,
                             wsid: connection.wsid,
                           }),
                         );
                       }
 
-                      if (channelName === UnbindConnectionToUser) {
+                      if (channelName === UnbindUserFromConnection) {
                         this.channels.deleteConnection(connection);
 
                         connection.send(
                           this.makeMessage(channelName, {
-                            message: "[ CANCELING ][ ASSIGNMENT ][ DONE ]",
+                            message: "UNBIND_USER_FROM_CONNECTION [ DONE ]",
                             uid: connection.uid,
                             wsid: connection.wsid,
                           }),
@@ -233,7 +236,7 @@ export class WebSocketServer<
                     } else {
                       connection.send(
                         this.makeErrorMessage(
-                          `[ ASSIGNMENT_ERROR ] user by id: ${payload.uid} not found`,
+                          `BIND_USER_TO_CONNECTION [ FAIL ] [ user by id: ${payload.uid} not found ]`,
                           {
                             channelName,
                             payload,
@@ -244,10 +247,13 @@ export class WebSocketServer<
                   })
                   .catch((error: any) => {
                     connection.send(
-                      this.makeErrorMessage(`[ ASSIGNMENT_ERROR ] ${getErrorMessage(error)}`, {
-                        error,
-                        payload,
-                      }),
+                      this.makeErrorMessage(
+                        `BIND_USER_TO_CONNECTION [ FAIL ] [ ${getErrorMessage(error)} ]`,
+                        {
+                          error,
+                          payload,
+                        },
+                      ),
                     );
                   });
               } else {

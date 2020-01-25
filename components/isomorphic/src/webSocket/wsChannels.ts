@@ -1,5 +1,5 @@
 export const ErrorChannel = "ERROR";
 export const PingChannel = "PING";
 export const PongChannel = "PONG";
-export const BindConnectionToUser = "BIND_CONNECTION_TO_USER";
-export const UnbindConnectionToUser = "UNBIND_CONNECTION_TO_USER";
+export const BindUserToConnection = "BIND_USER_TO_CONNECTION";
+export const UnbindUserFromConnection = "UNBIND_USER_FROM_CONNECTION";

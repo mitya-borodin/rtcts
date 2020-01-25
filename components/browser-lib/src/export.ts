@@ -27,8 +27,8 @@ export { WSClient } from "./implementation/transport/ws/WSClient";
 export { UserHTTPTransport } from "./implementation/user/UserHTTPTransport";
 export { UserRepository } from "./implementation/user/UserRepository";
 
-// COMPONENTS
-export { Link } from "./components/Link";
+// UI COMPONENTS
+export { Link } from "./ui/Link";
 
 // ENUMS
-export { mediatorChannelEnum } from "./enums/mediatorChannelEnum";
+export { repositoryPubSubEnum } from "./enums/repositoryPubSubEnum";

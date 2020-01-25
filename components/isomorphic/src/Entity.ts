@@ -10,7 +10,7 @@ export abstract class SimpleObject<Data> {
 
 export abstract class ValueObject<Data, VA extends any[] = any[]> extends SimpleObject<Data> {
   public abstract canBeInsert(): this is Required<Data>;
-  public abstract validate(...args: VA): Promise<ValidateResult>;
+  public abstract validate(...args: VA): ValidateResult;
 }
 
 export type EntityID = { id?: string };

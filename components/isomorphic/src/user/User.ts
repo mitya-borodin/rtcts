@@ -65,7 +65,7 @@ export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
   }
 
   // The validate method allows you to implement the logic of checking the entered values in the object and to minimize the object describing the result of the check
-  public async validate(...args: VA): Promise<ValidateResult> {
+  public validate(...args: VA): ValidateResult {
     const validates: Validate[] = [];
 
     if (!isString(this.login)) {

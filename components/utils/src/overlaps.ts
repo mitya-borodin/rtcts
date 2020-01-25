@@ -1,3 +1,4 @@
+/* eslint-disable prefer-rest-params */
 import { Moment } from "moment";
 import { isBoolean } from "./isType";
 

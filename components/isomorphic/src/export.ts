@@ -16,8 +16,8 @@ export {
   ErrorChannel,
   PingChannel,
   PongChannel,
-  BindConnectionToUser,
-  UnbindConnectionToUser,
+  BindUserToConnection,
+  UnbindUserFromConnection,
 } from "./webSocket/wsChannels";
 export { wsEventEnum } from "./webSocket/wsEventEnum";
 export { makeErrorMessage, makeMessage, recognizeMessage } from "./webSocket/wsHelpers";

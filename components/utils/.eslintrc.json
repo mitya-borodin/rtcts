@@ -24,7 +24,6 @@
     "no-unused-expressions": "error",
     "no-underscore-dangle": ["warn", { "enforceInMethodNames": true }],
     "react/display-name": "warn",
-    "react/prop-types": "off",
-    "prefer-rest-params": "off"
+    "react/prop-types": "off"
   }
 }
