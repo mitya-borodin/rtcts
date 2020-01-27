@@ -1,144 +1,142 @@
-import { IEntity, IUser } from "@borodindmitriy/interfaces";
-import { Mediator } from "@borodindmitriy/isomorphic";
-import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
-import { IUserHTTPTransport } from "../../interfaces/user/IUserHTTPTransport";
-import { RepositoryHTTPTransport } from "../transport/http/RepositoryHTTPTransport";
+import { Entity, Response, ListResponse } from "@rtcts/isomorphic";
+import EventEmitter from "eventemitter3";
+import {
+  RepositoryHTTPTransport,
+  RepositoryHTTPTransportACL,
+} from "../transport/http/RepositoryHTTPTransport";
+import { WSClient } from "../transport/ws/WSClient";
+
+interface UserHTTPTransportACL extends RepositoryHTTPTransportACL {
+  updateLogin: string[];
+  updatePassword: string[];
+  updateGroup: string[];
+}
 
 export class UserHTTPTransport<
-  U extends IUser & IEntity,
-  WS extends IWSClient = IWSClient,
-  ME extends Mediator = Mediator
-> extends RepositoryHTTPTransport<U, WS> implements IUserHTTPTransport<U> {
-  public ACL: {
-    collection: string[];
-    current: string[];
-    read: string[];
-    create: string[];
-    update: string[];
-    remove: string[];
-    onChannel: string[];
-    offChannel: string[];
-    updateLogin: string[];
-    updatePassword: string[];
-    updateGroup: string[];
-  };
+  ENTITY extends Entity<DATA>,
+  DATA,
+  WS extends WSClient = WSClient,
+  PUB_SUB extends EventEmitter = EventEmitter
+> extends RepositoryHTTPTransport<ENTITY, DATA, WS, PUB_SUB> {
+  public ACL: UserHTTPTransportACL;
 
   constructor(
     name: string,
-    Class: new (data?: any) => U,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
-    ACL: {
-      collection: string[];
-      read: string[];
-      create: string[];
-      update: string[];
-      remove: string[];
-      onChannel: string[];
-      offChannel: string[];
-      updateLogin: string[];
-      updatePassword: string[];
-      updateGroup: string[];
-    },
-    mediator: ME,
+    ACL: UserHTTPTransportACL,
+    pubSub: PUB_SUB,
     root = "/api",
   ) {
-    super(name, Class, ws, channelName, ACL, mediator, root);
+    super(name, Entity, ws, channelName, ACL, pubSub, root);
   }
 
-  public async current(): Promise<U | void> {
+  public async current(): Promise<Response<ENTITY> | void> {
     try {
-      const output: object | void = await this.get(`/${this.name}/current`);
+      const result: any | void = await this.getHttpRequest(`/${this.name}/current`);
 
-      if (output) {
-        return new this.Class(output);
+      if (!result) {
+        return;
       }
+
+      const response = new Response(result);
+
+      return new Response<ENTITY>({
+        result: new this.Entity(response.result),
+        validates: response.validates,
+      });
     } catch (error) {
       console.error(error);
-
-      return Promise.reject();
     }
   }
 
-  public async signIn(data: object): Promise<string | void> {
+  public async signIn(data: object): Promise<void> {
     try {
-      const output: string | null = await this.post(`/${this.name}/signIn`, data);
-
-      if (output) {
-        return output;
-      }
+      await this.postHttpRequest(`/${this.name}/signIn`, data);
     } catch (error) {
       console.error(error);
-
-      return Promise.reject();
     }
   }
 
-  public async signUp(data: object): Promise<{ token: string; user: object } | void> {
+  public async signUp(data: object): Promise<void> {
     try {
-      const output: { token: string; user: object } | void = await this.post(
-        `/${this.name}/signUp`,
-        data,
-      );
-
-      if (output) {
-        return output;
-      }
+      await this.postHttpRequest(`/${this.name}/signUp`, data);
     } catch (error) {
       console.error(error);
-
-      return Promise.reject();
     }
   }
 
-  public async updateLogin(data: object): Promise<U | void> {
+  public async updateLogin(data: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.updateLogin.includes(this.group)) {
-        const output: object | void = await this.post(`/${this.name}/updateLogin`, data);
+      if (this.ACL.updateLogin.includes(this.currentUserGroup)) {
+        const result: any | void = await this.postHttpRequest(`/${this.name}/updateLogin`, data);
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const response = new Response(result);
+
+        return new Response<ENTITY>({
+          result: new this.Entity(response.result),
+          validates: response.validates,
+        });
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject();
     }
   }
 
-  public async updatePassword(data: object): Promise<U | void> {
+  public async updatePassword(data: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.updatePassword.includes(this.group)) {
-        const output: object | void = await this.post(`/${this.name}/updatePassword`, data);
+      if (this.ACL.updatePassword.includes(this.currentUserGroup)) {
+        const result: any | void = await this.postHttpRequest(`/${this.name}/updatePassword`, data);
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const response = new Response(result);
+
+        return new Response<ENTITY>({
+          result: new this.Entity(response.result),
+          validates: response.validates,
+        });
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject();
     }
   }
 
-  public async updateGroup(ids: string[], group: string): Promise<U[] | void> {
+  public async updateGroup(ids: string[], group: string): Promise<ListResponse<ENTITY> | void> {
     try {
-      if (this.ACL.updateGroup.includes(this.group)) {
-        const output: object[] | void = await this.post(`/${this.name}/updateGroup`, {
+      if (this.ACL.updateGroup.includes(this.currentUserGroup)) {
+        const result: any | void = await this.postHttpRequest(`/${this.name}/updateGroup`, {
           ids,
           group,
         });
 
-        if (output) {
-          return output.map((item) => new this.Class(item));
+        if (!result) {
+          return;
         }
+
+        const listResponse = new ListResponse(result);
+
+        return new ListResponse<ENTITY>({
+          count: listResponse.count,
+          results: listResponse.results.map((result: any) => {
+            const entity = new this.Entity(result);
+
+            entity.isEntity();
+
+            return entity;
+          }),
+          validates: listResponse.validates,
+        });
       }
     } catch (error) {
       console.error(error);
-
-      return Promise.reject();
     }
   }
 }

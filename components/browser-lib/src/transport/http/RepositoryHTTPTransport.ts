@@ -1,122 +1,152 @@
-import { Mediator } from "@borodindmitriy/isomorphic";
-import { IRepositoryHTTPTransport } from "../../../interfaces/transport/http/IRepositoryHTTPTransport";
-import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
-import { HTTPTransport } from "./HTTPTransport";
+import { Entity, ListResponse, Response } from "@rtcts/isomorphic";
+import EventEmitter from "eventemitter3";
+import { WSClient } from "../ws/WSClient";
+import { HTTPTransport, HTTPTransportACL } from "./HTTPTransport";
+
+export interface RepositoryHTTPTransportACL extends HTTPTransportACL {
+  collection: string[];
+  read: string[];
+  create: string[];
+  update: string[];
+  remove: string[];
+}
 
 export class RepositoryHTTPTransport<
-  T,
-  WS extends IWSClient = IWSClient,
-  ME extends Mediator = Mediator
-> extends HTTPTransport<T, WS, ME> implements IRepositoryHTTPTransport<T> {
-  public readonly ACL: {
-    collection: string[];
-    read: string[];
-    create: string[];
-    update: string[];
-    remove: string[];
-    onChannel: string[];
-    offChannel: string[];
-  };
-  public group: string;
+  ENTITY extends Entity<DATA>,
+  DATA,
+  WS extends WSClient = WSClient,
+  PUB_SUB extends EventEmitter = EventEmitter
+> extends HTTPTransport<WS, PUB_SUB> {
+  protected Entity: new (data: any) => ENTITY;
 
-  protected name: string;
-  protected Class: new (data?: any) => T;
-  protected ws: WS;
-  protected root: string;
-  protected channelName: string;
-  protected mediator: ME;
+  public readonly ACL: RepositoryHTTPTransportACL;
 
   constructor(
     name: string,
-    Class: new (data?: any) => T,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
-    ACL: {
-      collection: string[];
-      read: string[];
-      create: string[];
-      update: string[];
-      remove: string[];
-      onChannel: string[];
-      offChannel: string[];
-    },
-    mediator: ME,
+    ACL: RepositoryHTTPTransportACL,
+    pubSub: PUB_SUB,
     root = "/api",
   ) {
-    super(name, Class, ws, channelName, ACL, mediator, root);
+    super(name, ws, channelName, ACL, pubSub, root);
 
-    // BINDINGS
-    this.collection = this.collection.bind(this);
-    this.read = this.read.bind(this);
+    this.Entity = Entity;
+
+    this.getList = this.getList.bind(this);
+    this.getItem = this.getItem.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.remove = this.remove.bind(this);
   }
 
-  public async collection(): Promise<T[] | void> {
+  public async getList(): Promise<ListResponse<ENTITY> | void> {
     try {
-      if (this.ACL.collection.includes(this.group)) {
-        const output: object[] | void = await this.get(`/${this.name}/collection`);
+      if (this.ACL.collection.includes(this.currentUserGroup)) {
+        const result: any | void = await this.getHttpRequest(`/${this.name}`);
 
-        if (output) {
-          return output.map((item) => new this.Class(item));
+        if (!result) {
+          return;
         }
+
+        const listResponse = new ListResponse(result);
+
+        return new ListResponse<ENTITY>({
+          count: listResponse.count,
+          results: listResponse.results.map((result: any) => {
+            const entity = new this.Entity(result);
+
+            entity.isEntity();
+
+            return entity;
+          }),
+          validates: listResponse.validates,
+        });
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async read(id: string): Promise<T | void> {
+  public async getItem(id: string): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.read.includes(this.group)) {
-        const output: object | void = await this.get(`/${this.name}/read?id=${id}`);
+      if (this.ACL.read.includes(this.currentUserGroup)) {
+        const result: any | void = await this.getHttpRequest(`/${this.name}/${id}`);
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const response = new Response(result);
+
+        return new Response<ENTITY>({
+          result: new this.Entity(response.result),
+          validates: response.validates,
+        });
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async create(input: object): Promise<T | void> {
+  public async create(input: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.create.includes(this.group)) {
-        const output: object | void = await this.put(`/${this.name}/create`, input);
+      if (this.ACL.create.includes(this.currentUserGroup)) {
+        const result: any | void = await this.putHttpRequest(`/${this.name}`, input);
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const response = new Response(result);
+
+        return new Response<ENTITY>({
+          result: new this.Entity(response.result),
+          validates: response.validates,
+        });
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async update(input: object): Promise<T | void> {
+  public async update(input: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.update.includes(this.group)) {
-        const output: object | void = await this.post(`/${this.name}/update`, input);
+      if (this.ACL.update.includes(this.currentUserGroup)) {
+        const result: any | void = await this.postHttpRequest(`/${this.name}`, input);
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const response = new Response(result);
+
+        return new Response<ENTITY>({
+          result: new this.Entity(response.result),
+          validates: response.validates,
+        });
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async remove(id: string): Promise<T | void> {
+  public async remove(id: string): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.remove.includes(this.group)) {
-        const output: object | void = await this.del(`/${this.name}/remove`, { id });
+      if (this.ACL.remove.includes(this.currentUserGroup)) {
+        const result: any | void = await this.deleteHttpRequest(`/${this.name}`, { id });
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const response = new Response(result);
+
+        return new Response<ENTITY>({
+          result: new this.Entity(response.result),
+          validates: response.validates,
+        });
       }
     } catch (error) {
       console.error(error);

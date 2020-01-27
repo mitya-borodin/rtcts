@@ -1,71 +1,83 @@
-import { Mediator } from "@borodindmitriy/isomorphic";
-import { ISingletonHTTPTransport } from "../../../interfaces/transport/http/ISingletonHTTPTransport";
-import { IWSClient } from "../../../interfaces/transport/ws/IWSClient";
-import { HTTPTransport } from "./HTTPTransport";
+import { HTTPTransport, HTTPTransportACL } from "./HTTPTransport";
+import EventEmitter from "eventemitter3";
+import { WSClient } from "../ws/WSClient";
+import { Entity, ListResponse, Response } from "@rtcts/isomorphic";
+
+export interface SingletonHTTPTransportACL extends HTTPTransportACL {
+  read: string[];
+  update: string[];
+}
 
 export class SingletonHTTPTransport<
-  T,
-  WS extends IWSClient = IWSClient,
-  ME extends Mediator = Mediator
-> extends HTTPTransport<T, WS, ME> implements ISingletonHTTPTransport<T> {
-  public readonly ACL: {
-    read: string[];
-    update: string[];
-    onChannel: string[];
-    offChannel: string[];
-  };
-  public group: string;
+  ENTITY extends Entity<DATA>,
+  DATA,
+  WS extends WSClient = WSClient,
+  PUB_SUB extends EventEmitter = EventEmitter
+> extends HTTPTransport<WS, PUB_SUB> {
+  protected Entity: new (data: any) => ENTITY;
 
-  protected name: string;
-  protected Class: new (data?: any) => T;
-  protected ws: WS;
-  protected root: string;
-  protected channelName: string;
-  protected mediator: ME;
+  public readonly ACL: SingletonHTTPTransportACL;
 
   constructor(
     name: string,
-    Class: new (data?: any) => T,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
-    ACL: {
-      read: string[];
-      update: string[];
-      onChannel: string[];
-      offChannel: string[];
-    },
-    mediator: ME,
+    ACL: SingletonHTTPTransportACL,
+    pubSub: PUB_SUB,
     root = "/api",
   ) {
-    super(name, Class, ws, channelName, ACL, mediator, root);
+    super(name, ws, channelName, ACL, pubSub, root);
 
-    // BINDINGS
-    this.read = this.read.bind(this);
+    this.Entity = Entity;
+
+    this.getList = this.getList.bind(this);
     this.update = this.update.bind(this);
   }
 
-  public async read(): Promise<T | void> {
+  public async getList(): Promise<ListResponse<ENTITY> | void> {
     try {
-      if (this.ACL.read.includes(this.group)) {
-        const output: object | void = await this.get(`/${this.name}/read`);
+      if (this.ACL.read.includes(this.currentUserGroup)) {
+        const result: any | void = await this.getHttpRequest(`/${this.name}`);
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const listResponse = new ListResponse(result);
+
+        return new ListResponse<ENTITY>({
+          count: listResponse.count,
+          results: listResponse.results.map((result: any) => {
+            const entity = new this.Entity(result);
+
+            entity.isEntity();
+
+            return entity;
+          }),
+          validates: listResponse.validates,
+        });
       }
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async update(data: object): Promise<T | void> {
+  public async update(data: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.update.includes(this.group)) {
-        const output: object | void = await this.post(`/${this.name}/update`, data);
+      if (this.ACL.update.includes(this.currentUserGroup)) {
+        const result: any | void = await this.postHttpRequest(`/${this.name}`, data);
 
-        if (output) {
-          return new this.Class(output);
+        if (!result) {
+          return;
         }
+
+        const response = new Response(result);
+
+        return new Response<ENTITY>({
+          result: new this.Entity(response.result),
+          validates: response.validates,
+        });
       }
     } catch (error) {
       console.error(error);

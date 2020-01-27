@@ -11,7 +11,7 @@ import {
   wsEventEnum,
 } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
-import { EventEmitter } from "eventemitter3";
+import EventEmitter from "eventemitter3";
 import { action, computed, observable } from "mobx";
 
 export class WSClient extends EventEmitter {

@@ -20,9 +20,9 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
     transport: T,
     wsClient: IWSClient,
     channelName: string,
-    mediator: Mediator,
+    pubSub: Mediator,
   ) {
-    super(Entity, transport, mediator, wsClient, channelName);
+    super(Entity, transport, pubSub, wsClient, channelName);
 
     // BINDINGS
     this.init = this.init.bind(this);
@@ -50,8 +50,8 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
       const user: E | void = this.map.get(this.currentUserID);
 
       if (user instanceof this.Entity) {
-        this.mediator.emit(userRepositoryEventEnum.SET_USER, user);
-        this.mediator.emit(userRepositoryEventEnum.SET_USER_GROUP, user.group);
+        this.pubSub.emit(userRepositoryEventEnum.SET_USER, user);
+        this.pubSub.emit(userRepositoryEventEnum.SET_USER_GROUP, user.group);
       }
 
       return user;
@@ -87,7 +87,7 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
 
           runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => (this.isInit = true));
         } else {
-          this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
+          this.pubSub.emit(userRepositoryEventEnum.GO_TO_LOGIN);
 
           throw new Error(`TOKEN_IS_MISSING`);
         }
@@ -127,7 +127,7 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
 
         this.destroy();
 
-        this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
+        this.pubSub.emit(userRepositoryEventEnum.LOGIN_FAIL);
 
         return Promise.reject();
       } finally {
@@ -150,7 +150,7 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
       if (this.isAuthorized) {
         await new Promise<void>((resolve, reject) => {
           try {
-            this.mediator.once(userRepositoryEventEnum.LOGOUT, () => {
+            this.pubSub.once(userRepositoryEventEnum.LOGOUT, () => {
               setTimeout(async () => {
                 if (this.ws.isAssigment) {
                   await this.ws.cancelAssigmentToUserOfTheConnection();
@@ -162,7 +162,7 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
             });
 
             this.start();
-            this.mediator.emit(userRepositoryEventEnum.LOGOUT);
+            this.pubSub.emit(userRepositoryEventEnum.LOGOUT);
           } catch (error) {
             reject(error);
           }
@@ -344,9 +344,9 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
 
       this.stop();
 
-      this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
-      this.mediator.emit(userRepositoryEventEnum.CLEAR_USER);
-      this.mediator.emit(userRepositoryEventEnum.CLEAR_USER_GROUP);
+      this.pubSub.emit(userRepositoryEventEnum.GO_TO_LOGIN);
+      this.pubSub.emit(userRepositoryEventEnum.CLEAR_USER);
+      this.pubSub.emit(userRepositoryEventEnum.CLEAR_USER_GROUP);
 
       console.log(`[ ${this.constructor.name} ][ DESTROY ][ SUCCESS ]`);
     } catch (error) {
@@ -368,8 +368,8 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
             const observableUser = this.collection.get(this.currentUserID);
 
             if (observableUser instanceof this.Entity) {
-              this.mediator.emit(userRepositoryEventEnum.SET_USER, observableUser);
-              this.mediator.emit(userRepositoryEventEnum.SET_USER_GROUP, observableUser.group);
+              this.pubSub.emit(userRepositoryEventEnum.SET_USER, observableUser);
+              this.pubSub.emit(userRepositoryEventEnum.SET_USER_GROUP, observableUser.group);
             }
 
             this.ws.setUserID(this.currentUserID);
@@ -382,7 +382,7 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
               await this.ws.assigmentToUserOfTheConnection();
             }
 
-            this.mediator.emit(userRepositoryEventEnum.LOGIN);
+            this.pubSub.emit(userRepositoryEventEnum.LOGIN);
           });
         } else {
           throw new Error(
@@ -399,8 +399,8 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
 
       this.destroy();
 
-      this.mediator.emit(userRepositoryEventEnum.LOGIN_FAIL);
-      this.mediator.emit(userRepositoryEventEnum.GO_TO_LOGIN);
+      this.pubSub.emit(userRepositoryEventEnum.LOGIN_FAIL);
+      this.pubSub.emit(userRepositoryEventEnum.GO_TO_LOGIN);
 
       return Promise.reject();
     } finally {

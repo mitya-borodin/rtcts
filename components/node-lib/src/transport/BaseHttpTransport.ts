@@ -5,12 +5,14 @@ import Router from "koa-router";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { Channels } from "../webSocket/Channels";
 
+export interface BaseHttpTransportACL {
+  readonly channel: string[];
+}
+
 export abstract class BaseHttpTransport<CH extends Channels = Channels> {
   protected readonly name: string;
   protected readonly channels: CH;
-  protected readonly ACL: {
-    readonly channel: string[];
-  };
+  protected readonly ACL: BaseHttpTransportACL;
   protected readonly switchers: {
     readonly channel: boolean;
   };
@@ -19,9 +21,7 @@ export abstract class BaseHttpTransport<CH extends Channels = Channels> {
   constructor(
     name: string,
     channels: CH,
-    ACL: {
-      channel: string[];
-    },
+    ACL: BaseHttpTransportACL,
     switchers: {
       channel: boolean;
     } = {

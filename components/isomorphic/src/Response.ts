@@ -2,12 +2,12 @@ import { isArray, isNumber, isUndefined } from "@rtcts/utils";
 import { ValidateData } from "./validate/Validate";
 import { ValidateResult } from "./validate/ValidateResult";
 
-export class ListResponse {
+export class ListResponse<T = any> {
   readonly count: number;
-  readonly results: any[];
+  readonly results: T[];
   readonly validates: ValidateResult;
 
-  constructor(data?: Omit<ListResponse, "toJSON">) {
+  constructor(data?: Omit<ListResponse<T>, "toJSON">) {
     if (data) {
       if (isNumber(data.count)) {
         this.count = data.count;
@@ -15,7 +15,7 @@ export class ListResponse {
         throw new Error("ListResponse.count isn't valid");
       }
 
-      if (isArray(data.results)) {
+      if (isArray<T>(data.results)) {
         this.results = data.results;
       } else {
         throw new Error("ListResponse.results isn't valid");
@@ -31,7 +31,11 @@ export class ListResponse {
     }
   }
 
-  public toJSON(): object {
+  public toJSON(): {
+    count: number;
+    results: T[];
+    validates: ValidateData[];
+  } {
     return {
       count: this.count,
       results: this.results,
@@ -40,11 +44,11 @@ export class ListResponse {
   }
 }
 
-export class Response {
-  readonly result: any;
+export class Response<T = any> {
+  readonly result: T;
   readonly validates: ValidateResult;
 
-  constructor(data?: Omit<Response, "toJSON">) {
+  constructor(data?: Omit<Response<T>, "toJSON">) {
     if (data) {
       if (!isUndefined(data.result)) {
         this.result = data.result;
@@ -62,7 +66,10 @@ export class Response {
     }
   }
 
-  public toJSON(): object {
+  public toJSON(): {
+    result: T;
+    validates: ValidateData[];
+  } {
     return {
       result: this.result,
       validates: this.validates.toJSON(),

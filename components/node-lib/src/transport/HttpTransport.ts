@@ -4,7 +4,15 @@ import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { Model } from "../model/Model";
 import { Channels } from "../webSocket/Channels";
-import { BaseHttpTransport } from "./BaseHttpTransport";
+import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
+
+export interface HttpTransportACL extends BaseHttpTransportACL {
+  readonly getList: string[];
+  readonly getItem: string[];
+  readonly create: string[];
+  readonly remove: string[];
+  readonly update: string[];
+}
 
 export class HttpTransport<
   E extends Entity<DATA, VA>,
@@ -15,14 +23,7 @@ export class HttpTransport<
 > extends BaseHttpTransport<CH> {
   protected readonly Entity: new (data: any) => E;
   protected readonly model: M;
-  protected readonly ACL: {
-    readonly getList: string[];
-    readonly getItem: string[];
-    readonly create: string[];
-    readonly remove: string[];
-    readonly update: string[];
-    readonly channel: string[];
-  };
+  protected readonly ACL: HttpTransportACL;
   protected readonly switchers: {
     readonly getList: boolean;
     readonly getItem: boolean;
@@ -37,14 +38,7 @@ export class HttpTransport<
     Entity: new (data: any) => E,
     model: M,
     channels: CH,
-    ACL: {
-      getList: string[];
-      getItem: string[];
-      create: string[];
-      update: string[];
-      remove: string[];
-      channel: string[];
-    },
+    ACL: HttpTransportACL,
     switchers: {
       getList: boolean;
       getItem: boolean;
@@ -136,7 +130,7 @@ export class HttpTransport<
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
             } else {
-              throw new Error("The model is not creating");
+              throw new Error("The model wasn't created");
             }
           },
         );
@@ -164,7 +158,7 @@ export class HttpTransport<
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
             } else {
-              throw new Error("The model is not updating");
+              throw new Error("The model wasn't updated");
             }
           },
         );

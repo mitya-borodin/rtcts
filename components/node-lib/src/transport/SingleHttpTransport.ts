@@ -4,7 +4,12 @@ import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { Model } from "../model/Model";
 import { Channels } from "../webSocket/Channels";
-import { BaseHttpTransport } from "./BaseHttpTransport";
+import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
+
+export interface SingleHttpTransportACL extends BaseHttpTransportACL {
+  readonly getList: string[];
+  readonly update: string[];
+}
 
 export class SingleHttpTransport<
   E extends Entity<DATA, VA>,
@@ -15,13 +20,9 @@ export class SingleHttpTransport<
 > extends BaseHttpTransport<CH> {
   protected readonly Entity: new (data: any) => E;
   protected readonly model: M;
-  protected readonly ACL: {
-    readonly getItem: string[];
-    readonly update: string[];
-    readonly channel: string[];
-  };
+  protected readonly ACL: SingleHttpTransportACL;
   protected readonly switchers: {
-    readonly getItem: boolean;
+    readonly getList: boolean;
     readonly update: boolean;
     readonly channel: boolean;
   };
@@ -31,17 +32,13 @@ export class SingleHttpTransport<
     Entity: new (data: any) => E,
     model: M,
     channels: CH,
-    ACL: {
-      getItem: string[];
-      update: string[];
-      channel: string[];
-    },
+    ACL: SingleHttpTransportACL,
     switchers: {
-      getItem: boolean;
+      getList: boolean;
       update: boolean;
       channel: boolean;
     } = {
-      getItem: true,
+      getList: true,
       update: true,
       channel: true,
     },
@@ -51,18 +48,18 @@ export class SingleHttpTransport<
     this.Entity = Entity;
     this.model = model;
 
-    this.getItem();
+    this.getList();
     this.update();
   }
 
-  protected getItem(): void {
-    const URL = `/${this.name}/getItem`;
+  protected getList(): void {
+    const URL = `/${this.name}`;
 
     this.router.get(
       URL,
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
-        await this.executor(ctx, URL, this.ACL.getItem, this.switchers.getItem, async () => {
+        await this.executor(ctx, URL, this.ACL.getList, this.switchers.getList, async () => {
           const listResponse = await this.model.getListResponse(ctx.query.offset, ctx.query.limit);
 
           if (listResponse.results.length > 0) {
@@ -80,7 +77,7 @@ export class SingleHttpTransport<
   }
 
   protected update(): void {
-    const URL = `/${this.name}/update`;
+    const URL = `/${this.name}`;
 
     this.router.post(
       URL,
@@ -99,7 +96,7 @@ export class SingleHttpTransport<
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
             } else {
-              throw new Error("The model is not updating");
+              throw new Error("The model wasn't updated");
             }
           },
         );

@@ -29,7 +29,7 @@ export class SingletonRepository<
   protected transport: T;
   protected ws: WS;
   protected channelName: string;
-  protected mediator: ME;
+  protected pubSub: ME;
 
   protected isInit: boolean;
 
@@ -38,7 +38,7 @@ export class SingletonRepository<
     transport: T,
     ws: WS,
     channelName: string,
-    mediator: ME,
+    pubSub: ME,
   ) {
     super();
 
@@ -47,7 +47,7 @@ export class SingletonRepository<
     this.transport = transport;
     this.ws = ws;
     this.channelName = channelName;
-    this.mediator = mediator;
+    this.pubSub = pubSub;
 
     // * INIT
     this.isInit = false;
@@ -86,7 +86,7 @@ export class SingletonRepository<
               this.emit(SingletonRepository.events.init, entity);
 
               // ! EMIT
-              this.mediator.emit(mediatorChannelEnum.repository_init, this);
+              this.pubSub.emit(mediatorChannelEnum.repository_init, this);
             });
           } else {
             throw new Error(

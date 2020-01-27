@@ -1,12 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { User, UserData, userGroupEnum, Response, ValidateResult } from "@rtcts/isomorphic";
+import { Response, User, UserData, userGroupEnum, ValidateResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import Koa from "koa";
 import { getAuthenticateMiddleware, setCookieForAuthenticate } from "../app/auth";
 import { Config } from "../app/Config";
 import { UserModel } from "../model/UserModel";
 import { Channels } from "../webSocket/Channels";
-import { HttpTransport } from "./HttpTransport";
+import { HttpTransport, HttpTransportACL } from "./HttpTransport";
+
+export interface UserHttpTransportACL extends HttpTransportACL {
+  readonly updateLogin: string[];
+  readonly updatePassword: string[];
+  readonly updateGroup: string[];
+  readonly signUp: string[];
+}
 
 export class UserHttpTransport<
   E extends User<VA>,
@@ -15,18 +22,7 @@ export class UserHttpTransport<
   C extends Config = Config,
   CH extends Channels = Channels
 > extends HttpTransport<E, UserData, VA, M, CH> {
-  protected readonly ACL: {
-    readonly getList: string[];
-    readonly getItem: string[];
-    readonly channel: string[];
-    readonly create: string[];
-    readonly update: string[];
-    readonly remove: string[];
-    readonly updateLogin: string[];
-    readonly updatePassword: string[];
-    readonly updateGroup: string[];
-    readonly signUp: string[];
-  };
+  protected readonly ACL: UserHttpTransportACL;
 
   protected readonly switchers: {
     readonly getList: boolean;
@@ -46,18 +42,7 @@ export class UserHttpTransport<
     Entity: new (data: any) => E,
     model: M,
     channels: CH,
-    ACL: {
-      getList: string[];
-      getItem: string[];
-      create: string[];
-      update: string[];
-      remove: string[];
-      channel: string[];
-      updateLogin: string[];
-      updatePassword: string[];
-      updateGroup: string[];
-      signUp: string[];
-    } = {
+    ACL: UserHttpTransportACL = {
       getList: [userGroupEnum.admin],
       getItem: [userGroupEnum.admin],
       create: [userGroupEnum.admin],
@@ -105,7 +90,7 @@ export class UserHttpTransport<
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
   protected update(): void {
-    const URL = `/${this.name}/update`;
+    const URL = `/${this.name}`;
 
     this.router.post(
       URL,
@@ -118,7 +103,7 @@ export class UserHttpTransport<
           this.switchers.update,
           async (userId: string, wsid: string) => {
             if (userId !== ctx.body.id) {
-              throw new Error("The model isn't updating");
+              throw new Error("The model wasn't updated");
             }
 
             const response = await this.model.updateResponse(ctx.body, userId, wsid);
@@ -128,7 +113,7 @@ export class UserHttpTransport<
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
             } else {
-              throw new Error("The model is not updating");
+              throw new Error("The model wasn't updated");
             }
           },
         );
@@ -174,7 +159,7 @@ export class UserHttpTransport<
             ctx.type = "text/plain";
             ctx.body = "";
           } else {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ token isn't creating ]`;
+            const message = `[ ${this.constructor.name} ][ ${URL} ][ token wasn't updated ]`;
 
             ctx.throw(message, 404);
           }
@@ -197,7 +182,7 @@ export class UserHttpTransport<
           ctx.type = "text/plain";
           ctx.body = "";
         } else {
-          const message = `[ ${this.constructor.name} ][ ${URL} ][ token isn't creating ]`;
+          const message = `[ ${this.constructor.name} ][ ${URL} ][ token wasn't updated ]`;
 
           ctx.throw(message, 404);
         }
@@ -222,7 +207,7 @@ export class UserHttpTransport<
             ctx.type = "application/json";
             ctx.body = JSON.stringify(response);
           } else {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ login isn't updating ]`;
+            const message = `[ ${this.constructor.name} ][ ${URL} ][ login wasn't updated ]`;
 
             ctx.throw(message, 404);
           }
@@ -245,14 +230,18 @@ export class UserHttpTransport<
             throw new Error("Password isn't updating");
           }
 
-          const user: E | null = await this.model.updatePassword(ctx.body, userId, wsid);
+          const response: Response = await this.model.updatePasswordResponse(
+            ctx.body,
+            userId,
+            wsid,
+          );
 
-          if (user) {
+          if (response.result) {
             ctx.status = 200;
             ctx.type = "application/json";
-            ctx.body = JSON.stringify(user.getUnSecureData());
+            ctx.body = JSON.stringify(response);
           } else {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ password isn't updating ]`;
+            const message = `[ ${this.constructor.name} ][ ${URL} ][ password wasn't updated ]`;
 
             ctx.throw(message, 404);
           }
@@ -270,24 +259,24 @@ export class UserHttpTransport<
         URL,
         this.ACL.updateGroup,
         this.switchers.updateGroup,
-        async (userId: string, wsid: string) => {
+        async (userId: string, wsid: string): Promise<void> => {
           const { ids, group } = ctx.body;
 
           if (ids.length === 1 && ids[0] !== userId) {
             throw new Error("Group isn't updating");
           }
 
-          const users: E[] = await this.model.updateGroup(ids, group, userId, wsid);
+          const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
 
-          if (users) {
-            ctx.status = 200;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(users.map((user) => user.getUnSecureData()));
-          } else {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ password isn't updating ]`;
+          if (listResponse.results.length === 0) {
+            const message = `[ ${this.constructor.name} ][ ${URL} ][ update group wasn't updated ]`;
 
             ctx.throw(message, 404);
           }
+
+          ctx.status = 200;
+          ctx.type = "application/json";
+          ctx.body = JSON.stringify(listResponse);
         },
       );
     });

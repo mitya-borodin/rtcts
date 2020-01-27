@@ -31,7 +31,7 @@ export class Repository<
 
   protected Entity: new (data?: any) => E;
   protected transport: T;
-  protected mediator: ME;
+  protected pubSub: ME;
   protected ws: WS;
   protected channelName: string;
 
@@ -40,7 +40,7 @@ export class Repository<
   constructor(
     Entity: new (data?: any) => E,
     transport: T,
-    mediator: ME,
+    pubSub: ME,
     ws: WS,
     channelName: string,
   ) {
@@ -49,7 +49,7 @@ export class Repository<
     // * DEPS
     this.Entity = Entity;
     this.transport = transport;
-    this.mediator = mediator;
+    this.pubSub = pubSub;
     this.ws = ws;
     this.channelName = channelName;
 
@@ -115,7 +115,7 @@ export class Repository<
               this.emit(Repository.events.init, collection);
 
               // ! EMIT
-              this.mediator.emit(mediatorChannelEnum.repository_init, this);
+              this.pubSub.emit(mediatorChannelEnum.repository_init, this);
             });
           } else {
             throw new Error(
