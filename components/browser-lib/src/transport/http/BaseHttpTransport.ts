@@ -3,12 +3,12 @@ import { isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";
 
-export interface HTTPTransportACL {
+export interface BaseHttpTransportACL {
   subscribeToChannel: string[];
   unsubscribeFromChannel: string[];
 }
 
-export class HTTPTransport<
+export class BaseHttpTransport<
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > {
@@ -17,7 +17,7 @@ export class HTTPTransport<
   protected name: string;
   protected ws: WS;
   protected channelName: string;
-  public readonly ACL: HTTPTransportACL;
+  public readonly ACL: BaseHttpTransportACL;
   protected pubSub: PUB_SUB;
   protected rootPath: string;
 
@@ -25,7 +25,7 @@ export class HTTPTransport<
     name: string,
     ws: WS,
     channelName: string,
-    ACL: HTTPTransportACL,
+    ACL: BaseHttpTransportACL,
     pubSub: PUB_SUB,
     rootPath = "/api",
   ) {

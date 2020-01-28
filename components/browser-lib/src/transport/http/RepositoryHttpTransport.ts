@@ -1,9 +1,9 @@
 import { Entity, ListResponse, Response } from "@rtcts/isomorphic";
 import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";
-import { HTTPTransport, HTTPTransportACL } from "./HTTPTransport";
+import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
 
-export interface RepositoryHTTPTransportACL extends HTTPTransportACL {
+export interface RepositoryBaseHttpTransportACL extends BaseHttpTransportACL {
   collection: string[];
   read: string[];
   create: string[];
@@ -11,22 +11,22 @@ export interface RepositoryHTTPTransportACL extends HTTPTransportACL {
   remove: string[];
 }
 
-export class RepositoryHTTPTransport<
+export class RepositoryHttpTransport<
   ENTITY extends Entity<DATA>,
   DATA,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends HTTPTransport<WS, PUB_SUB> {
+> extends BaseHttpTransport<WS, PUB_SUB> {
   protected Entity: new (data: any) => ENTITY;
 
-  public readonly ACL: RepositoryHTTPTransportACL;
+  public readonly ACL: RepositoryBaseHttpTransportACL;
 
   constructor(
     name: string,
     Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
-    ACL: RepositoryHTTPTransportACL,
+    ACL: RepositoryBaseHttpTransportACL,
     pubSub: PUB_SUB,
     root = "/api",
   ) {

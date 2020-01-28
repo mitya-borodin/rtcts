@@ -2,12 +2,12 @@
 import { Entity } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
-import { Model } from "../model/Model";
+import { SingleModel } from "../model/SingleModel";
 import { Channels } from "../webSocket/Channels";
 import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
 
 export interface SingleHttpTransportACL extends BaseHttpTransportACL {
-  readonly getList: string[];
+  readonly getItem: string[];
   readonly update: string[];
 }
 
@@ -15,14 +15,14 @@ export class SingleHttpTransport<
   E extends Entity<DATA, VA>,
   DATA,
   VA extends any[],
-  M extends Model<E, DATA, VA>,
+  M extends SingleModel<E, DATA, VA>,
   CH extends Channels = Channels
 > extends BaseHttpTransport<CH> {
   protected readonly Entity: new (data: any) => E;
   protected readonly model: M;
   protected readonly ACL: SingleHttpTransportACL;
   protected readonly switchers: {
-    readonly getList: boolean;
+    readonly getItem: boolean;
     readonly update: boolean;
     readonly channel: boolean;
   };
@@ -34,11 +34,11 @@ export class SingleHttpTransport<
     channels: CH,
     ACL: SingleHttpTransportACL,
     switchers: {
-      getList: boolean;
+      getItem: boolean;
       update: boolean;
       channel: boolean;
     } = {
-      getList: true,
+      getItem: true,
       update: true,
       channel: true,
     },
@@ -48,24 +48,24 @@ export class SingleHttpTransport<
     this.Entity = Entity;
     this.model = model;
 
-    this.getList();
+    this.getItem();
     this.update();
   }
 
-  protected getList(): void {
+  protected getItem(): void {
     const URL = `/${this.name}`;
 
     this.router.get(
       URL,
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
-        await this.executor(ctx, URL, this.ACL.getList, this.switchers.getList, async () => {
-          const listResponse = await this.model.getListResponse(ctx.query.offset, ctx.query.limit);
+        await this.executor(ctx, URL, this.ACL.getItem, this.switchers.getItem, async () => {
+          const response = await this.model.getItemResponse();
 
-          if (listResponse.results.length > 0) {
+          if (response.result) {
             ctx.status = 200;
             ctx.type = "application/json";
-            ctx.body = JSON.stringify(listResponse);
+            ctx.body = JSON.stringify(response);
           } else {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ MODELS_NOT_FOUND ]`;
 
