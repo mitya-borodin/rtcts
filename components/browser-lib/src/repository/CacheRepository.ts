@@ -1,119 +1,120 @@
-import { EventEmitter } from "@borodindmitriy/isomorphic";
-import { getErrorMessage, isString } from "@borodindmitriy/utils";
-import { action, computed, observable, ObservableMap, runInAction } from "mobx";
-import { ICacheRepository } from "../../interfaces/repository/ICacheRepository";
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Entity } from "@rtcts/isomorphic";
+import { getErrorMessage } from "@rtcts/utils";
+import EventEmitter from "eventemitter3";
+import { action, computed, observable, ObservableMap } from "mobx";
 
-// tslint:disable: object-literal-sort-keys
-
-export class CacheRepository<T extends { id: string | void }> extends EventEmitter
-  implements ICacheRepository<T> {
+export class CacheRepository<ENTITY extends Entity<DATA>, DATA> extends EventEmitter {
   public static events = {
-    update: `[ CacheRepository ][ UPDATE ]`,
-    remove: `[ CacheRepository ][ REMOVE ]`,
+    set: `CacheRepository.event.set`,
+    delete: `CacheRepository.event.delete`,
   };
 
   @observable
-  protected collection: ObservableMap<string, T>;
-  protected Entity: new (...args: any[]) => T;
+  protected collection: ObservableMap<string, ENTITY>;
+  protected Entity: new (data: any) => ENTITY;
 
-  constructor(Entity: new (...args: any[]) => T) {
+  constructor(Entity: new (data: any) => ENTITY) {
     super();
 
     // * DEPS
     this.Entity = Entity;
 
     // ! OBSERVABLE
-    runInAction(
-      `[ ${this.constructor.name} ][ SET_INITIAL_VALUE ]`,
-      () => (this.collection = observable.map()),
-    );
+    this.collection = observable.map();
 
     // * BINDINGS
-    this.update = this.update.bind(this);
-    this.remove = this.remove.bind(this);
-    this.destroy = this.destroy.bind(this);
+    this.set = this.set.bind(this);
+    this.delete = this.delete.bind(this);
+
     this.filter = this.filter.bind(this);
-    this.collectionDidUpdate = this.collectionDidUpdate.bind(this);
-    this.collectionDidRemove = this.collectionDidRemove.bind(this);
+
+    this.destroy = this.destroy.bind(this);
+
+    this.collectionDidSet = this.collectionDidSet.bind(this);
+    this.collectionDidDelete = this.collectionDidDelete.bind(this);
   }
 
-  @computed({ name: "[ CACHE ][ REPOSITORY ][ MAP ]" })
-  get map(): ObservableMap<string, T> {
+  @computed({ name: "CacheRepository.map" })
+  get map(): ObservableMap<string, ENTITY> {
     return this.collection;
   }
 
-  @computed({ name: "[ CACHE ][ REPOSITORY ][ LIST ]" })
-  get list(): T[] {
-    const list: T[] = [];
-
-    for (const value of this.collection.values()) {
-      list.push(value);
-    }
-
-    return this.filter(list);
+  @computed({ name: "CacheRepository.list" })
+  get list(): ENTITY[] {
+    return this.filter(Array.from(this.collection.values()));
   }
 
-  @action("[ CACHE ][ REPOSITORY ][ UPDATE ]")
-  public update(items: T[]): void {
+  @action("CacheRepository.set")
+  public set(items: ENTITY[]): void {
     try {
-      const entities: T[] = [];
+      const entities: ENTITY[] = [];
 
       for (const item of items) {
-        if (item instanceof this.Entity && isString(item.id)) {
+        if (item instanceof this.Entity && item.isEntity()) {
           this.collection.set(item.id, item);
+
           entities.push(item);
         }
       }
 
+      this.collectionDidSet(entities);
       this.collectionDidUpdate(entities);
-      this.emit(CacheRepository.events.update, entities);
+      this.emit(CacheRepository.events.set, entities);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE ][ ${getErrorMessage(error)} ]`);
-      console.error(error);
+      console.error(`${this.constructor.name}.set error: ${getErrorMessage(error)}`);
     }
   }
 
-  @action("[ CACHE ][ REPOSITORY ][ REMOVE ]")
-  public remove(ids: string[]): void {
+  @action("CacheRepository.delete")
+  public delete(ids: string[]): void {
     try {
-      const entities: T[] = [];
+      const entities: ENTITY[] = [];
 
       for (const id of ids) {
-        const entity: T | void = this.collection.get(id);
+        const entity: ENTITY | void = this.collection.get(id);
 
-        if (entity instanceof this.Entity) {
+        if (entity instanceof this.Entity && entity.isEntity()) {
           entities.push(entity);
+
           this.collection.delete(id);
         }
       }
 
-      this.collectionDidRemove(entities);
-      this.emit(CacheRepository.events.update, entities);
+      this.collectionDidDelete(entities);
+      this.collectionDidUpdate(entities);
+      this.emit(CacheRepository.events.delete, entities);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ REMOVE ][ ${getErrorMessage(error)} ]`);
-      console.error(error);
+      console.error(`${this.constructor.name}.delete error: ${getErrorMessage(error)}`);
     }
   }
 
-  @action("[ CACHE ][ REPOSITORY ][ DESTROY ]")
+  @action("CacheRepository.destroy")
   protected destroy(): void {
     this.collection.clear();
-    this.collectionDidDestroied();
+    this.collectionDidDestroy();
   }
 
-  protected filter(list: T[]): T[] {
+  // ! For extends
+
+  protected filter(list: ENTITY[]): ENTITY[] {
     return list;
   }
 
-  protected collectionDidUpdate(entities: T[]): void {
+  protected collectionDidSet(entities: ENTITY[]): void {
+    // ! HOOK FOR COLLECTION SET
+  }
+
+  protected collectionDidDelete(entities: ENTITY[]): void {
+    // ! HOOK FOR COLLECTION DELETE
+  }
+
+  protected collectionDidUpdate(entities: ENTITY[]): void {
     // ! HOOK FOR COLLECTION UPDATE
   }
 
-  protected collectionDidRemove(entities: T[]): void {
-    // ! HOOK FOR COLLECTION UPDATE
-  }
-
-  protected collectionDidDestroied(): void {
+  protected collectionDidDestroy(): void {
     // ! HOOK FOR COLLECTION DESTROY
   }
 }
