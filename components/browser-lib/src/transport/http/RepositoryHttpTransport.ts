@@ -43,27 +43,29 @@ export class RepositoryHttpTransport<
 
   public async getList(): Promise<ListResponse<ENTITY> | void> {
     try {
-      if (this.ACL.collection.includes(this.currentUserGroup)) {
-        const result: any | void = await this.getHttpRequest(`/${this.name}`);
-
-        if (!result) {
-          return;
-        }
-
-        const listResponse = new ListResponse(result);
-
-        return new ListResponse<ENTITY>({
-          count: listResponse.count,
-          results: listResponse.results.map((result: any) => {
-            const entity = new this.Entity(result);
-
-            entity.isEntity();
-
-            return entity;
-          }),
-          validates: listResponse.validates,
-        });
+      if (!this.ACL.collection.includes(this.currentUserGroup)) {
+        return;
       }
+
+      const result: any | void = await this.getHttpRequest(`/${this.name}`);
+
+      if (!result) {
+        return;
+      }
+
+      const listResponse = new ListResponse(result);
+
+      return new ListResponse<ENTITY>({
+        count: listResponse.count,
+        results: listResponse.results.map((result: any) => {
+          const entity = new this.Entity(result);
+
+          entity.isEntity();
+
+          return entity;
+        }),
+        validates: listResponse.validates,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -71,20 +73,22 @@ export class RepositoryHttpTransport<
 
   public async getItem(id: string): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.read.includes(this.currentUserGroup)) {
-        const result: any | void = await this.getHttpRequest(`/${this.name}/${id}`);
-
-        if (!result) {
-          return;
-        }
-
-        const response = new Response(result);
-
-        return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
-        });
+      if (!this.ACL.read.includes(this.currentUserGroup)) {
+        return;
       }
+
+      const result: any | void = await this.getHttpRequest(`/${this.name}/${id}`);
+
+      if (!result) {
+        return;
+      }
+
+      const response = new Response(result);
+
+      return new Response<ENTITY>({
+        result: new this.Entity(response.result),
+        validates: response.validates,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -92,20 +96,22 @@ export class RepositoryHttpTransport<
 
   public async create(input: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.create.includes(this.currentUserGroup)) {
-        const result: any | void = await this.putHttpRequest(`/${this.name}`, input);
-
-        if (!result) {
-          return;
-        }
-
-        const response = new Response(result);
-
-        return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
-        });
+      if (!this.ACL.create.includes(this.currentUserGroup)) {
+        return;
       }
+
+      const result: any | void = await this.putHttpRequest(`/${this.name}`, input);
+
+      if (!result) {
+        return;
+      }
+
+      const response = new Response(result);
+
+      return new Response<ENTITY>({
+        result: new this.Entity(response.result),
+        validates: response.validates,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -113,20 +119,22 @@ export class RepositoryHttpTransport<
 
   public async update(input: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.update.includes(this.currentUserGroup)) {
-        const result: any | void = await this.postHttpRequest(`/${this.name}`, input);
-
-        if (!result) {
-          return;
-        }
-
-        const response = new Response(result);
-
-        return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
-        });
+      if (!this.ACL.update.includes(this.currentUserGroup)) {
+        return;
       }
+
+      const result: any | void = await this.postHttpRequest(`/${this.name}`, input);
+
+      if (!result) {
+        return;
+      }
+
+      const response = new Response(result);
+
+      return new Response<ENTITY>({
+        result: new this.Entity(response.result),
+        validates: response.validates,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -134,20 +142,22 @@ export class RepositoryHttpTransport<
 
   public async remove(id: string): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.remove.includes(this.currentUserGroup)) {
-        const result: any | void = await this.deleteHttpRequest(`/${this.name}`, { id });
-
-        if (!result) {
-          return;
-        }
-
-        const response = new Response(result);
-
-        return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
-        });
+      if (!this.ACL.remove.includes(this.currentUserGroup)) {
+        return;
       }
+
+      const result: any | void = await this.deleteHttpRequest(`/${this.name}`, { id });
+
+      if (!result) {
+        return;
+      }
+
+      const response = new Response(result);
+
+      return new Response<ENTITY>({
+        result: new this.Entity(response.result),
+        validates: response.validates,
+      });
     } catch (error) {
       console.error(error);
     }

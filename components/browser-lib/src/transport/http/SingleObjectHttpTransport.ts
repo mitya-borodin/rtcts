@@ -3,12 +3,12 @@ import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";
 import { Entity, Response } from "@rtcts/isomorphic";
 
-export interface SingletonHttpTransportACL extends BaseHttpTransportACL {
+export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
   getItem: string[];
   update: string[];
 }
 
-export class SingletonHttpTransport<
+export class SingleObjectHttpTransport<
   ENTITY extends Entity<DATA>,
   DATA,
   WS extends WSClient = WSClient,
@@ -16,14 +16,14 @@ export class SingletonHttpTransport<
 > extends BaseHttpTransport<WS, PUB_SUB> {
   protected Entity: new (data: any) => ENTITY;
 
-  public readonly ACL: SingletonHttpTransportACL;
+  public readonly ACL: SingleObjectHttpTransportACL;
 
   constructor(
     name: string,
     Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
-    ACL: SingletonHttpTransportACL,
+    ACL: SingleObjectHttpTransportACL,
     pubSub: PUB_SUB,
     root = "/api",
   ) {
@@ -37,20 +37,22 @@ export class SingletonHttpTransport<
 
   public async getItem(): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.getItem.includes(this.currentUserGroup)) {
-        const result: any | void = await this.getHttpRequest(`/${this.name}`);
-
-        if (!result) {
-          return;
-        }
-
-        const response = new Response(result);
-
-        return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
-        });
+      if (!this.ACL.getItem.includes(this.currentUserGroup)) {
+        return;
       }
+
+      const result: any | void = await this.getHttpRequest(`/${this.name}`);
+
+      if (!result) {
+        return;
+      }
+
+      const response = new Response(result);
+
+      return new Response<ENTITY>({
+        result: new this.Entity(response.result),
+        validates: response.validates,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -58,20 +60,22 @@ export class SingletonHttpTransport<
 
   public async update(data: object): Promise<Response<ENTITY> | void> {
     try {
-      if (this.ACL.update.includes(this.currentUserGroup)) {
-        const result: any | void = await this.postHttpRequest(`/${this.name}`, data);
-
-        if (!result) {
-          return;
-        }
-
-        const response = new Response(result);
-
-        return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
-        });
+      if (!this.ACL.update.includes(this.currentUserGroup)) {
+        return;
       }
+
+      const result: any | void = await this.postHttpRequest(`/${this.name}`, data);
+
+      if (!result) {
+        return;
+      }
+
+      const response = new Response(result);
+
+      return new Response<ENTITY>({
+        result: new this.Entity(response.result),
+        validates: response.validates,
+      });
     } catch (error) {
       console.error(error);
     }

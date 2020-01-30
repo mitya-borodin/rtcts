@@ -2,25 +2,25 @@
 import { Entity } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
-import { SingleModel } from "../model/SingleModel";
+import { SingleObjectModel } from "../model/SingleObjectModel";
 import { Channels } from "../webSocket/Channels";
 import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
 
-export interface SingleHttpTransportACL extends BaseHttpTransportACL {
+export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
   readonly getItem: string[];
   readonly update: string[];
 }
 
-export class SingleHttpTransport<
+export class SingleObjectHttpTransport<
   E extends Entity<DATA, VA>,
   DATA,
   VA extends any[],
-  M extends SingleModel<E, DATA, VA>,
+  M extends SingleObjectModel<E, DATA, VA>,
   CH extends Channels = Channels
 > extends BaseHttpTransport<CH> {
   protected readonly Entity: new (data: any) => E;
   protected readonly model: M;
-  protected readonly ACL: SingleHttpTransportACL;
+  protected readonly ACL: SingleObjectHttpTransportACL;
   protected readonly switchers: {
     readonly getItem: boolean;
     readonly update: boolean;
@@ -32,7 +32,7 @@ export class SingleHttpTransport<
     Entity: new (data: any) => E,
     model: M,
     channels: CH,
-    ACL: SingleHttpTransportACL,
+    ACL: SingleObjectHttpTransportACL,
     switchers: {
       getItem: boolean;
       update: boolean;

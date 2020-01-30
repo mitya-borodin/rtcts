@@ -3,23 +3,24 @@ import { getErrorMessage, isObject } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, observable, runInAction } from "mobx";
 import { repositoryPubSubEnum } from "../enums/repositoryPubSubEnum";
-import { SingletonHttpTransport } from "../transport/http/SingletonHttpTransport";
+import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTransport";
 import { WSClient } from "../transport/ws/WSClient";
 
 // tslint:disable: object-literal-sort-keys
 
-export class SingletonRepository<
+export class SingleObjectRepository<
   ENTITY extends Entity<DATA>,
   DATA,
-  HTTP_TRANSPORT extends SingletonHttpTransport<ENTITY, DATA, WS, PUB_SUB>,
+  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, WS, PUB_SUB>,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends EventEmitter {
   public static events = {
-    init: `[ SingletonRepository ][ INIT ]`,
-    update: `[ SingletonRepository ][ UPDATE ]`,
-    destroy: `[ SingletonRepository ][ DESTROY ]`,
+    init: `SingleObjectRepository.init`,
+    update: `SingleObjectRepository.update`,
+    destroy: `SingleObjectRepository.destroy`,
   };
+
   @observable
   public pending: boolean;
   @observable
@@ -68,71 +69,71 @@ export class SingletonRepository<
     this.ws.on(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, this.handleUserUnBindedToConnection);
   }
 
-  @action("SingletonRepository.init")
+  @action("SingleObjectRepository.init")
   public async init(): Promise<void> {
-    if (!this.isInit) {
-      try {
-        if (this.httpTransport.ACL.getItem.includes(this.httpTransport.currentUserGroup)) {
-          this.start();
+    if (this.isInit) {
+      return;
+    }
 
-          const response: Response<ENTITY> | void = await this.httpTransport.getItem();
-
-          if (response) {
-            runInAction(`Initialization (${this.constructor.name}) succeed`, () => {
-              this.entity = response.result;
-              this.isInit = true;
-
-              this.entityDidInit();
-
-              this.emit(SingletonRepository.events.init, this.entity);
-
-              this.pubSub.emit(repositoryPubSubEnum.init, this);
-            });
-          } else {
-            throw new Error(`response is empty`);
-          }
-        } else {
-          throw new Error(`access denied for (${this.httpTransport.currentUserGroup})`);
-        }
-      } catch (error) {
-        console.error(
-          `Initialization (${this.constructor.name}) failed: ${getErrorMessage(error)}`,
-        );
-      } finally {
-        this.stop();
+    try {
+      if (!this.httpTransport.ACL.getItem.includes(this.httpTransport.currentUserGroup)) {
+        throw new Error(`access denied for (${this.httpTransport.currentUserGroup})`);
       }
+
+      this.start();
+
+      const response: Response<ENTITY> | void = await this.httpTransport.getItem();
+
+      if (!response) {
+        throw new Error(`response is empty`);
+      }
+
+      runInAction(`Initialization (${this.constructor.name}) succeed`, () => {
+        this.entity = response.result;
+        this.isInit = true;
+
+        this.entityDidInit();
+
+        this.emit(SingleObjectRepository.events.init, this.entity);
+
+        this.pubSub.emit(repositoryPubSubEnum.init, this);
+      });
+    } catch (error) {
+      console.error(`Initialization (${this.constructor.name}) failed: ${getErrorMessage(error)}`);
+    } finally {
+      this.stop();
     }
   }
 
-  @action("SingletonRepository.update")
+  @action("SingleObjectRepository.update")
   public async update(data: object): Promise<ENTITY | void> {
     try {
-      if (this.isInit) {
-        if (this.httpTransport.ACL.update.includes(this.httpTransport.currentUserGroup)) {
-          this.start();
-
-          const response: Response<ENTITY> | void = await this.httpTransport.update(data);
-
-          if (response) {
-            runInAction(
-              `Update (${this.constructor.name}) succeed`,
-              () => (this.entity = response.result),
-            );
-
-            this.entityDidUpdate();
-
-            this.emit(SingletonRepository.events.update, this.entity);
-
-            return this.entity;
-          } else {
-            throw new Error(`response is empty`);
-          }
-        } else {
-          throw new Error(`access denied for (${this.httpTransport.currentUserGroup})`);
-        }
-      } else {
+      if (!this.isInit) {
         throw new Error(`doesn't initialized yet`);
       }
+
+      if (!this.httpTransport.ACL.update.includes(this.httpTransport.currentUserGroup)) {
+        throw new Error(`access denied for (${this.httpTransport.currentUserGroup})`);
+      }
+
+      this.start();
+
+      const response: Response<ENTITY> | void = await this.httpTransport.update(data);
+
+      if (!response) {
+        throw new Error(`response is empty`);
+      }
+
+      runInAction(
+        `Update (${this.constructor.name}) succeed`,
+        () => (this.entity = response.result),
+      );
+
+      this.entityDidUpdate();
+
+      this.emit(SingleObjectRepository.events.update, this.entity);
+
+      return this.entity;
     } catch (error) {
       console.error(`Update (${this.constructor.name}) failed: ${getErrorMessage(error)}`);
     } finally {
@@ -140,7 +141,7 @@ export class SingletonRepository<
     }
   }
 
-  @action("SingletonRepository.receiveMessage")
+  @action("SingleObjectRepository.receiveMessage")
   public receiveMessage([channelName, payload]: [string, any]): ENTITY | ENTITY[] | void {
     if (this.isInit) {
       try {
@@ -162,7 +163,7 @@ export class SingletonRepository<
           if (isObject(payload.create) || isObject(payload.update)) {
             this.entityDidUpdate();
 
-            this.emit(SingletonRepository.events.update, this.entity);
+            this.emit(SingleObjectRepository.events.update, this.entity);
 
             return this.entity;
           }

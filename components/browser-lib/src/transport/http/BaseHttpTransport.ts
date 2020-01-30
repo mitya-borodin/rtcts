@@ -57,12 +57,14 @@ export class BaseHttpTransport<
 
   public async subscribeToChannel(): Promise<void> {
     try {
-      if (this.ACL.subscribeToChannel.includes(this.currentUserGroup)) {
-        await this.postHttpRequest(`/${this.name}/channel`, {
-          channelName: this.channelName,
-          action: "on",
-        });
+      if (!this.ACL.subscribeToChannel.includes(this.currentUserGroup)) {
+        return;
       }
+
+      await this.postHttpRequest(`/${this.name}/channel`, {
+        channelName: this.channelName,
+        action: "on",
+      });
     } catch (error) {
       console.error(error);
     }
@@ -70,12 +72,14 @@ export class BaseHttpTransport<
 
   public async unsubscribeFromChannel(): Promise<void> {
     try {
-      if (this.ACL.unsubscribeFromChannel.includes(this.currentUserGroup)) {
-        await this.postHttpRequest(`/${this.name}/channel`, {
-          channelName: this.channelName,
-          action: "off",
-        });
+      if (!this.ACL.unsubscribeFromChannel.includes(this.currentUserGroup)) {
+        return;
       }
+
+      await this.postHttpRequest(`/${this.name}/channel`, {
+        channelName: this.channelName,
+        action: "off",
+      });
     } catch (error) {
       console.error(error);
     }

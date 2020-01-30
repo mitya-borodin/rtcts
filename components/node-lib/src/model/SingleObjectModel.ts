@@ -4,7 +4,7 @@ import { isObject } from "@rtcts/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
-export class SingleModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
+export class SingleObjectModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   protected readonly repository: MongoDBRepository<E, DATA, VA>;
   protected readonly Entity: new (data: any) => E;
   protected readonly sendThroughWebSocket: Send;

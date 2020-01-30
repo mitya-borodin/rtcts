@@ -11,13 +11,13 @@ export { KoaServer } from "./app/KoaServer";
 export { Model } from "./model/Model";
 export { MongoDBConnection } from "./model/MongoDBConnection";
 export { MongoDBRepository } from "./model/MongoDBRepository";
-export { SingleModel } from "./model/SingleModel";
+export { SingleObjectModel } from "./model/SingleObjectModel";
 export { UserModel } from "./model/UserModel";
 
 // Transport
 export { BaseHttpTransport } from "./transport/BaseHttpTransport";
 export { HttpTransport } from "./transport/HttpTransport";
-export { SingleHttpTransport } from "./transport/SingleHttpTransport";
+export { SingleObjectHttpTransport } from "./transport/SingleObjectHttpTransport";
 export { UserHttpTransport } from "./transport/UserHttpTransport";
 
 // UTILS
