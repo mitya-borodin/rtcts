@@ -228,14 +228,14 @@ export class WSClient extends EventEmitter {
     },
   ): void {
     try {
-      if (this.connection instanceof WebSocket) {
-        if (this.isUserBindToConnection) {
-          this.connection.send(makeMessage(channelName, payload));
-        } else {
-          console.info(`The user is not associated with any connection`);
-        }
-      } else {
+      if (!(this.connection instanceof WebSocket)) {
         throw new Error(`The connection has not been established yet`);
+      }
+
+      if (this.isUserBindToConnection) {
+        this.connection.send(makeMessage(channelName, payload));
+      } else {
+        console.info(`The user is not associated with any connection`);
       }
     } catch (error) {
       console.error(error);
@@ -247,28 +247,37 @@ export class WSClient extends EventEmitter {
   public async bindUserToConnection(): Promise<void> {
     try {
       await new Promise<void>((resolve, reject) => {
-        if (this.uid.length > 0) {
-          if (!this.isUserBindToConnection) {
-            if (this.connection instanceof WebSocket) {
-              if (this.connection.readyState === WebSocket.OPEN) {
-                this.connection.send(makeMessage(BindUserToConnection, { uid: this.uid }));
-                this.once(wsEventEnum.USER_BINDED_TO_CONNECTION, resolve);
-              } else {
-                console.info(`WSClient.send readyState: ${this.connection.readyState}`);
-
-                setTimeout(this.bindUserToConnection, 1000);
-              }
-            } else {
-              reject(`The connection has not been established yet`);
-            }
-          } else {
-            reject(`The user is already connected to the connection`);
-          }
-        } else {
+        if (this.uid.length === 0) {
           reject(
             `The user ID is not specified, you should use method setUserID(uid: string) before`,
           );
+
+          return;
         }
+
+        if (this.isUserBindToConnection) {
+          reject(`The user is already connected to the connection`);
+
+          return;
+        }
+
+        if (!(this.connection instanceof WebSocket)) {
+          reject(`The connection has not been established yet`);
+
+          return;
+        }
+
+        if (this.connection.readyState !== WebSocket.OPEN) {
+          console.info(`WSClient.send readyState: ${this.connection.readyState}`);
+
+          setTimeout(this.bindUserToConnection, 1000);
+
+          return;
+        }
+
+        this.connection.send(makeMessage(BindUserToConnection, { uid: this.uid }));
+
+        this.once(wsEventEnum.USER_BINDED_TO_CONNECTION, resolve);
       });
     } catch (error) {
       console.error(error);
@@ -280,20 +289,25 @@ export class WSClient extends EventEmitter {
   public async unbindUserFromConnection(): Promise<void> {
     try {
       await new Promise<void>((resolve, reject) => {
-        if (this.uid.length > 0) {
-          if (this.connection instanceof WebSocket && this.isUserBindToConnection) {
-            this.send(UnbindUserFromConnection, { uid: this.uid });
-            this.once(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, resolve);
-          } else {
-            reject(
-              `The connection is not established or the user ID is not set or the user is not linked to the connection`,
-            );
-          }
-        } else {
+        if (this.uid.length === 0) {
           reject(
             `The user ID is not specified, you should use method setUserID(uid: string) before`,
           );
+
+          return;
         }
+
+        if (!(this.connection instanceof WebSocket && this.isUserBindToConnection)) {
+          reject(
+            `The connection is not established or the user ID is not set or the user is not linked to the connection`,
+          );
+
+          return;
+        }
+
+        this.send(UnbindUserFromConnection, { uid: this.uid });
+
+        this.once(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, resolve);
       });
     } catch (error) {
       console.error(error);
