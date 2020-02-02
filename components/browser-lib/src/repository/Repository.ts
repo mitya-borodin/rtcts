@@ -11,9 +11,10 @@ import { repositoryPubSubEnum } from "../enums/repositoryPubSubEnum";
 // tslint:disable: object-literal-sort-keys
 
 export class Repository<
-  ENTITY extends Entity<DATA>,
+  HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
+  ENTITY extends Entity<DATA, VA>,
   DATA,
-  HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, WS, PUB_SUB>,
+  VA extends any[] = any[],
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends EventEmitter {
@@ -40,11 +41,11 @@ export class Repository<
   protected isInit: boolean;
 
   constructor(
-    Entity: new (data: any) => ENTITY,
     httpTransport: HTTP_TRANSPORT,
-    pubSub: PUB_SUB,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
+    pubSub: PUB_SUB,
   ) {
     super();
 
@@ -113,7 +114,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      runInAction(`Initialization (${this.constructor.name}) succeed`, () => {
+      runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
         const collection: ENTITY[] = [];
 
         for (const item of listResponse.results) {
@@ -133,7 +134,9 @@ export class Repository<
         this.pubSub.emit(repositoryPubSubEnum.init, this);
       });
     } catch (error) {
-      console.error(`Initialization (${this.constructor.name}) failed: ${getErrorMessage(error)}`);
+      console.error(
+        `Initialization (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
     } finally {
       this.stop();
     }

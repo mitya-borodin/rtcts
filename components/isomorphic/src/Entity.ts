@@ -1,24 +1,25 @@
 import { ValidateResult } from "./validate/ValidateResult";
 import { isString } from "@rtcts/utils";
 
-export abstract class SimpleObject<Data> {
-  public abstract toObject(): Data;
-  public toJSON(): Data {
+export abstract class SimpleObject<DATA> {
+  public abstract toObject(): DATA;
+
+  public toJSON(): DATA {
     return this.toObject();
   }
 }
 
-export abstract class ValueObject<Data, VA extends any[] = any[]> extends SimpleObject<Data> {
-  public abstract canBeInsert(): this is Required<Data>;
+export abstract class ValueObject<DATA, VA extends any[] = any[]> extends SimpleObject<DATA> {
+  public abstract canBeInsert<T = DATA>(): this is Required<T>;
   public abstract validate(...args: VA): ValidateResult;
 }
 
 export type EntityID = { id?: string };
 
-export abstract class Entity<Data, VA extends any[] = any[]> extends ValueObject<Data, VA> {
+export abstract class Entity<DATA, VA extends any[] = any[]> extends ValueObject<DATA, VA> {
   readonly id?: string;
 
-  constructor(data: Data & EntityID) {
+  constructor(data: EntityID & DATA) {
     super();
 
     if (data) {
@@ -30,22 +31,23 @@ export abstract class Entity<Data, VA extends any[] = any[]> extends ValueObject
     }
   }
 
-  public isEntity(): this is Required<EntityID> & Required<Data> {
+  public isEntity<T = DATA>(): this is Required<EntityID> & Required<T> {
     if (!isString(this.id)) {
       throw new Error(`${this.constructor.name}.id should be String`);
     }
 
-    this.canBeInsert();
+    this.canBeInsert<T>();
 
     return true;
   }
 
-  public toObject(): Data & EntityID {
+  public toObject(): EntityID & DATA {
     return {
       ...(isString(this.id) ? { id: this.id } : {}),
       ...this.eject(),
     };
   }
 
-  protected abstract eject(): Data;
+  // ! The eject method returns an object as DATA with allFields that are the current object's content
+  protected abstract eject(): DATA;
 }

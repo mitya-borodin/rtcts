@@ -1,5 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity, ValueObject } from "@rtcts/isomorphic";
+import { ValueObject, Entity } from "@rtcts/isomorphic";
 import { isObject } from "@rtcts/utils";
 import { ObjectId } from "bson";
 import omit from "lodash.omit";
@@ -20,18 +21,18 @@ import {
 } from "mongodb";
 import { MongoDBConnection } from "./MongoDBConnection";
 
-export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
+export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   private readonly name: string;
   private readonly db: MongoDBConnection;
   private readonly options?: CollectionCreateOptions;
   private collection?: Collection;
 
-  protected readonly Entity: new (data?: any) => E;
+  protected readonly Entity: new (data?: any) => ENTITY;
 
   constructor(
     name: string,
     db: MongoDBConnection,
-    Entity: new (data: any) => E,
+    Entity: new (data: any) => ENTITY,
     options?: CollectionCreateOptions,
   ) {
     this.name = name;
@@ -84,7 +85,7 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
   public async insertMany(
     items: ValueObject<DATA>[],
     options?: CollectionInsertManyOptions,
-  ): Promise<E[]> {
+  ): Promise<ENTITY[]> {
     try {
       const collection: Collection<any> = await this.getCollection();
 
@@ -106,7 +107,7 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
   public async insertOne(
     item: ValueObject<DATA>,
     options?: CollectionInsertOneOptions,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
       if (item.canBeInsert()) {
         const collection: Collection<any> = await this.getCollection();
@@ -126,7 +127,12 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async find(query: object, offset = 0, limit = 20, options?: FindOneOptions): Promise<E[]> {
+  public async find(
+    query: object,
+    offset = 0,
+    limit = 20,
+    options?: FindOneOptions,
+  ): Promise<ENTITY[]> {
     try {
       const collection: Collection<any> = await this.getCollection();
 
@@ -150,7 +156,7 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async findOne(query: object, options?: FindOneOptions): Promise<E | null> {
+  public async findOne(query: object, options?: FindOneOptions): Promise<ENTITY | null> {
     try {
       const collection: Collection = await this.getCollection();
       const item: object | null = await collection.findOne(
@@ -168,9 +174,9 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
     return null;
   }
 
-  public async findById(id: string, options?: FindOneOptions): Promise<E | null> {
+  public async findById(id: string, options?: FindOneOptions): Promise<ENTITY | null> {
     try {
-      const item: object | null = await this.findOne(
+      const item: ENTITY | null = await this.findOne(
         { _id: new ObjectId(id) },
         this.getOptions(options),
       );
@@ -190,7 +196,7 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
     query: object,
     update: object,
     options?: FindOneAndReplaceOption,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
       const collection: Collection<any> = await this.getCollection();
       const result: FindAndModifyWriteOpResultObject = await collection.findOneAndUpdate(
@@ -213,7 +219,7 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
   public async findOneAndRemove(
     query: object,
     options?: { projection?: object; sort?: object },
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
       const collection: Collection<any> = await this.getCollection();
 
@@ -235,7 +241,7 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
   public async findByIdAndRemove(
     id: string,
     options?: { projection?: object; sort?: object },
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
       return await this.findOneAndRemove({ _id: new ObjectId(id) }, this.getOptions(options));
     } catch (error) {
@@ -308,7 +314,7 @@ export class MongoDBRepository<E extends Entity<DATA, VA>, DATA, VA extends any[
     throw new Error("The incoming object does not contain a suitable ObjectID");
   }
 
-  private createEntity({ _id, ...data }: { [key: string]: any }): E {
+  private createEntity({ _id, ...data }: { [key: string]: any }): ENTITY {
     if (ObjectId.isValid(_id)) {
       const entity = new this.Entity({ ...data, id: _id.toHexString() });
 

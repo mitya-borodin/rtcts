@@ -9,8 +9,9 @@ export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class SingleObjectHttpTransport<
-  ENTITY extends Entity<DATA>,
+  ENTITY extends Entity<DATA, VA>,
   DATA,
+  VA extends any[] = any[],
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends BaseHttpTransport<WS, PUB_SUB> {

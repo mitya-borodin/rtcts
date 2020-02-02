@@ -1,23 +1,24 @@
-import { Entity, Response, ListResponse } from "@rtcts/isomorphic";
+import { ListResponse, Response, User, UserData } from "@rtcts/isomorphic";
 import EventEmitter from "eventemitter3";
 import {
-  RepositoryHTTPTransport,
-  RepositoryHTTPTransportACL,
-} from "../transport/http/RepositoryHTTPTransport";
+  RepositoryHttpTransport,
+  RepositoryHttpTransportACL,
+} from "../transport/http/RepositoryHttpTransport";
 import { WSClient } from "../transport/ws/WSClient";
 
-interface UserHTTPTransportACL extends RepositoryHTTPTransportACL {
+interface UserHTTPTransportACL extends RepositoryHttpTransportACL {
   updateLogin: string[];
   updatePassword: string[];
   updateGroup: string[];
 }
 
 export class UserHTTPTransport<
-  ENTITY extends Entity<DATA>,
-  DATA,
+  ENTITY extends User<DATA, VA>,
+  DATA extends UserData = UserData,
+  VA extends any[] = any[],
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends RepositoryHTTPTransport<ENTITY, DATA, WS, PUB_SUB> {
+> extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB> {
   public ACL: UserHTTPTransportACL;
 
   constructor(
@@ -62,6 +63,14 @@ export class UserHTTPTransport<
   public async signUp(data: object): Promise<void> {
     try {
       await this.postHttpRequest(`/${this.name}/signUp`, data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  public async signOut(): Promise<void> {
+    try {
+      await this.postHttpRequest(`/${this.name}/signOut`);
     } catch (error) {
       console.error(error);
     }

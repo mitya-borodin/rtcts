@@ -4,14 +4,14 @@ import { isObject } from "@rtcts/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
-export class SingleObjectModel<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
-  protected readonly repository: MongoDBRepository<E, DATA, VA>;
-  protected readonly Entity: new (data: any) => E;
+export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
+  protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
+  protected readonly Entity: new (data: any) => ENTITY;
   protected readonly sendThroughWebSocket: Send;
 
   constructor(
-    repository: MongoDBRepository<E, DATA, VA>,
-    Entity: new (data: any) => E,
+    repository: MongoDBRepository<ENTITY, DATA, VA>,
+    Entity: new (data: any) => ENTITY,
     sendThroughWebSocket: Send,
   ) {
     this.repository = repository;
@@ -22,7 +22,7 @@ export class SingleObjectModel<E extends Entity<DATA, VA>, DATA, VA extends any[
   // ! Response API
 
   public async getItemResponse(): Promise<Response> {
-    const result: E | null = await this.getItem();
+    const result: ENTITY | null = await this.getItem();
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -37,7 +37,7 @@ export class SingleObjectModel<E extends Entity<DATA, VA>, DATA, VA extends any[
     options?: FindOneAndReplaceOption,
     excludeCurrentDevice = true,
   ): Promise<Response> {
-    const result: E | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -47,11 +47,11 @@ export class SingleObjectModel<E extends Entity<DATA, VA>, DATA, VA extends any[
 
   // ! Model API
 
-  public async getItem(): Promise<E | null> {
+  public async getItem(): Promise<ENTITY | null> {
     try {
       return await this.repository.findOne({});
     } catch (error) {
-      const collection: Collection<E> = await this.repository.getCollection();
+      const collection: Collection<ENTITY> = await this.repository.getCollection();
 
       await collection.drop();
 
@@ -67,15 +67,15 @@ export class SingleObjectModel<E extends Entity<DATA, VA>, DATA, VA extends any[
     wsid: string,
     options?: FindOneAndReplaceOption,
     excludeCurrentDevice = true,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
-      const currentEntity: E | null = await this.getItem();
+      const currentEntity: ENTITY | null = await this.getItem();
 
       if (currentEntity === null) {
-        const insert: E = new this.Entity(data);
+        const insert: ENTITY = new this.Entity(data);
 
         if (insert.canBeInsert()) {
-          const entity: E | null = await this.repository.insertOne(insert, options);
+          const entity: ENTITY | null = await this.repository.insertOne(insert, options);
 
           if (entity) {
             this.sendThroughWebSocket(
@@ -89,12 +89,12 @@ export class SingleObjectModel<E extends Entity<DATA, VA>, DATA, VA extends any[
           }
         }
       } else {
-        const entity: E = new this.Entity(data);
+        const entity: ENTITY = new this.Entity(data);
 
         if (entity.isEntity()) {
           const { id: _id, ...$set } = entity.toObject();
 
-          const updatedEntity: E | null = await this.repository.findOneAndUpdate(
+          const updatedEntity: ENTITY | null = await this.repository.findOneAndUpdate(
             { _id },
             { $set },
             {

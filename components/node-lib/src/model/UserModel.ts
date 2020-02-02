@@ -22,17 +22,18 @@ import { Model } from "./Model";
 import { MongoDBRepository } from "./MongoDBRepository";
 
 export class UserModel<
-  E extends User<VA>,
-  VA extends any[] = any[], // Validate Arguments
-  C extends Config = Config
-> extends Model<E, UserData, VA> {
-  protected config: C;
+  ENTITY extends User<DATA, VA>,
+  DATA extends UserData = UserData,
+  VA extends any[] = any[],
+  CONFIG extends Config = Config
+> extends Model<ENTITY, DATA, VA> {
+  protected config: CONFIG;
 
   constructor(
-    repository: MongoDBRepository<E, UserData, VA>,
-    Entity: new (data: any) => E,
+    repository: MongoDBRepository<ENTITY, DATA, VA>,
+    Entity: new (data: any) => ENTITY,
     sendThroughWebSocket: Send,
-    config: C,
+    config: CONFIG,
   ) {
     super(repository, Entity, sendThroughWebSocket);
 
@@ -41,7 +42,7 @@ export class UserModel<
 
   // ! Response API
   public async getListResponse(offset = 0, limit = 20): Promise<ListResponse> {
-    const results: E[] = await this.repository.find({}, offset, limit);
+    const results: ENTITY[] = await this.repository.find({}, offset, limit);
 
     return new ListResponse({
       count: results.length,
@@ -51,7 +52,7 @@ export class UserModel<
   }
 
   public async getItemResponse(id: string, options?: FindOneOptions): Promise<Response> {
-    const result: E | null = await this.repository.findById(id, options);
+    const result: ENTITY | null = await this.repository.findById(id, options);
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -66,7 +67,13 @@ export class UserModel<
     options?: CollectionInsertOneOptions,
     excludeCurrentDevice = true,
   ): Promise<Response> {
-    const result: E | null = await super.create(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await super.create(
+      data,
+      uid,
+      wsid,
+      options,
+      excludeCurrentDevice,
+    );
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -81,7 +88,13 @@ export class UserModel<
     options?: CollectionInsertOneOptions,
     excludeCurrentDevice = true,
   ): Promise<Response> {
-    const result: E | null = await super.update(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await super.update(
+      data,
+      uid,
+      wsid,
+      options,
+      excludeCurrentDevice,
+    );
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -96,7 +109,7 @@ export class UserModel<
     options?: { projection?: object; sort?: object },
     excludeCurrentDevice = true,
   ): Promise<Response> {
-    const result: E | null = await super.remove(id, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await super.remove(id, uid, wsid, options, excludeCurrentDevice);
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -109,7 +122,7 @@ export class UserModel<
     uid: string,
     wsid: string,
   ): Promise<Response> {
-    const result: E | null = await this.updateLogin(data, uid, wsid);
+    const result: ENTITY | null = await this.updateLogin(data, uid, wsid);
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -122,7 +135,7 @@ export class UserModel<
     uid: string,
     wsid: string,
   ): Promise<Response> {
-    const result: E | null = await this.updatePassword(data, uid, wsid);
+    const result: ENTITY | null = await this.updatePassword(data, uid, wsid);
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -139,7 +152,7 @@ export class UserModel<
     offset = 0,
     limit = 1000,
   ): Promise<ListResponse> {
-    const results: E[] | null = await this.updateGroup(
+    const results: ENTITY[] | null = await this.updateGroup(
       ids,
       group,
       uid,
@@ -158,17 +171,17 @@ export class UserModel<
 
   // ! Model API
 
-  public async getUsers(offset = 0, limit = 20): Promise<E[]> {
+  public async getUsers(offset = 0, limit = 20): Promise<ENTITY[]> {
     return await await this.repository.find({}, offset, limit);
   }
 
-  public async getUserById(id: string): Promise<E | null> {
+  public async getUserById(id: string): Promise<ENTITY | null> {
     return await this.repository.findById(id);
   }
 
   public async init(): Promise<void> {
     try {
-      const result: E | null = await this.repository.findOne({});
+      const result: ENTITY | null = await this.repository.findOne({});
 
       if (result === null) {
         await this.signUp({
@@ -187,39 +200,37 @@ export class UserModel<
     try {
       const { login, password, password_confirm, group, ...other } = data;
 
-      if (isString(login) && isString(password) && isString(password_confirm) && isString(group)) {
-        const existingUser: E | null = await this.repository.findOne({ login });
+      if (
+        !isString(login) ||
+        !isString(password) ||
+        !isString(password_confirm) ||
+        !isString(group)
+      ) {
+        throw new Error(`Incorrect signUp data: ${JSON.stringify(data)}`);
+      }
 
-        if (existingUser === null) {
-          const isValidPassword = checkPassword(password, password_confirm);
+      const existingUser: ENTITY | null = await this.repository.findOne({ login });
 
-          if (isValidPassword) {
-            const salt = getSalt();
-            const hashedPassword = encryptPassword(password, salt);
-            const insert = new this.Entity({ login, group, salt, hashedPassword, ...other });
+      if (!existingUser === null) {
+        throw new Error(`User with login: ${data.login} already exist`);
+      }
 
-            if (insert.canBeInsert()) {
-              const user: E | null = await this.repository.insertOne(insert);
+      const isValidPassword = checkPassword(password, password_confirm);
 
-              if (user && user.isEntity()) {
-                const { secretKey } = this.config.jwt;
+      if (!isValidPassword) {
+        throw new Error(`Password incorrect, ${JSON.stringify({ password, password_confirm })} }`);
+      }
 
-                return jwt.sign(user.id, secretKey, { expiresIn: "12h" });
-              }
-            }
-          }
+      const salt = getSalt();
+      const hashedPassword = encryptPassword(password, salt);
+      const insert = new this.Entity({ login, group, salt, hashedPassword, ...other });
 
-          throw new Error(
-            `Password incorrect, { password: ${password}, password_confirm: ${password_confirm} }`,
-          );
-        } else {
-          throw new Error(`[ USER ALREADY EXIST ][ login: ${data.login} ]`);
+      if (insert.canBeInsert()) {
+        const user: ENTITY | null = await this.repository.insertOne(insert);
+
+        if (user && user.isEntity()) {
+          return jwt.sign(user.id, this.config.jwt.secretKey, { expiresIn: "12h" });
         }
-      } else {
-        throw new Error(
-          `[ INCORRECT ARGS ][ login: ${data.login} ][ password: ${data.password} ]` +
-            `[ password_confirm: ${data.password_confirm} ][ group: ${data.group} ]`,
-        );
       }
     } catch (error) {
       console.error(error);
@@ -230,23 +241,23 @@ export class UserModel<
 
   public async signIn(data: { [key: string]: any }): Promise<string | null> {
     try {
-      if (isString(data.login) && isString(data.password)) {
-        const user: E | null = await this.repository.findOne({ login: data.login });
-
-        if (user && user.isEntity()) {
-          if (authenticate(data.password, user.salt, user.hashedPassword)) {
-            const { secretKey } = this.config.jwt;
-
-            return jwt.sign(user.id, secretKey, { expiresIn: "12h" });
-          }
-
-          throw new Error(`[ PASSWORD INCORRECT ][ password: ${data.password} ]`);
-        }
-
-        throw new Error(`[ USER NOT FOUND ][ login: ${data.login} ]`);
+      if (!isString(data.login) || !isString(data.password)) {
+        throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
       }
 
-      throw new Error(`[ INCORRECT ARGS ][ login: ${data.login} ][ password: ${data.password} ]`);
+      const user: ENTITY | null = await this.repository.findOne({ login: data.login });
+
+      if (user === null) {
+        throw new Error(`User with login: ${data.login} not found`);
+      }
+
+      if (user.isEntity<UserData>() && user.checkSecureFields()) {
+        if (!authenticate(data.password, user.salt, user.hashedPassword)) {
+          throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
+        }
+
+        return jwt.sign(user.id, this.config.jwt.secretKey, { expiresIn: "12h" });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -258,19 +269,21 @@ export class UserModel<
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
-      if (isString(data.id) && isString(data.login)) {
-        const result: E | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
-
-        if (result && result.isEntity()) {
-          return await super.update({ ...result.toObject(), login: data.login }, uid, wsid);
-        }
-
-        throw new Error(`[ USER NOT FOUND ][ ID: ${data.id} ][ login: ${data.login} ]`);
+      if (!isString(data.id) || !isString(data.login)) {
+        throw new Error(`Incorrect updateLogin data: ${JSON.stringify(data)}`);
       }
 
-      throw new Error(`[ INCORRECT_PROPS ][ ID: ${data.id} ][ login: ${data.login} ]`);
+      const result: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+
+      if (result === null) {
+        throw new Error(`User with id: ${data.id} and login: ${data.login} not found`);
+      }
+
+      if (result.isEntity()) {
+        return await super.update({ ...result.toObject(), login: data.login }, uid, wsid);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -282,33 +295,31 @@ export class UserModel<
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
-      if (isString(data.id) && isString(data.password) && isString(data.password_confirm)) {
-        const isValidPassword = checkPassword(data.password, data.password_confirm);
-
-        if (isValidPassword) {
-          const result: E | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
-
-          if (result && result.isEntity()) {
-            const salt = getSalt();
-            const hashedPassword = encryptPassword(data.password, salt);
-            const query = { ...result.toObject(), salt, hashedPassword };
-
-            return await super.update(query, uid, wsid);
-          }
-        }
-
-        throw new Error(
-          `[ INCORRECT_PASSWORD ][ ID: ${data.id} ][ password: ${data.password} ]` +
-            `[ password_confirm: ${data.password_confirm} ]`,
-        );
+      if (!isString(data.id) || !isString(data.password) || !isString(data.password_confirm)) {
+        throw new Error(`Incorrect updatePassword data: ${JSON.stringify(data)}`);
       }
 
-      throw new Error(
-        `[ INCORRECT_PROPS ][ ID: ${data.id} ][ password: ${data.password} ]` +
-          `[ password_confirm: ${data.password_confirm} ]`,
-      );
+      const isValidPassword = checkPassword(data.password, data.password_confirm);
+
+      if (!isValidPassword) {
+        throw new Error(`Incorrect password: ${JSON.stringify(data)}`);
+      }
+
+      const result: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+
+      if (result === null) {
+        throw new Error(`User with id: ${data.id} not found`);
+      }
+
+      if (result.isEntity()) {
+        const salt = getSalt();
+        const hashedPassword = encryptPassword(data.password, salt);
+        const query = { ...result.toObject(), salt, hashedPassword };
+
+        return await super.update(query, uid, wsid);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -324,14 +335,14 @@ export class UserModel<
     excludeCurrentDevice = true,
     offset = 0,
     limit = 1000,
-  ): Promise<E[]> {
+  ): Promise<ENTITY[]> {
     try {
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
       const update = { $set: { group } };
 
       await this.repository.updateMany(query, update);
 
-      const users: E[] = await super.repository.find(query, offset, limit);
+      const users: ENTITY[] = await super.repository.find(query, offset, limit);
 
       this.sendThroughWebSocket(
         {
@@ -362,12 +373,12 @@ export class UserModel<
     uid: string,
     wsid: string,
     options?: FindOneAndReplaceOption,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
-      const insert: E = new this.Entity(data);
+      const insert: ENTITY = new this.Entity(data);
 
-      if (insert.checkNoSecure() && isString(insert.id)) {
-        const currentUser: E | null = await this.repository.findById(insert.id);
+      if (insert.checkNoSecureFields() && isString(insert.id)) {
+        const currentUser: ENTITY | null = await this.repository.findById(insert.id);
 
         if (currentUser) {
           return await super.update(

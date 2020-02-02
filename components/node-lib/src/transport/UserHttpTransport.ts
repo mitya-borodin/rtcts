@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Response, User, UserData, userGroupEnum, ValidateResult } from "@rtcts/isomorphic";
+import { Response, User, userGroupEnum, ValidateResult, UserData } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import Koa from "koa";
-import { getAuthenticateMiddleware, setCookieForAuthenticate } from "../app/auth";
+import {
+  getAuthenticateMiddleware,
+  setCookieForAuthenticate,
+  unsetCookieForAuthenticate,
+} from "../app/auth";
 import { Config } from "../app/Config";
 import { UserModel } from "../model/UserModel";
 import { Channels } from "../webSocket/Channels";
@@ -13,15 +17,17 @@ export interface UserHttpTransportACL extends HttpTransportACL {
   readonly updatePassword: string[];
   readonly updateGroup: string[];
   readonly signUp: string[];
+  readonly signOut: string[];
 }
 
 export class UserHttpTransport<
-  E extends User<VA>,
-  M extends UserModel<E, VA, C>,
+  ENTITY extends User<DATA, VA>,
+  MODEL extends UserModel<ENTITY, DATA, VA, C>,
+  DATA extends UserData = UserData,
   VA extends any[] = any[],
   C extends Config = Config,
   CH extends Channels = Channels
-> extends HttpTransport<E, UserData, VA, M, CH> {
+> extends HttpTransport<ENTITY, UserData, any[], MODEL, User, CH> {
   protected readonly ACL: UserHttpTransportACL;
 
   protected readonly switchers: {
@@ -35,12 +41,13 @@ export class UserHttpTransport<
     readonly updatePassword: boolean;
     readonly updateGroup: boolean;
     readonly signUp: boolean;
+    readonly signOut: boolean;
   };
 
   constructor(
     name: string,
-    Entity: new (data: any) => E,
-    model: M,
+    Entity: new (data: any) => ENTITY,
+    model: MODEL,
     channels: CH,
     ACL: UserHttpTransportACL = {
       getList: [userGroupEnum.admin],
@@ -53,6 +60,7 @@ export class UserHttpTransport<
       updatePassword: [userGroupEnum.admin],
       updateGroup: [userGroupEnum.admin],
       signUp: [userGroupEnum.admin],
+      signOut: [userGroupEnum.admin],
     },
     switchers: {
       getList: boolean;
@@ -65,6 +73,7 @@ export class UserHttpTransport<
       updatePassword: boolean;
       updateGroup: boolean;
       signUp: boolean;
+      signOut: boolean;
     } = {
       getList: true,
       getItem: false,
@@ -76,13 +85,15 @@ export class UserHttpTransport<
       updatePassword: true,
       updateGroup: true,
       signUp: true,
+      signOut: true,
     },
   ) {
-    super(name, Entity, model, channels, ACL, switchers);
+    super(name, Entity, model, channels, ACL, switchers, Entity);
 
     this.current();
     this.signIn();
     this.signUp();
+    this.signOut();
     this.updateLogin();
     this.updatePassword();
     this.updateGroup();
@@ -138,7 +149,7 @@ export class UserHttpTransport<
         ctx.type = "application/json";
         ctx.body = JSON.stringify(response);
       } else {
-        ctx.throw(404);
+        ctx.throw(404, `Current user is not available (${this.constructor.name})(${URL})`);
       }
     });
   }
@@ -159,7 +170,7 @@ export class UserHttpTransport<
             ctx.type = "text/plain";
             ctx.body = "";
           } else {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ token wasn't updated ]`;
+            const message = `SingIn (${this.constructor.name})(${URL}) has been failed`;
 
             ctx.throw(message, 404);
           }
@@ -182,10 +193,24 @@ export class UserHttpTransport<
           ctx.type = "text/plain";
           ctx.body = "";
         } else {
-          const message = `[ ${this.constructor.name} ][ ${URL} ][ token wasn't updated ]`;
+          const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
 
           ctx.throw(message, 404);
         }
+      });
+    });
+  }
+
+  protected signOut(): void {
+    const URL = `/${this.name}/signOut`;
+
+    this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
+      await this.executor(ctx, URL, this.ACL.signOut, this.switchers.signOut, async () => {
+        unsetCookieForAuthenticate(ctx);
+
+        ctx.status = 200;
+        ctx.type = "text/plain";
+        ctx.body = "";
       });
     });
   }
@@ -207,7 +232,7 @@ export class UserHttpTransport<
             ctx.type = "application/json";
             ctx.body = JSON.stringify(response);
           } else {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ login wasn't updated ]`;
+            const message = `UpdateLogin (${this.constructor.name})(${URL}) has been failed`;
 
             ctx.throw(message, 404);
           }
@@ -241,7 +266,7 @@ export class UserHttpTransport<
             ctx.type = "application/json";
             ctx.body = JSON.stringify(response);
           } else {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ password wasn't updated ]`;
+            const message = `UpdatePassword (${this.constructor.name})(${URL}) has been failed`;
 
             ctx.throw(message, 404);
           }
@@ -269,7 +294,7 @@ export class UserHttpTransport<
           const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
 
           if (listResponse.results.length === 0) {
-            const message = `[ ${this.constructor.name} ][ ${URL} ][ update group wasn't updated ]`;
+            const message = `UpdateGroup (${this.constructor.name})(${URL}) has been failed`;
 
             ctx.throw(message, 404);
           }

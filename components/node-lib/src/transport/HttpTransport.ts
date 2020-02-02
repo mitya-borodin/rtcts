@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity } from "@rtcts/isomorphic";
+import { Entity, User, UserData } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { Model } from "../model/Model";
@@ -15,14 +15,15 @@ export interface HttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class HttpTransport<
-  E extends Entity<DATA, VA>,
+  ENTITY extends Entity<DATA, VA>,
   DATA,
   VA extends any[],
-  M extends Model<E, DATA, VA>,
+  MODEL extends Model<ENTITY, DATA, VA>,
+  USER extends User<UserData, any[]>,
   CH extends Channels = Channels
-> extends BaseHttpTransport<CH> {
-  protected readonly Entity: new (data: any) => E;
-  protected readonly model: M;
+> extends BaseHttpTransport<USER, CH> {
+  protected readonly Entity: new (data: any) => ENTITY;
+  protected readonly model: MODEL;
   protected readonly ACL: HttpTransportACL;
   protected readonly switchers: {
     readonly getList: boolean;
@@ -35,8 +36,8 @@ export class HttpTransport<
 
   constructor(
     name: string,
-    Entity: new (data: any) => E,
-    model: M,
+    Entity: new (data: any) => ENTITY,
+    model: MODEL,
     channels: CH,
     ACL: HttpTransportACL,
     switchers: {
@@ -54,8 +55,9 @@ export class HttpTransport<
       remove: true,
       channel: true,
     },
+    User: new (data: any) => USER,
   ) {
-    super(name, channels, ACL, switchers);
+    super(name, channels, ACL, switchers, User);
 
     this.Entity = Entity;
     this.model = model;

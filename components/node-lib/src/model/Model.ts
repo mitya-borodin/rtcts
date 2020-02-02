@@ -3,14 +3,14 @@ import { Entity, Send, ListResponse, Response, ValidateResult } from "@rtcts/iso
 import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
-export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
-  protected readonly repository: MongoDBRepository<E, DATA, VA>;
-  protected readonly Entity: new (data: any) => E;
+export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
+  protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
+  protected readonly Entity: new (data: any) => ENTITY;
   protected readonly sendThroughWebSocket: Send;
 
   constructor(
-    repository: MongoDBRepository<E, DATA, VA>,
-    Entity: new (data: any) => E,
+    repository: MongoDBRepository<ENTITY, DATA, VA>,
+    Entity: new (data: any) => ENTITY,
     sendThroughWebSocket: Send,
   ) {
     this.repository = repository;
@@ -21,7 +21,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   // ! Response API
 
   public async getListResponse(offset = 0, limit = 20): Promise<ListResponse> {
-    const results: E[] = await this.repository.find({}, offset, limit);
+    const results: ENTITY[] = await this.repository.find({}, offset, limit);
 
     return new ListResponse({
       count: results.length,
@@ -31,7 +31,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
   }
 
   public async getItemResponse(id: string, options?: FindOneOptions): Promise<Response> {
-    const result: E | null = await this.repository.findById(id, options);
+    const result: ENTITY | null = await this.repository.findById(id, options);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -46,7 +46,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     options?: CollectionInsertOneOptions,
     excludeCurrentDevice = true,
   ): Promise<Response> {
-    const result: E | null = await this.create(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.create(data, uid, wsid, options, excludeCurrentDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -61,7 +61,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     options?: CollectionInsertOneOptions,
     excludeCurrentDevice = true,
   ): Promise<Response> {
-    const result: E | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -76,7 +76,7 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     options?: { projection?: object; sort?: object },
     excludeCurrentDevice = true,
   ): Promise<Response> {
-    const result: E | null = await this.remove(id, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.remove(id, uid, wsid, options, excludeCurrentDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -86,11 +86,11 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
 
   // ! Model API
 
-  public async getMap(offset = 0, limit = 20): Promise<Map<string, E>> {
-    const map: Map<string, E> = new Map();
+  public async getMap(offset = 0, limit = 20): Promise<Map<string, ENTITY>> {
+    const map: Map<string, ENTITY> = new Map();
 
     try {
-      const items: E[] = await this.repository.find({}, offset, limit);
+      const items: ENTITY[] = await this.repository.find({}, offset, limit);
 
       for (const item of items) {
         if (item.isEntity()) {
@@ -110,12 +110,12 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     wsid: string,
     options?: CollectionInsertOneOptions,
     excludeCurrentDevice = true,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
       const insert = new this.Entity(data);
 
       if (insert.canBeInsert()) {
-        const result: E | null = await this.repository.insertOne(insert, options);
+        const result: ENTITY | null = await this.repository.insertOne(insert, options);
 
         if (result) {
           this.sendThroughWebSocket({ create: result.toObject() }, uid, wsid, excludeCurrentDevice);
@@ -136,13 +136,13 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     wsid: string,
     options?: FindOneAndReplaceOption,
     excludeCurrentDevice = true,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
       const entity = new this.Entity(data);
 
       if (entity.isEntity()) {
         const { id, ...$set } = entity.toObject();
-        const result: E | null = await this.repository.findOneAndUpdate(
+        const result: ENTITY | null = await this.repository.findOneAndUpdate(
           { id },
           { $set },
           {
@@ -170,9 +170,9 @@ export class Model<E extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
     wsid: string,
     options?: { projection?: object; sort?: object },
     excludeCurrentDevice = true,
-  ): Promise<E | null> {
+  ): Promise<ENTITY | null> {
     try {
-      const result: E | null = await this.repository.findByIdAndRemove(id, options);
+      const result: ENTITY | null = await this.repository.findByIdAndRemove(id, options);
 
       if (result !== null) {
         this.sendThroughWebSocket({ remove: result.toObject() }, uid, wsid, excludeCurrentDevice);

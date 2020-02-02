@@ -7,23 +7,31 @@ import { Validate } from "../validate/Validate";
 import { logTypeEnum } from "../log/logTypeEnum";
 import omit from "lodash.omit";
 
-export type UserData = Pick<User, "login" | "group" | "salt" | "hashedPassword">;
+export interface UserData {
+  readonly login?: string;
+  readonly group?: string;
+  readonly salt?: string;
+  readonly hashedPassword?: string;
+}
 
-const fields: string[] = ["login", "group"];
+const noSecureFields: string[] = ["login", "group"];
 const secureFields: string[] = ["salt", "hashedPassword"];
 
-export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
+export class User<DATA extends UserData = UserData, VA extends any[] = any[]> extends Entity<
+  DATA,
+  VA
+> {
   public readonly login?: string;
   public readonly group?: string;
   public readonly salt?: string;
   public readonly hashedPassword?: string;
 
-  // The check in the constructor ensures that the correct fields will be written into the object
-  constructor(data: UserData & EntityID) {
+  // The check in the constructor ensures that the correct noSecureFields will be written into the object
+  constructor(data: EntityID & DATA) {
     super(data);
 
     if (data) {
-      for (const field of fields) {
+      for (const field of [...noSecureFields, ...secureFields]) {
         if (isString(data[name])) {
           this[field] = data[field];
         }
@@ -33,9 +41,9 @@ export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
     }
   }
 
-  // The canBeInsert method ensures that all mandatory fields are filled in and have the correct data type.
-  public canBeInsert(): this is Required<UserData> {
-    for (const field of fields) {
+  // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
+  public canBeInsert<T = DATA>(): this is Required<T> {
+    for (const field of noSecureFields) {
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);
       }
@@ -44,8 +52,8 @@ export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
     return true;
   }
 
-  public checkNoSecure(): this is Required<Omit<UserData, "salt" | "hashedPassword">> {
-    for (const field of fields) {
+  public checkNoSecureFields(): this is Required<Pick<UserData, "login" | "group">> {
+    for (const field of noSecureFields) {
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);
       }
@@ -65,7 +73,7 @@ export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
   }
 
   // The validate method allows you to implement the logic of checking the entered values in the object and to minimize the object describing the result of the check
-  public validate(...args: VA): ValidateResult {
+  public validate(...args: any[]): ValidateResult {
     const validates: Validate[] = [];
 
     if (!isString(this.login)) {
@@ -91,17 +99,17 @@ export class User<VA extends any[] = any[]> extends Entity<UserData, VA> {
     return new ValidateResult(validates);
   }
 
-  public getUnSecureData(): Omit<UserData, "salt" | "hashedPassword"> {
+  public getUnSecureData(): Omit<DATA, "salt" | "hashedPassword"> {
     return omit(this.toObject(), ["salt", "hashedPassword"]);
   }
 
-  // The eject method returns an object with fields that are the object's content
-  protected eject(): UserData {
+  // ! The eject method returns an object as DATA with allFields that are the current object's content
+  protected eject(): DATA {
     return {
       login: this.login,
       group: this.group,
       ...(this.salt ? { salt: this.salt } : {}),
       ...(this.hashedPassword ? { hashedPassword: this.hashedPassword } : {}),
-    };
+    } as DATA;
   }
 }

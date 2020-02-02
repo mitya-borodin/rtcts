@@ -9,9 +9,10 @@ import { WSClient } from "../transport/ws/WSClient";
 // tslint:disable: object-literal-sort-keys
 
 export class SingleObjectRepository<
-  ENTITY extends Entity<DATA>,
+  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
+  ENTITY extends Entity<DATA, VA>,
   DATA,
-  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, WS, PUB_SUB>,
+  VA extends any[] = any[],
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends EventEmitter {
@@ -88,7 +89,7 @@ export class SingleObjectRepository<
         throw new Error(`response is empty`);
       }
 
-      runInAction(`Initialization (${this.constructor.name}) succeed`, () => {
+      runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
         this.entity = response.result;
         this.isInit = true;
 
@@ -99,7 +100,9 @@ export class SingleObjectRepository<
         this.pubSub.emit(repositoryPubSubEnum.init, this);
       });
     } catch (error) {
-      console.error(`Initialization (${this.constructor.name}) failed: ${getErrorMessage(error)}`);
+      console.error(
+        `Initialization (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
     } finally {
       this.stop();
     }
@@ -125,7 +128,7 @@ export class SingleObjectRepository<
       }
 
       runInAction(
-        `Update (${this.constructor.name}) succeed`,
+        `Update (${this.constructor.name}) has been succeed`,
         () => (this.entity = response.result),
       );
 
@@ -135,7 +138,7 @@ export class SingleObjectRepository<
 
       return this.entity;
     } catch (error) {
-      console.error(`Update (${this.constructor.name}) failed: ${getErrorMessage(error)}`);
+      console.error(`Update (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`);
     } finally {
       this.stop();
     }

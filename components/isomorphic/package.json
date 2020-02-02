@@ -19,6 +19,9 @@
     "lib",
     "lib_bundle"
   ],
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "start": "rearguard start",
     "start:ts_node_dev": "rearguard start --ts_node_dev",
@@ -38,11 +41,13 @@
     "@rtcts/utils": "^1.0.0",
     "@rtcts/vendors": "^1.0.0",
     "lodash.omit": "^4.5.0",
+    "lodash.pick": "^4.4.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
     "@types/eslint": "^6.1.3",
     "@types/lodash.omit": "^4.5.6",
+    "@types/lodash.pick": "^4.4.6",
     "@types/prettier": "^1.19.0",
     "@types/stylelint": "^9.10.1",
     "@typescript-eslint/eslint-plugin": "^2.3.3",

@@ -1,4 +1,5 @@
-import { User } from "@rtcts/isomorphic";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { User, UserData } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";
 import Router from "koa-router";
@@ -9,7 +10,10 @@ export interface BaseHttpTransportACL {
   readonly channel: string[];
 }
 
-export abstract class BaseHttpTransport<CH extends Channels = Channels> {
+export abstract class BaseHttpTransport<
+  USER extends User<UserData, any[]>,
+  CH extends Channels = Channels
+> {
   protected readonly name: string;
   protected readonly channels: CH;
   protected readonly ACL: BaseHttpTransportACL;
@@ -17,6 +21,8 @@ export abstract class BaseHttpTransport<CH extends Channels = Channels> {
     readonly channel: boolean;
   };
   protected readonly router: Router;
+
+  protected readonly User: new (data: any) => USER;
 
   constructor(
     name: string,
@@ -27,12 +33,14 @@ export abstract class BaseHttpTransport<CH extends Channels = Channels> {
     } = {
       channel: true,
     },
+    User: new (data: any) => USER,
   ) {
     this.name = name;
     this.channels = channels;
     this.ACL = ACL;
     this.switchers = switchers;
     this.router = new Router();
+    this.User = User;
 
     this.channel();
   }
@@ -96,13 +104,15 @@ export abstract class BaseHttpTransport<CH extends Channels = Channels> {
         // ! components/node-lib/src/webSocket/webSocketMiddleware.ts
         const { wsid } = ctx.body;
 
-        if (user instanceof User && user.isEntity()) {
-          if (ACL.length === 0 || ACL.includes(user.group)) {
-            return await worker(user.id, wsid);
-          }
+        if (
+          user instanceof this.User &&
+          user.isEntity() &&
+          (ACL.length === 0 || ACL.includes(user.group))
+        ) {
+          return await worker(user.id, wsid);
         }
 
-        ctx.throw(`[ ${this.constructor.name} ][ ${URL} ][ ACCESS_DENIED ]`, 403);
+        ctx.throw(`Access denied (${this.constructor.name})(${URL}) for ${user.group}`, 403);
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         const message = `[ ${this.constructor.name} ][ ${URL} ][ ${errorMessage} ]`;

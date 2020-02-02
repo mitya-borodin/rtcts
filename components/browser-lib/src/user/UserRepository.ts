@@ -1,30 +1,41 @@
-import { IEntity, IUser, userGroupEnum, userRepositoryEventEnum } from "@borodindmitriy/interfaces";
-import { Mediator } from "@borodindmitriy/isomorphic";
-import { getErrorMessage, isString } from "@borodindmitriy/utils";
+import {
+  Response,
+  User,
+  UserData,
+  userEventEnum,
+  userGroupEnum,
+  ListResponse,
+} from "@rtcts/isomorphic";
+import { getErrorMessage, isString } from "@rtcts/utils";
+import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
-import { IWSClient } from "../../interfaces/transport/ws/IWSClient";
-import { IUserHTTPTransport } from "../../interfaces/user/IUserHTTPTransport";
-import { IUserRepository } from "../../interfaces/user/IUserRepository";
 import { Repository } from "../repository/Repository";
+import { WSClient } from "../transport/ws/WSClient";
+import { UserHTTPTransport } from "./UserHTTPTransport";
 
-export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransport<E>>
-  extends Repository<E, T>
-  implements IUserRepository<E> {
-  protected Entity: new (data: any) => E;
+export class UserRepository<
+  HTTP_TRANSPORT extends UserHTTPTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
+  ENTITY extends User<DATA, VA>,
+  DATA extends UserData = UserData,
+  VA extends any[] = any[],
+  WS extends WSClient = WSClient,
+  PUB_SUB extends EventEmitter = EventEmitter
+> extends Repository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB> {
+  protected Entity: new (data: any) => ENTITY;
 
   @observable
-  private currentUserID: string | undefined;
+  private user: ENTITY | undefined;
 
   constructor(
-    Entity: new (data: any) => E,
-    transport: T,
-    wsClient: IWSClient,
+    httpTransport: HTTP_TRANSPORT,
+    Entity: new (data: any) => ENTITY,
+    wsClient: WS,
     channelName: string,
-    pubSub: Mediator,
+    pubSub: PUB_SUB,
   ) {
-    super(Entity, transport, pubSub, wsClient, channelName);
+    super(httpTransport, Entity, wsClient, channelName, pubSub);
 
-    // BINDINGS
+    // ! BINDINGS
     this.init = this.init.bind(this);
     this.signIn = this.signIn.bind(this);
     this.signOut = this.signOut.bind(this);
@@ -35,36 +46,13 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
     this.remove = this.remove.bind(this);
   }
 
-  get isToken() {
-    return isString(localStorage.getItem("token"));
+  @computed({ name: "UserRepository.id" })
+  get id(): string | undefined {
+    return this.user instanceof this.Entity ? this.user.id : undefined;
   }
 
-  @computed({ name: "[ USER_REPOSITORY ][ ID ]" })
-  get id(): string {
-    return isString(this.currentUserID) ? this.currentUserID : "";
-  }
-
-  @computed({ name: "[ USER_REPOSITORY ][ USER ]" })
-  get user(): E | void {
-    if (isString(this.currentUserID)) {
-      const user: E | void = this.map.get(this.currentUserID);
-
-      if (user instanceof this.Entity) {
-        this.pubSub.emit(userRepositoryEventEnum.SET_USER, user);
-        this.pubSub.emit(userRepositoryEventEnum.SET_USER_GROUP, user.group);
-      }
-
-      return user;
-    }
-  }
-
-  @computed({ name: "[ USER_REPOSITORY ][ IS_AUTHORIZED ]" })
-  get isAuthorized() {
-    return this.user instanceof this.Entity || isString(this.isToken);
-  }
-
-  @computed({ name: "[ USER_REPOSITORY ][ IS_ADMIN ]" })
-  get isAdmin() {
+  @computed({ name: "UserRepository.isAdmin" })
+  get isAdmin(): boolean {
     if (this.user instanceof this.Entity) {
       return this.user.group === userGroupEnum.admin;
     }
@@ -72,337 +60,359 @@ export class UserRepository<E extends IUser & IEntity, T extends IUserHTTPTransp
     return false;
   }
 
-  @action("[ USER_REPOSITORY ][ INIT ]")
+  @computed({ name: "UserRepository.isAuthorized" })
+  get isAuthorized(): boolean {
+    return isString(this.id);
+  }
+
+  @action("UserRepository.init")
   public async init(): Promise<void> {
-    if (!this.isInit) {
-      try {
-        this.start();
-
-        if (this.isToken) {
-          await this.getCurrentUser(); // ! Загрузка текущего пользователя;
-
-          if (this.transport.ACL.collection.includes(this.transport.group)) {
-            await super.init(); // ! Загрузка коллекции;
-          }
-
-          runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => (this.isInit = true));
-        } else {
-          this.pubSub.emit(userRepositoryEventEnum.GO_TO_LOGIN);
-
-          throw new Error(`TOKEN_IS_MISSING`);
-        }
-      } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ INIT ][ ${getErrorMessage(error)} ]`);
-
-        return Promise.reject();
-      } finally {
-        this.stop();
-      }
+    if (this.isInit) {
+      return;
     }
-  }
 
-  // Шаг 1: Получить токен;
-  // Шаг 2: Вызвать метод init;
-  @action("[ USER_REPOSITORY ][ SIGN_IN ]")
-  public async signIn(data: { [key: string]: any }): Promise<void> {
-    if (!this.isAuthorized) {
-      try {
-        this.start();
-
-        if (isString(data.login) && isString(data.password)) {
-          const token: string | void = await this.transport.signIn(data);
-
-          if (isString(token)) {
-            localStorage.setItem("token", token);
-
-            await this.init();
-          } else {
-            throw new Error(`TOKEN_IS_MISSING`);
-          }
-        } else {
-          throw new Error(`data failed: { login: ${data.login}, password: ${data.password} }`);
-        }
-      } catch (error) {
-        console.error(`[ ${this.constructor.name} ][ SIGN_IN ][ ${getErrorMessage(error)} ]`);
-
-        this.destroy();
-
-        this.pubSub.emit(userRepositoryEventEnum.LOGIN_FAIL);
-
-        return Promise.reject();
-      } finally {
-        this.stop();
-      }
-    }
-  }
-
-  // LOGOUT
-  // Шаг 1: Проверяем авторизованы мы или нет.
-  // Шаг 2: Создаем событие LOGOUT.
-  // Шаг 3: Если существует связь uid и wsid её необходимо разорвать.
-  // Шаг 4: Даляем из localStorage поле token;
-  // Шаг 5: Все поля приводим к значениям по умолчанию;
-  @action("[ USER_REPOSITORY ][ SIGN_OUT ]")
-  public async signOut(): Promise<void> {
     try {
       this.start();
 
+      // ! Для того, чтобы понять авторизованы мы или нет, нам необходимо попытаться скачать данные
+      // ! текущего пользователя.
+      // ! Если таких данных не было загружено, то необходимо ввести логин и пароль.
+
+      await this.fetchCurrentUser();
+
       if (this.isAuthorized) {
-        await new Promise<void>((resolve, reject) => {
-          try {
-            this.pubSub.once(userRepositoryEventEnum.LOGOUT, () => {
-              setTimeout(async () => {
-                if (this.ws.isAssigment) {
-                  await this.ws.cancelAssigmentToUserOfTheConnection();
-                }
+        // * Загружаем список пользователей если для текущей роли это доступно.
+        if (this.httpTransport.ACL.collection.includes(this.httpTransport.currentUserGroup)) {
+          // ? Вызываем метод из родительского класса так как при инициализации он загружает
+          // ? коллекцию entities
+          await super.init();
+        }
 
-                this.destroy();
-                resolve();
-              }, 100);
-            });
-
-            this.start();
-            this.pubSub.emit(userRepositoryEventEnum.LOGOUT);
-          } catch (error) {
-            reject(error);
-          }
-        });
+        // * Завершаем процедуру инициализации
+        runInAction(
+          `Initialization (${this.constructor.name}) has been succeed`,
+          () => (this.isInit = true),
+        );
       } else {
-        throw new Error("NOT_LOGINED");
+        this.pubSub.emit(userEventEnum.GO_TO_SIGN_IN);
       }
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ SIGN_OUT ][ ${getErrorMessage(error)} ]`);
-
-      return Promise.reject();
+      console.error(
+        `Initialization (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
     } finally {
       this.stop();
     }
   }
 
-  @action("[ USER_REPOSITORY ][ SIGN_UP ]")
-  public async signUp(data: { [key: string]: any }): Promise<boolean> {
+  // * SIGN_IN
+  // * Шаг 0: Проверяем, что логин и пароль введены верно.
+  // * Шаг 1: Выполняем вход по логину и паролю.
+  // * Шаг 2: Выполняем инициализацию хранилища пользователей.
+  @action("UserRepository.signIn")
+  public async signIn(data: { [key: string]: any }): Promise<void> {
     try {
+      if (!isString(data.login) || !isString(data.password)) {
+        throw new Error(`login of password isn't string: ${JSON.stringify(data)}`);
+      }
+
       this.start();
 
-      const result: { token: string; user: object } | void = await this.transport.signUp(data);
-
-      if (result) {
-        runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => {
-          const user = new this.Entity(result.user);
-
-          this.map.set(user.id, user);
-        });
-
-        return true;
-      } else {
-        return false;
-      }
+      await this.httpTransport.signIn(data);
+      await this.init();
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ SIGN_UP ][ ${getErrorMessage(error)} ]`);
+      console.error(`SignIn (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`);
 
       this.destroy();
 
-      return Promise.reject();
+      this.pubSub.emit(userEventEnum.SIGN_IN_FAIL);
     } finally {
       this.stop();
     }
   }
 
-  @action("[ USER_REPOSITORY ][ UPDATE_LOGIN ]")
-  public async updateLogin(data: { [key: string]: any }): Promise<void> {
+  // * SIGN_OUT
+  // * Шаг 1: Проверяем входили ли мы в систему.
+  // * Шаг 2: Одноразово подписываемся на событие SIGN_OUT.
+  // * Шаг 3: Если текущий пользователь связан с web socket соединением, то необходимо разорвать связь.
+  // * Шаг 4: Вызываем метод сервера который перезапишет cookie
+  // * Шаг 5: Возбуждаем событие SIGN_OUT, так как все обработчики будут вызваны синхронно,
+  // *        то наш обработчик выполнится последним.
+  @action("UserRepository.signOut")
+  public async signOut(): Promise<void> {
     try {
+      if (!this.isAuthorized) {
+        throw new Error(`you are not signed in`);
+      }
+
       this.start();
 
-      if (isString(data.id) && isString(data.login)) {
-        const cur_user: E | void = this.map.get(data.id);
+      await new Promise<void>((resolve, reject) => {
+        try {
+          this.pubSub.once(userEventEnum.SIGN_OUT, () => {
+            setTimeout(async () => {
+              if (this.ws.isUserBindToConnection) {
+                await this.ws.unbindUserFromConnection();
+              }
 
-        if (cur_user instanceof this.Entity) {
-          const entity: E | void = await this.transport.updateLogin({
-            ...cur_user.toJS(),
-            ...data,
+              await this.httpTransport.signOut();
+
+              this.destroy();
+              resolve();
+            }, 1000);
           });
 
-          if (entity instanceof this.Entity) {
-            runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
-              this.collection.set(entity.id, entity),
-            );
-          } else {
-            throw new Error(
-              `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
-            );
-          }
-        } else {
-          throw new Error("USER_NOT_FOUND");
+          this.start();
+          this.pubSub.emit(userEventEnum.SIGN_OUT);
+        } catch (error) {
+          reject(error);
         }
-      } else {
-        throw new Error(`data failed: { id: ${data.id}, login: ${data.login} }`);
-      }
+      });
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_LOGIN ][ ${getErrorMessage(error)} ]`);
-
-      return Promise.reject();
+      console.error(
+        `SignOut (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
     } finally {
       this.stop();
     }
   }
 
-  @action("[ USER_REPOSITORY ][ UPDATE_PASSWORD ]")
-  public async updatePassword(data: { [key: string]: any }): Promise<void> {
+  @action("UserRepository.signUp")
+  public async signUp(data: { [key: string]: any }): Promise<void> {
     try {
+      const { login, password, password_confirm, group } = data;
+
+      if (
+        !isString(login) ||
+        !isString(password) ||
+        !isString(password_confirm) ||
+        !isString(group)
+      ) {
+        throw new Error(`signUp data isn't correct: ${JSON.stringify(data)}`);
+      }
+
       this.start();
 
-      if (isString(data.id) && isString(data.password) && isString(data.password_confirm)) {
-        const entity = await this.transport.updatePassword(data);
-
-        if (entity instanceof this.Entity) {
-          runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
-            this.collection.set(entity.id, entity),
-          );
-        } else {
-          throw new Error(
-            `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
-          );
-        }
-      } else {
-        throw new Error(
-          `data failed: { password: ${data.password}, password_confirm: ${data.password_confirm} }`,
-        );
-      }
+      await this.httpTransport.signUp(data);
+      await this.init();
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_PASSWORD ][ ${getErrorMessage(error)} ]`);
+      console.error(`SignUp (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`);
 
-      return Promise.reject();
+      this.destroy();
     } finally {
       this.stop();
     }
   }
 
-  @action("[ USER_REPOSITORY ][ UPDATE_GROUP ]")
+  @action("UserRepository.updateLogin")
+  public async updateLogin(data: { [key: string]: any }): Promise<void> {
+    try {
+      const { id, login } = data;
+
+      if (!isString(id) || !isString(login)) {
+        throw new Error(`updateLogin data isn't correct: ${JSON.stringify(data)}`);
+      }
+
+      this.start();
+
+      const targetUser: ENTITY | void = this.map.get(data.id);
+
+      if (!targetUser) {
+        throw new Error(`user by id: ${data.id} not found`);
+      }
+
+      const response: Response<ENTITY> | void = await this.httpTransport.updateLogin({
+        ...targetUser.toObject(),
+        ...data,
+      });
+
+      if (!response) {
+        throw new Error(`response is empty`);
+      }
+
+      const entity = response.result;
+
+      if (!entity.isEntity()) {
+        return;
+      }
+
+      runInAction(`UpdateLogin (${this.constructor.name}) has been succeed`, () => {
+        this.collection.set(entity.id, entity);
+      });
+    } catch (error) {
+      console.error(
+        `UpdateLogin (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
+    } finally {
+      this.stop();
+    }
+  }
+
+  @action("UserRepository.updatePassword")
+  public async updatePassword(data: { [key: string]: any }): Promise<void> {
+    try {
+      const { id, password, password_confirm } = data;
+
+      if (!isString(id) || !isString(password) || !isString(password_confirm)) {
+        throw new Error(`updatePassword data isn't correct: ${JSON.stringify(data)}`);
+      }
+
+      this.start();
+
+      const response: Response<ENTITY> | void = await this.httpTransport.updatePassword(data);
+
+      if (!response) {
+        throw new Error(`response is empty`);
+      }
+
+      const entity = response.result;
+
+      if (!entity.isEntity()) {
+        return;
+      }
+
+      runInAction(`UpdatePassword (${this.constructor.name}) has been succeed`, () =>
+        this.collection.set(entity.id, entity),
+      );
+    } catch (error) {
+      console.error(
+        `UpdatePassword (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
+    } finally {
+      this.stop();
+    }
+  }
+
+  @action("UserRepository.updateGroup")
   public async updateGroup(ids: string[], updateGroup: string): Promise<void> {
     try {
       this.start();
 
-      const collection: E[] | void = await this.transport.updateGroup(ids, updateGroup);
+      const listResponse: ListResponse<ENTITY> | void = await this.httpTransport.updateGroup(
+        ids,
+        updateGroup,
+      );
 
-      if (Array.isArray(collection)) {
-        runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () => {
-          for (const user of collection) {
-            if (user instanceof this.Entity) {
-              this.collection.set(user.id, user);
-            } else {
-              throw new Error(
-                `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(user)}`,
-              );
-            }
-          }
-        });
-      } else {
-        throw new Error(`COLLECTION IS NOT ARRAY - ${Object.prototype.toString.call(collection)}`);
+      if (!listResponse) {
+        throw new Error(`listResponse is empty`);
       }
-    } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ UPDATE_GROUP ][ ${getErrorMessage(error)} ]`);
 
-      return Promise.reject();
+      runInAction(`UpdateGroup (${this.constructor.name}) has been succeed`, () => {
+        for (const user of listResponse.results) {
+          if (!user.isEntity()) {
+            continue;
+          }
+
+          this.collection.set(user.id, user);
+        }
+      });
+    } catch (error) {
+      console.error(
+        `UpdateGroup (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
     } finally {
       this.stop();
     }
   }
 
-  @action("[ USER_REPOSITORY ][ REMOVE ]")
+  @action("UserRepository.remove")
   public async remove(id: string): Promise<void> {
     try {
       this.start();
 
-      const user: E | void = await this.transport.remove(id);
+      const response: Response<ENTITY> | void = await this.httpTransport.remove(id);
 
-      if (user instanceof this.Entity) {
-        runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, () =>
-          this.collection.delete(user.id),
-        );
-      } else {
-        throw new Error(
-          `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(user)}`,
-        );
+      if (!response) {
+        throw new Error(`response is empty`);
       }
-    } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ REMOVE ][ ${getErrorMessage(error)} ]`);
 
-      return Promise.reject();
+      const entity = response.result;
+
+      if (!entity.isEntity()) {
+        return;
+      }
+
+      runInAction(`Remove (${this.constructor.name}) has been succeed`, () =>
+        this.collection.delete(entity.id),
+      );
+    } catch (error) {
+      console.error(`Remove (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`);
     } finally {
       this.stop();
     }
   }
 
-  @action("[ USER_REPOSITORY ][ DESTROY ]")
+  @action("UserRepository.destroy")
   protected destroy(): void {
     try {
       super.destroy();
 
-      localStorage.removeItem("token");
+      this.user = undefined;
 
-      this.currentUserID = undefined;
+      this.pubSub.emit(userEventEnum.GO_TO_SIGN_IN);
+      this.pubSub.emit(userEventEnum.CLEAR_USER);
+      this.pubSub.emit(userEventEnum.CLEAR_USER_GROUP);
+
+      console.log(`Destroy ${this.constructor.name} has been success`);
 
       this.stop();
-
-      this.pubSub.emit(userRepositoryEventEnum.GO_TO_LOGIN);
-      this.pubSub.emit(userRepositoryEventEnum.CLEAR_USER);
-      this.pubSub.emit(userRepositoryEventEnum.CLEAR_USER_GROUP);
-
-      console.log(`[ ${this.constructor.name} ][ DESTROY ][ SUCCESS ]`);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ DESTROY ][ ${getErrorMessage(error)} ]`);
+      console.error(
+        `Destroy (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
+      );
     }
   }
 
-  @action("[ USER_STORE ][ READ_CURRENT_USER ]")
-  private async getCurrentUser(): Promise<void> {
+  @action("UserRepository.fetchCurrentUser")
+  private async fetchCurrentUser(): Promise<void> {
     try {
-      if (this.isToken) {
-        const entity: E | void = await this.transport.current();
+      const response: Response<ENTITY> | void = await this.httpTransport.current();
 
-        if (entity instanceof this.Entity) {
-          await runInAction(`[ ${this.constructor.name} ][ SUCCESS ]`, async () => {
-            this.currentUserID = entity.id;
-            this.collection.set(this.currentUserID, entity);
-
-            const observableUser = this.collection.get(this.currentUserID);
-
-            if (observableUser instanceof this.Entity) {
-              this.pubSub.emit(userRepositoryEventEnum.SET_USER, observableUser);
-              this.pubSub.emit(userRepositoryEventEnum.SET_USER_GROUP, observableUser.group);
-            }
-
-            this.ws.setUserID(this.currentUserID);
-
-            if (!this.ws.isOpen) {
-              await this.ws.connect();
-            }
-
-            if (!this.ws.isAssigment) {
-              await this.ws.assigmentToUserOfTheConnection();
-            }
-
-            this.pubSub.emit(userRepositoryEventEnum.LOGIN);
-          });
-        } else {
-          throw new Error(
-            `ITEM IS NOT ${this.Entity.name} - ${Object.prototype.toString.call(entity)}`,
-          );
-        }
-      } else {
-        throw new Error(`TOKEN_IS_MISSING`);
+      if (!response) {
+        throw new Error(`response is empty`);
       }
+
+      const entity = response.result;
+
+      if (!entity.isEntity()) {
+        return;
+      }
+
+      await runInAction(
+        `fetchCurrentUser (${this.constructor.name}) has been succeed`,
+        async () => {
+          this.user = entity;
+          this.collection.set(entity.id, entity);
+
+          const observableUser = this.collection.get(entity.id);
+
+          if (observableUser instanceof this.Entity && observableUser.isEntity()) {
+            this.pubSub.emit(userEventEnum.SET_USER, observableUser);
+            this.pubSub.emit(userEventEnum.SET_USER_GROUP, observableUser.group);
+          }
+
+          this.ws.setUserID(entity.id);
+
+          if (!this.ws.isOpen) {
+            await this.ws.connect();
+          }
+
+          if (!this.ws.isUserBindToConnection) {
+            await this.ws.bindUserToConnection();
+          }
+
+          this.pubSub.emit(userEventEnum.SIGN_IN);
+        },
+      );
     } catch (error) {
       console.error(
-        `[ ${this.constructor.name} ][ READ_CURRENT_USER ][ ${getErrorMessage(error)} ]`,
+        `fetchCurrentUser (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
       );
 
       this.destroy();
 
-      this.pubSub.emit(userRepositoryEventEnum.LOGIN_FAIL);
-      this.pubSub.emit(userRepositoryEventEnum.GO_TO_LOGIN);
-
-      return Promise.reject();
+      this.pubSub.emit(userEventEnum.SIGN_IN_FAIL);
+      this.pubSub.emit(userEventEnum.GO_TO_SIGN_IN);
     } finally {
       this.stop();
     }

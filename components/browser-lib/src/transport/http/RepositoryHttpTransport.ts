@@ -3,7 +3,7 @@ import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";
 import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
 
-export interface RepositoryBaseHttpTransportACL extends BaseHttpTransportACL {
+export interface RepositoryHttpTransportACL extends BaseHttpTransportACL {
   collection: string[];
   read: string[];
   create: string[];
@@ -12,21 +12,22 @@ export interface RepositoryBaseHttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class RepositoryHttpTransport<
-  ENTITY extends Entity<DATA>,
+  ENTITY extends Entity<DATA, VA>,
   DATA,
+  VA extends any[] = any[],
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends BaseHttpTransport<WS, PUB_SUB> {
   protected Entity: new (data: any) => ENTITY;
 
-  public readonly ACL: RepositoryBaseHttpTransportACL;
+  public readonly ACL: RepositoryHttpTransportACL;
 
   constructor(
     name: string,
     Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
-    ACL: RepositoryBaseHttpTransportACL,
+    ACL: RepositoryHttpTransportACL,
     pubSub: PUB_SUB,
     root = "/api",
   ) {

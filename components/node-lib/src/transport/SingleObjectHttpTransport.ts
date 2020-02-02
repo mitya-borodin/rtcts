@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity } from "@rtcts/isomorphic";
+import { Entity, User, UserData } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { SingleObjectModel } from "../model/SingleObjectModel";
@@ -12,14 +12,15 @@ export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class SingleObjectHttpTransport<
-  E extends Entity<DATA, VA>,
+  ENTITY extends Entity<DATA, VA>,
   DATA,
   VA extends any[],
-  M extends SingleObjectModel<E, DATA, VA>,
+  MODEL extends SingleObjectModel<ENTITY, DATA, VA>,
+  USER extends User<UserData, any[]>,
   CH extends Channels = Channels
-> extends BaseHttpTransport<CH> {
-  protected readonly Entity: new (data: any) => E;
-  protected readonly model: M;
+> extends BaseHttpTransport<USER, CH> {
+  protected readonly Entity: new (data: any) => ENTITY;
+  protected readonly model: MODEL;
   protected readonly ACL: SingleObjectHttpTransportACL;
   protected readonly switchers: {
     readonly getItem: boolean;
@@ -29,8 +30,8 @@ export class SingleObjectHttpTransport<
 
   constructor(
     name: string,
-    Entity: new (data: any) => E,
-    model: M,
+    Entity: new (data: any) => ENTITY,
+    model: MODEL,
     channels: CH,
     ACL: SingleObjectHttpTransportACL,
     switchers: {
@@ -42,8 +43,9 @@ export class SingleObjectHttpTransport<
       update: true,
       channel: true,
     },
+    User: new (data: any) => USER,
   ) {
-    super(name, channels, ACL, switchers);
+    super(name, channels, ACL, switchers, User);
 
     this.Entity = Entity;
     this.model = model;

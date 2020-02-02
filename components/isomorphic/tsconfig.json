@@ -29,6 +29,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "importHelpers": true,
+    "resolveJsonModule": true,
     "sourceMap": true,
     "inlineSourceMap": false,
     "inlineSources": false,
