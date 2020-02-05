@@ -14,17 +14,17 @@ export interface RepositoryHttpTransportACL extends BaseHttpTransportACL {
 export class RepositoryHttpTransport<
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  VA extends any[] = any[],
+  VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends BaseHttpTransport<WS, PUB_SUB> {
-  protected Entity: new (data: any) => ENTITY;
+  protected Entity: new (data?: any) => ENTITY;
 
   public readonly ACL: RepositoryHttpTransportACL;
 
   constructor(
     name: string,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     ws: WS,
     channelName: string,
     ACL: RepositoryHttpTransportACL,

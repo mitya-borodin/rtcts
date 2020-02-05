@@ -21,7 +21,7 @@ import {
 } from "mongodb";
 import { MongoDBConnection } from "./MongoDBConnection";
 
-export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
+export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = object> {
   private readonly name: string;
   private readonly db: MongoDBConnection;
   private readonly options?: CollectionCreateOptions;
@@ -32,7 +32,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   constructor(
     name: string,
     db: MongoDBConnection,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     options?: CollectionCreateOptions,
   ) {
     this.name = name;

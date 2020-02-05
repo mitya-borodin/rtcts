@@ -4,14 +4,14 @@ import { isObject } from "@rtcts/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
-export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends any[] = any[]> {
+export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = object> {
   protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
-  protected readonly Entity: new (data: any) => ENTITY;
+  protected readonly Entity: new (data?: any) => ENTITY;
   protected readonly sendThroughWebSocket: Send;
 
   constructor(
     repository: MongoDBRepository<ENTITY, DATA, VA>,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     sendThroughWebSocket: Send,
   ) {
     this.repository = repository;

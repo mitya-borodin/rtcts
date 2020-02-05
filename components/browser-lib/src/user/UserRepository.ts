@@ -17,18 +17,18 @@ export class UserRepository<
   HTTP_TRANSPORT extends UserHTTPTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
   ENTITY extends User<DATA, VA>,
   DATA extends UserData = UserData,
-  VA extends any[] = any[],
+  VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends Repository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB> {
-  protected Entity: new (data: any) => ENTITY;
+  protected Entity: new (data?: any) => ENTITY;
 
   @observable
   private user: ENTITY | undefined;
 
   constructor(
     httpTransport: HTTP_TRANSPORT,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     wsClient: WS,
     channelName: string,
     pubSub: PUB_SUB,
@@ -77,7 +77,6 @@ export class UserRepository<
       // ! Для того, чтобы понять авторизованы мы или нет, нам необходимо попытаться скачать данные
       // ! текущего пользователя.
       // ! Если таких данных не было загружено, то необходимо ввести логин и пароль.
-
       await this.fetchCurrentUser();
 
       if (this.isAuthorized) {
@@ -353,7 +352,7 @@ export class UserRepository<
       this.pubSub.emit(userEventEnum.CLEAR_USER);
       this.pubSub.emit(userEventEnum.CLEAR_USER_GROUP);
 
-      console.log(`Destroy ${this.constructor.name} has been success`);
+      console.log(`Destroy ${this.constructor.name} has been succeed`);
 
       this.stop();
     } catch (error) {

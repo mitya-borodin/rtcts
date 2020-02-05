@@ -17,7 +17,7 @@ export interface UserData {
 const noSecureFields: string[] = ["login", "group"];
 const secureFields: string[] = ["salt", "hashedPassword"];
 
-export class User<DATA extends UserData = UserData, VA extends any[] = any[]> extends Entity<
+export class User<DATA extends UserData = UserData, VA extends object = object> extends Entity<
   DATA,
   VA
 > {
@@ -27,7 +27,7 @@ export class User<DATA extends UserData = UserData, VA extends any[] = any[]> ex
   public readonly hashedPassword?: string;
 
   // The check in the constructor ensures that the correct noSecureFields will be written into the object
-  constructor(data: EntityID & DATA) {
+  constructor(data: Partial<EntityID> & Partial<DATA>) {
     super(data);
 
     if (data) {
@@ -43,6 +43,16 @@ export class User<DATA extends UserData = UserData, VA extends any[] = any[]> ex
 
   // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
   public canBeInsert<T = DATA>(): this is Required<T> {
+    for (const field of [...noSecureFields, ...secureFields]) {
+      if (!isString(this[field])) {
+        throw new Error(`User.${field} should be String`);
+      }
+    }
+
+    return true;
+  }
+
+  public checkNoSecureFields(): this is Pick<Required<UserData>, "login" | "group"> {
     for (const field of noSecureFields) {
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);
@@ -52,17 +62,7 @@ export class User<DATA extends UserData = UserData, VA extends any[] = any[]> ex
     return true;
   }
 
-  public checkNoSecureFields(): this is Required<Pick<UserData, "login" | "group">> {
-    for (const field of noSecureFields) {
-      if (!isString(this[field])) {
-        throw new Error(`User.${field} should be String`);
-      }
-    }
-
-    return true;
-  }
-
-  public checkSecureFields(): this is Required<Pick<UserData, "salt" | "hashedPassword">> {
+  public checkSecureFields(): this is Pick<Required<UserData>, "salt" | "hashedPassword"> {
     for (const field of secureFields) {
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);

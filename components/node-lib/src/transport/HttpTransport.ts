@@ -15,14 +15,16 @@ export interface HttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class HttpTransport<
+  MODEL extends Model<ENTITY, DATA, VA>,
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  VA extends any[],
-  MODEL extends Model<ENTITY, DATA, VA>,
-  USER extends User<UserData, any[]>,
-  CH extends Channels = Channels
-> extends BaseHttpTransport<USER, CH> {
-  protected readonly Entity: new (data: any) => ENTITY;
+  VA extends object,
+  USER extends User<USER_DATA, USER_VA>,
+  USER_DATA extends UserData = UserData,
+  USER_VA extends object = object,
+  CHANNELS extends Channels = Channels
+> extends BaseHttpTransport<USER, USER_DATA, USER_VA, CHANNELS> {
+  protected readonly Entity: new (data: Partial<DATA>) => ENTITY;
   protected readonly model: MODEL;
   protected readonly ACL: HttpTransportACL;
   protected readonly switchers: {
@@ -36,9 +38,9 @@ export class HttpTransport<
 
   constructor(
     name: string,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     model: MODEL,
-    channels: CH,
+    channels: CHANNELS,
     ACL: HttpTransportACL,
     switchers: {
       getList: boolean;
@@ -55,7 +57,7 @@ export class HttpTransport<
       remove: true,
       channel: true,
     },
-    User: new (data: any) => USER,
+    User: new (data?: any) => USER,
   ) {
     super(name, channels, ACL, switchers, User);
 

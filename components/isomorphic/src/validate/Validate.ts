@@ -1,13 +1,16 @@
 import { isArray, isString, isUndefined } from "@rtcts/utils";
 import { Log, LogData } from "../log/Log";
 
-export type ValidateData = LogData & Required<Pick<Validate, "field">> & Pick<Validate, "title">;
+export interface ValidateData extends LogData {
+  readonly field: string | string[];
+  readonly title?: string;
+}
 
-export class Validate extends Log {
+export class Validate<DATA extends ValidateData = ValidateData> extends Log<DATA> {
   public readonly field: string | string[];
   public readonly title?: string;
 
-  constructor(data: ValidateData) {
+  constructor(data: Partial<DATA>) {
     super(data);
 
     this.field = "";
@@ -47,15 +50,15 @@ export class Validate extends Log {
     Object.freeze(this);
   }
 
-  public get log(): Log {
+  public get log(): Log<LogData> {
     return new Log({ type: this.type, message: this.message });
   }
 
-  public toObject(): ValidateData {
+  public toObject(): DATA {
     return {
       ...super.toObject(),
       field: this.field,
       title: this.title,
-    };
+    } as DATA;
   }
 }

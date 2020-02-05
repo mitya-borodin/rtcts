@@ -3,12 +3,12 @@ import chalk from "chalk";
 import { Connection } from "./Connection";
 import { isString } from "@rtcts/utils";
 
-export class Channels<C extends Connection = Connection> {
+export class Channels<CONNECTION extends Connection = Connection> {
   // Map<connectionID: string, Connection>
-  private connections: Map<string, C>;
+  private connections: Map<string, CONNECTION>;
 
   // Map<channelName: string, Map<connectionID: string, Connection>>
-  private channels: Map<string, Map<string, C>>;
+  private channels: Map<string, Map<string, CONNECTION>>;
 
   constructor() {
     this.connections = new Map();
@@ -21,7 +21,7 @@ export class Channels<C extends Connection = Connection> {
     this.send = this.send.bind(this);
   }
 
-  public addConnection(connection: C): void {
+  public addConnection(connection: CONNECTION): void {
     try {
       const connectionID = connection.getConnectionID();
 
@@ -44,7 +44,7 @@ export class Channels<C extends Connection = Connection> {
     }
   }
 
-  public deleteConnection(connection: C): void {
+  public deleteConnection(connection: CONNECTION): void {
     try {
       const connectionID = connection.getConnectionID();
       const curConnection = this.connections.get(connectionID);

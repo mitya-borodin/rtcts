@@ -8,7 +8,7 @@ import { action, computed, observable, ObservableMap } from "mobx";
 export class CacheRepository<
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  VA extends any[] = any[]
+  VA extends object = object
 > extends EventEmitter {
   public static events = {
     set: `CacheRepository.event.set`,
@@ -17,9 +17,9 @@ export class CacheRepository<
 
   @observable
   protected collection: ObservableMap<string, ENTITY>;
-  protected Entity: new (data: any) => ENTITY;
+  protected Entity: new (data?: any) => ENTITY;
 
-  constructor(Entity: new (data: any) => ENTITY) {
+  constructor(Entity: new (data?: any) => ENTITY) {
     super();
 
     // * DEPS

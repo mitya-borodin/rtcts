@@ -15,7 +15,7 @@ interface UserHTTPTransportACL extends RepositoryHttpTransportACL {
 export class UserHTTPTransport<
   ENTITY extends User<DATA, VA>,
   DATA extends UserData = UserData,
-  VA extends any[] = any[],
+  VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB> {
@@ -23,7 +23,7 @@ export class UserHTTPTransport<
 
   constructor(
     name: string,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     ws: WS,
     channelName: string,
     ACL: UserHTTPTransportACL,

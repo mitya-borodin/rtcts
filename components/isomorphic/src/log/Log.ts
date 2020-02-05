@@ -3,15 +3,18 @@ import { SimpleObject } from "../Entity";
 import { LogType } from "./LogType";
 import { logTypeEnum } from "./logTypeEnum";
 
-export type LogData = Pick<Log, "type" | "message">;
+export interface LogData {
+  readonly type: LogType;
+  readonly message: string;
+}
 
 const fields: string[] = ["type", "message"];
 
-export class Log extends SimpleObject<LogData> {
+export class Log<DATA extends LogData = LogData> extends SimpleObject<DATA> {
   public readonly type: LogType;
   public readonly message: string;
 
-  constructor(data: LogData) {
+  constructor(data: Partial<DATA>) {
     super();
 
     this.type = logTypeEnum.log;
@@ -30,10 +33,10 @@ export class Log extends SimpleObject<LogData> {
     }
   }
 
-  public toObject(): LogData {
+  public toObject(): DATA {
     return {
       type: this.type,
       message: this.message,
-    };
+    } as DATA;
   }
 }

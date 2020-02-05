@@ -11,29 +11,31 @@ export interface BaseHttpTransportACL {
 }
 
 export abstract class BaseHttpTransport<
-  USER extends User<UserData, any[]>,
-  CH extends Channels = Channels
+  USER extends User<USER_DATA, USER_VA>,
+  USER_DATA extends UserData = UserData,
+  USER_VA extends object = object,
+  CHANNELS extends Channels = Channels
 > {
   protected readonly name: string;
-  protected readonly channels: CH;
+  protected readonly channels: CHANNELS;
   protected readonly ACL: BaseHttpTransportACL;
   protected readonly switchers: {
     readonly channel: boolean;
   };
   protected readonly router: Router;
 
-  protected readonly User: new (data: any) => USER;
+  protected readonly User: new (data?: any) => USER;
 
   constructor(
     name: string,
-    channels: CH,
+    channels: CHANNELS,
     ACL: BaseHttpTransportACL,
     switchers: {
       channel: boolean;
     } = {
       channel: true,
     },
-    User: new (data: any) => USER,
+    User: new (data?: any) => USER,
   ) {
     this.name = name;
     this.channels = channels;
@@ -106,7 +108,8 @@ export abstract class BaseHttpTransport<
 
         if (
           user instanceof this.User &&
-          user.isEntity() &&
+          // ! I should set UserData because I need to use concrete type
+          user.isEntity<UserData>() &&
           (ACL.length === 0 || ACL.includes(user.group))
         ) {
           return await worker(user.id, wsid);

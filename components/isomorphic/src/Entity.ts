@@ -7,19 +7,23 @@ export abstract class SimpleObject<DATA> {
   public toJSON(): DATA {
     return this.toObject();
   }
+
+  public toJS(): DATA {
+    return this.toObject();
+  }
 }
 
-export abstract class ValueObject<DATA, VA extends any[] = any[]> extends SimpleObject<DATA> {
+export abstract class ValueObject<DATA, VA extends object = object> extends SimpleObject<DATA> {
   public abstract canBeInsert<T = DATA>(): this is Required<T>;
-  public abstract validate(...args: VA): ValidateResult;
+  public abstract validate<T = VA>(options?: T): ValidateResult;
 }
 
 export type EntityID = { id?: string };
 
-export abstract class Entity<DATA, VA extends any[] = any[]> extends ValueObject<DATA, VA> {
+export abstract class Entity<DATA, VA extends object = object> extends ValueObject<DATA, VA> {
   readonly id?: string;
 
-  constructor(data: EntityID & DATA) {
+  constructor(data: Partial<EntityID> & Partial<DATA>) {
     super();
 
     if (data) {

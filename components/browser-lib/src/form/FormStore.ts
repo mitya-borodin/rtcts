@@ -5,7 +5,12 @@ import { getErrorMessage, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
 
-export class FormStore<ENTITY extends Entity<DATA, any[]>, DATA, CHANGE> extends EventEmitter {
+export class FormStore<
+  CHANGE,
+  ENTITY extends Entity<DATA, VA>,
+  DATA,
+  VA extends object = object
+> extends EventEmitter {
   @observable
   public pending: boolean;
   @observable
@@ -14,9 +19,9 @@ export class FormStore<ENTITY extends Entity<DATA, any[]>, DATA, CHANGE> extends
   @observable
   public form: ENTITY | undefined;
 
-  protected readonly Entity: new (...args: any[]) => ENTITY;
+  protected readonly Entity: new (data?: any) => ENTITY;
 
-  constructor(Entity: new (...args: any[]) => ENTITY) {
+  constructor(Entity: new (data?: any) => ENTITY) {
     super();
 
     this.Entity = Entity;
@@ -24,14 +29,13 @@ export class FormStore<ENTITY extends Entity<DATA, any[]>, DATA, CHANGE> extends
     this.pending = false;
     this.showValidateResult = false;
 
-    // * BINDS
     this.open = this.open.bind(this);
     this.change = this.change.bind(this);
     this.cancel = this.cancel.bind(this);
     this.submit = this.submit.bind(this);
   }
 
-  @computed({ name: "[ FORM_STORE ][ VALIDATE_RESULT ]" })
+  @computed({ name: "FormStore.validateResult" })
   get validateResult(): ValidateResult {
     if (this.form instanceof this.Entity) {
       return this.form.validate();
@@ -40,24 +44,24 @@ export class FormStore<ENTITY extends Entity<DATA, any[]>, DATA, CHANGE> extends
     return new ValidateResult([]);
   }
 
-  @computed({ name: "[ FORM_STORE ][ IS_VALID ]" })
+  @computed({ name: "FormStore.isValid" })
   get isValid(): boolean {
     return this.validateResult.isValid;
   }
 
-  @computed({ name: "[ FORM_STORE ][ IS_OPEN ]" })
+  @computed({ name: "FormStore.isOpen" })
   get isOpen(): boolean {
     return this.form instanceof this.Entity;
   }
 
-  @computed({ name: "[ FORM_STORE ][ IS_EDIT ]" })
+  @computed({ name: "FormStore.isEdit" })
   get isEdit(): boolean {
     return this.form instanceof this.Entity && isString(this.form.id) && this.form.id.length > 0;
   }
 
   public async open(id?: string): Promise<void> {
     const hasID = isString(id) && id.length > 0;
-    const title = `[ ${this.constructor.name} ][ OPEN ][ ${hasID ? "UPDATE" : "CREATE"} ]`;
+    const title = `${this.constructor.name} is open for ${hasID ? "update" : "create"} `;
 
     try {
       this.start();
@@ -65,14 +69,14 @@ export class FormStore<ENTITY extends Entity<DATA, any[]>, DATA, CHANGE> extends
 
       runInAction(title, () => (this.form = form));
     } catch (error) {
-      console.error(`${title}[ ${getErrorMessage(error)} ]`);
+      console.error(`${title} failed: ${getErrorMessage(error)}`);
     } finally {
       this.stop();
     }
   }
 
   public async change(change: CHANGE): Promise<void> {
-    const title = `[ ${this.constructor.name} ][ CHANGE ]`;
+    const title = `${this.constructor.name} has been changed`;
 
     try {
       this.start();
@@ -85,13 +89,13 @@ export class FormStore<ENTITY extends Entity<DATA, any[]>, DATA, CHANGE> extends
         throw new Error(`Try change on closed form`);
       }
     } catch (error) {
-      console.error(`[ ${title}[ ${getErrorMessage(error)} ]`);
+      console.error(`${title} failed: ${getErrorMessage(error)}`);
     } finally {
       this.stop();
     }
   }
 
-  @action("[ FORM_STORE ][ SUBMIT ]")
+  @action("FormStore.submit")
   public async submit(): Promise<void> {
     try {
       this.start();

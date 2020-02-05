@@ -24,14 +24,14 @@ import { MongoDBRepository } from "./MongoDBRepository";
 export class UserModel<
   ENTITY extends User<DATA, VA>,
   DATA extends UserData = UserData,
-  VA extends any[] = any[],
+  VA extends object = object,
   CONFIG extends Config = Config
 > extends Model<ENTITY, DATA, VA> {
   protected config: CONFIG;
 
   constructor(
     repository: MongoDBRepository<ENTITY, DATA, VA>,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     sendThroughWebSocket: Send,
     config: CONFIG,
   ) {
@@ -282,7 +282,13 @@ export class UserModel<
       }
 
       if (result.isEntity()) {
-        return await super.update({ ...result.toObject(), login: data.login }, uid, wsid);
+        const updatedEntity = new this.Entity({ ...result.toObject(), login: data.login });
+
+        if (!updatedEntity.isEntity()) {
+          throw new Error(`Updated entity wrong`);
+        }
+
+        return await super.update(updatedEntity.toObject(), uid, wsid);
       }
     } catch (error) {
       console.error(error);
@@ -348,7 +354,7 @@ export class UserModel<
         {
           bulkUpdate: users.map((user) => {
             if (user.isEntity()) {
-              return { id: user.id, login: user.login, group: user.group };
+              return user.getUnSecureData();
             }
 
             return user;

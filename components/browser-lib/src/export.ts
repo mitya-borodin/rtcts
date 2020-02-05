@@ -1,3 +1,12 @@
+// ENUMS
+export { repositoryPubSubEnum } from "./enums/repositoryPubSubEnum";
+export { SingleRepositoryPubSubEnum } from "./enums/SingleRepositoryPubSubEnum";
+
+// FILTER
+export { FilterStore } from "./filter/FilterStore";
+
+// FORM
+
 // REPOSITORY
 export { SingleObjectRepository } from "./repository/SingleObjectRepository";
 export { Repository } from "./repository/Repository";
@@ -9,12 +18,9 @@ export { RepositoryHttpTransport } from "./transport/http/RepositoryHttpTranspor
 export { SingleObjectHttpTransport } from "./transport/http/SingleObjectHttpTransport";
 export { WSClient } from "./transport/ws/WSClient";
 
-// FILTER
-export { FilterStore } from "./filter/FilterStore";
-
 // UI COMPONENTS
 export { Link } from "./ui/Link";
 
-// ENUMS
-export { repositoryPubSubEnum } from "./enums/repositoryPubSubEnum";
-export { SingleRepositoryPubSubEnum } from "./enums/SingleRepositoryPubSubEnum";
+// USER
+export { UserHTTPTransport } from "./user/UserHTTPTransport";
+export { UserRepository } from "./user/UserRepository";

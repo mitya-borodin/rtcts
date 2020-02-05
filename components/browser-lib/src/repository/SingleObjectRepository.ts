@@ -12,7 +12,7 @@ export class SingleObjectRepository<
   HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  VA extends any[] = any[],
+  VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends EventEmitter {
@@ -27,7 +27,7 @@ export class SingleObjectRepository<
   @observable
   public entity: ENTITY | undefined;
 
-  protected Entity: new (data: any) => ENTITY;
+  protected Entity: new (data?: any) => ENTITY;
   protected httpTransport: HTTP_TRANSPORT;
   protected ws: WS;
   protected channelName: string;
@@ -36,7 +36,7 @@ export class SingleObjectRepository<
   protected isInit: boolean;
 
   constructor(
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     httpTransport: HTTP_TRANSPORT,
     ws: WS,
     channelName: string,

@@ -1,6 +1,6 @@
 import { isArray, isObject, isString } from "@rtcts/utils";
 import { SimpleObject } from "../Entity";
-import { Log } from "../log/Log";
+import { Log, LogData } from "../log/Log";
 import { logTypeEnum } from "../log/logTypeEnum";
 import { Validate, ValidateData } from "./Validate";
 
@@ -17,16 +17,16 @@ export class ValidateResult extends SimpleObject<ValidateData[]> {
   public readonly hasValidating: boolean;
 
   public readonly messages: string[];
-  public readonly log: Log[];
+  public readonly log: Log<LogData>[];
 
   private readonly cache: Map<string, any> = new Map();
 
   constructor(
     data?:
-      | Array<ValidateResult | Validate | ValidateData>
+      | Array<ValidateResult | Validate | Partial<ValidateData>>
       | ValidateResult
       | Validate
-      | ValidateData,
+      | Partial<ValidateData>,
   ) {
     super();
 
@@ -53,7 +53,7 @@ export class ValidateResult extends SimpleObject<ValidateData[]> {
     let hasError = false;
     let hasValidating = false;
 
-    const log: Log[] = [];
+    const log: Log<LogData>[] = [];
     const messages: string[] = [];
 
     if (data) {

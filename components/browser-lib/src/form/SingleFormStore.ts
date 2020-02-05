@@ -2,12 +2,20 @@ import { Entity } from "@rtcts/isomorphic";
 import { isString, getErrorMessage } from "@rtcts/utils";
 import { FormStore } from "./FormStore";
 import { SingleRepositoryPubSubEnum } from "../enums/SingleRepositoryPubSubEnum";
+import { SingleObjectRepository } from "../repository/SingleObjectRepository";
+import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTransport";
+import { WSClient } from "../transport/ws/WSClient";
+import EventEmitter from "eventemitter3";
 
 export class SingleFormStore<
-  ENTITY extends Entity<DATA, any[]>,
+  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
+  ENTITY extends Entity<DATA, VA>,
   DATA,
   CHANGE,
-  REP extends SingletonRepository<ENTITY>
+  REP extends SingleObjectRepository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB>,
+  VA extends object = object,
+  WS extends WSClient = WSClient,
+  PUB_SUB extends EventEmitter = EventEmitter
 > extends FormStore<ENTITY, DATA, CHANGE> {
   protected readonly Entity: new (...args: any[]) => ENTITY;
   protected readonly repository: REP;
@@ -34,7 +42,7 @@ export class SingleFormStore<
 
   protected async submitForm(submit: ENTITY): Promise<void> {
     try {
-      let result: ENTITY | undefined;
+      let result: ENTITY | void;
 
       if (isString(submit.id)) {
         const entity: ENTITY = new this.Entity(submit.toObject());

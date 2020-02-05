@@ -14,7 +14,7 @@ export class Repository<
   HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  VA extends any[] = any[],
+  VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends EventEmitter {
@@ -32,7 +32,7 @@ export class Repository<
   @observable
   protected collection: ObservableMap<string, ENTITY>;
 
-  protected Entity: new (data: any) => ENTITY;
+  protected Entity: new (data?: any) => ENTITY;
   protected httpTransport: HTTP_TRANSPORT;
   protected pubSub: PUB_SUB;
   protected ws: WS;
@@ -42,7 +42,7 @@ export class Repository<
 
   constructor(
     httpTransport: HTTP_TRANSPORT,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     ws: WS,
     channelName: string,
     pubSub: PUB_SUB,

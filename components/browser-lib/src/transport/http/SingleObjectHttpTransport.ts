@@ -11,17 +11,17 @@ export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
 export class SingleObjectHttpTransport<
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  VA extends any[] = any[],
+  VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends BaseHttpTransport<WS, PUB_SUB> {
-  protected Entity: new (data: any) => ENTITY;
+  protected Entity: new (data?: any) => ENTITY;
 
   public readonly ACL: SingleObjectHttpTransportACL;
 
   constructor(
     name: string,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     ws: WS,
     channelName: string,
     ACL: SingleObjectHttpTransportACL,

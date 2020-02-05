@@ -1,22 +1,17 @@
-import { IEntity, IForm, IInsert } from "@borodindmitriy/interfaces";
-import { isString } from "@borodindmitriy/utils";
-import { IFormStore } from "../../interfaces/form/IFormStore";
-import { IRepository } from "../../interfaces/repository/IRepository";
 import { Repository } from "../repository/Repository";
 import { FormStore } from "./FormStore";
 
 export class RepositoryFormStore<
-  ENTITY extends IEntity,
-  INSERT extends IInsert,
-  FORM extends IForm,
+  REP extends IRepository<ENTITY>,
   CHANGE,
-  REP extends IRepository<ENTITY>
-> extends FormStore<FORM, CHANGE> implements IFormStore<FORM, CHANGE> {
+  ENTITY extends Entity<DATA, VA>,
+  DATA,
+  VA extends object = object
+> extends FormStore<CHANGE, ENTITY, DATA, VA> {
   public static events = {
     submit: `[ RepositoryFormStore ][ SUBMIT ]`,
   };
   protected readonly Entity: new (...args: any[]) => ENTITY;
-  protected readonly Insert: new (...args: any[]) => INSERT;
   protected readonly repository: REP;
 
   constructor(

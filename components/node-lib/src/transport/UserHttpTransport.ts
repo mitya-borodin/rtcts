@@ -21,13 +21,13 @@ export interface UserHttpTransportACL extends HttpTransportACL {
 }
 
 export class UserHttpTransport<
+  MODEL extends UserModel<ENTITY, DATA, VA, CONFIG>,
   ENTITY extends User<DATA, VA>,
-  MODEL extends UserModel<ENTITY, DATA, VA, C>,
   DATA extends UserData = UserData,
-  VA extends any[] = any[],
-  C extends Config = Config,
-  CH extends Channels = Channels
-> extends HttpTransport<ENTITY, UserData, any[], MODEL, User, CH> {
+  VA extends object = object,
+  CONFIG extends Config = Config,
+  CHANNELS extends Channels = Channels
+> extends HttpTransport<MODEL, ENTITY, DATA, VA, ENTITY, DATA, VA, CHANNELS> {
   protected readonly ACL: UserHttpTransportACL;
 
   protected readonly switchers: {
@@ -46,9 +46,9 @@ export class UserHttpTransport<
 
   constructor(
     name: string,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     model: MODEL,
-    channels: CH,
+    channels: CHANNELS,
     ACL: UserHttpTransportACL = {
       getList: [userGroupEnum.admin],
       getItem: [userGroupEnum.admin],

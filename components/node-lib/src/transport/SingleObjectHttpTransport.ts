@@ -12,14 +12,16 @@ export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class SingleObjectHttpTransport<
+  MODEL extends SingleObjectModel<ENTITY, DATA, VA>,
   ENTITY extends Entity<DATA, VA>,
   DATA,
   VA extends any[],
-  MODEL extends SingleObjectModel<ENTITY, DATA, VA>,
-  USER extends User<UserData, any[]>,
+  USER extends User<USER_DATA, USER_VA>,
+  USER_DATA extends UserData = UserData,
+  USER_VA extends object = object,
   CH extends Channels = Channels
-> extends BaseHttpTransport<USER, CH> {
-  protected readonly Entity: new (data: any) => ENTITY;
+> extends BaseHttpTransport<USER, USER_DATA, USER_VA, CH> {
+  protected readonly Entity: new (data?: any) => ENTITY;
   protected readonly model: MODEL;
   protected readonly ACL: SingleObjectHttpTransportACL;
   protected readonly switchers: {
@@ -30,7 +32,7 @@ export class SingleObjectHttpTransport<
 
   constructor(
     name: string,
-    Entity: new (data: any) => ENTITY,
+    Entity: new (data?: any) => ENTITY,
     model: MODEL,
     channels: CH,
     ACL: SingleObjectHttpTransportACL,
@@ -43,7 +45,7 @@ export class SingleObjectHttpTransport<
       update: true,
       channel: true,
     },
-    User: new (data: any) => USER,
+    User: new (data?: any) => USER,
   ) {
     super(name, channels, ACL, switchers, User);
 
