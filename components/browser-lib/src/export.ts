@@ -6,6 +6,9 @@ export { SingleRepositoryPubSubEnum } from "./enums/SingleRepositoryPubSubEnum";
 export { FilterStore } from "./filter/FilterStore";
 
 // FORM
+export { FormStore } from "./form/FormStore";
+export { SingleFormStore } from "./form/SingleFormStore";
+export { RepositoryFormStore } from "./form/RepositoryFormStore";
 
 // REPOSITORY
 export { SingleObjectRepository } from "./repository/SingleObjectRepository";

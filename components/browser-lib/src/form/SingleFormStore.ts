@@ -16,11 +16,11 @@ export class SingleFormStore<
   VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends FormStore<ENTITY, DATA, CHANGE> {
-  protected readonly Entity: new (...args: any[]) => ENTITY;
+> extends FormStore<CHANGE, ENTITY, DATA, VA> {
+  protected readonly Entity: new (data?: any) => ENTITY;
   protected readonly repository: REP;
 
-  constructor(Entity: new (...args: any[]) => ENTITY, repository: REP) {
+  constructor(Entity: new (data?: any) => ENTITY, repository: REP) {
     super(Entity);
 
     this.repository = repository;
@@ -35,7 +35,7 @@ export class SingleFormStore<
       return new this.Entity(this.repository.entity.toObject());
     }
 
-    console.warn("You should try call init()");
+    console.warn(`Initialize the repository before you begin using ${this.constructor.name}`);
 
     return new this.Entity();
   }
@@ -60,7 +60,7 @@ export class SingleFormStore<
 
       this.emit(SingleRepositoryPubSubEnum.submit, result);
     } catch (error) {
-      console.error(`[ ${this.constructor.name} ][ SUBMIT_FORM ][ ${getErrorMessage(error)} ]`);
+      console.error(`Submit (${this.constructor.name}) has been filed: ${getErrorMessage(error)}`);
     }
   }
 }

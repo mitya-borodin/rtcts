@@ -1,12 +1,22 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Repository } from "../repository/Repository";
 import { FormStore } from "./FormStore";
+import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTransport";
+import { Entity } from "@rtcts/isomorphic";
+import { WSClient } from "../transport/ws/WSClient";
+import EventEmitter from "eventemitter3";
+import { isString } from "@rtcts/utils";
 
 export class RepositoryFormStore<
-  REP extends IRepository<ENTITY>,
-  CHANGE,
+  HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  VA extends object = object
+  CHANGE,
+  REP extends Repository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB>,
+  VA extends object = object,
+  WS extends WSClient = WSClient,
+  PUB_SUB extends EventEmitter = EventEmitter
 > extends FormStore<CHANGE, ENTITY, DATA, VA> {
   public static events = {
     submit: `[ RepositoryFormStore ][ SUBMIT ]`,
@@ -14,17 +24,10 @@ export class RepositoryFormStore<
   protected readonly Entity: new (...args: any[]) => ENTITY;
   protected readonly repository: REP;
 
-  constructor(
-    Entity: new (...args: any[]) => ENTITY,
-    Insert: new (...args: any[]) => INSERT,
-    Form: new (...args: any[]) => FORM,
-    repository: REP,
-  ) {
-    super(Form);
+  constructor(Entity: new (...args: any[]) => ENTITY, repository: REP) {
+    super(Entity);
 
     // * DEPS
-    this.Entity = Entity;
-    this.Insert = Insert;
     this.repository = repository;
 
     // * BINDS
@@ -33,36 +36,40 @@ export class RepositoryFormStore<
     this.submitForm = this.submitForm.bind(this);
 
     // ! SUBSCRIPTIONS
-    this.repository.on(Repository.events.remove_submit, this.cancel);
+    this.repository.on(Repository.events.removeSubmit, this.cancel);
   }
 
-  protected async openForm(id?: string, ...args: any[]): Promise<FORM> {
+  protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
     if (isString(id) && id.length > 0) {
       const entity: ENTITY | void = this.repository.map.get(id);
 
       if (entity instanceof this.Entity) {
-        return new this.Form(entity.toJS());
+        return new this.Entity(entity.toObject());
       }
     }
 
-    return new this.Form();
+    return new this.Entity();
   }
 
-  protected async submitForm(submit: FORM): Promise<void> {
+  protected async submitForm(submit: ENTITY): Promise<void> {
     const result: ENTITY | void = await this.submitToRepository(submit);
 
     this.emit(RepositoryFormStore.events.submit, result);
   }
 
-  protected async submitToRepository(submit: FORM): Promise<ENTITY | void> {
+  protected async submitToRepository(submit: ENTITY): Promise<ENTITY | void> {
     if (isString(submit.id)) {
+      const entity: ENTITY = new this.Entity(submit.toObject());
+
+      if (entity.isEntity()) {
+        return await this.repository.update(entity.toObject());
+      }
+    } else {
       const entity: ENTITY = new this.Entity(submit.toJS());
 
-      return await this.repository.update(entity.toJS());
-    } else {
-      const insert: INSERT = new this.Insert(submit.toJS());
-
-      return await this.repository.create(insert.toJS());
+      if (entity.canBeInsert()) {
+        return await this.repository.create(entity.toObject());
+      }
     }
   }
 }
