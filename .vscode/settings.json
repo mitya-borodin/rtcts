@@ -1,19 +1,22 @@
 {
-  "search.followSymlinks": false,
-  "vsicons.dontShowNewVersionMessage": true,
-  "editor.formatOnSave": true,
-  "diffEditor.ignoreTrimWhitespace": true,
-  "npm.enableScriptExplorer": false,
   "files.autoSave": "afterDelay",
-  "workbench.colorTheme": "Darcula - WebStorm Edition",
-  "workbench.iconTheme": "vscode-icons",
-  "workbench.editor.revealIfOpen": true,
-  "git.confirmSync": false,
+  "window.zoomLevel": 0,
+  "editor.minimap.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+  "terminal.integrated.rendererType": "canvas",
+  "search.followSymlinks": false,
+  "git.confirmSync": true,
   "git.autofetch": true,
   "git.enableSmartCommit": true,
   "git.showPushSuccessNotification": true,
   "git.enableStatusBarSync": true,
   "git.showProgress": true,
+  "diffEditor.ignoreTrimWhitespace": true,
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.updateImportsOnFileMove.enabled": "never",
   "eslint.alwaysShowStatus": true,
@@ -45,10 +48,16 @@
       "changeProcessCWD": true
     }
   ],
-  "cSpell.words": ["borodindmitriy"],
-  "cSpell.language": "en,ru",
-  "terminal.integrated.rendererType": "canvas",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  }
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "npm.enableScriptExplorer": false,
+  "workbench.colorTheme": "Darcula - WebStorm Edition",
+  "workbench.iconTheme": "vscode-icons",
+  "workbench.editor.revealIfOpen": true,
+  "vsicons.dontShowNewVersionMessage": true,
+  "cSpell.words": [
+    "rtcts"
+  ],
+  "cSpell.language": "en,ru"
 }

@@ -35,6 +35,7 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
+    "react": "^16.12.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
