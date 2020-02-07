@@ -12,13 +12,16 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
     "lib",
     "lib_bundle"
   ],
+  "directories": {
+    "lib": "lib"
+  },
   "scripts": {
     "start": "rearguard start",
     "build": "rearguard build",
@@ -44,6 +47,8 @@
     "@types/mocha": "5.2.6",
     "@types/node": "11.13.0",
     "@types/prettier": "1.16.4",
+    "@types/react": "^16.9.19",
+    "@types/stylelint": "^9.10.1",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "chai": "4.2.0",

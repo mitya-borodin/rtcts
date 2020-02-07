@@ -1,16 +1,18 @@
 {
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react"],
   "extends": [
-    "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
     "eslint-config-prettier"
   ],
+  "parserOptions": {
+    "ecmaVersion": 2018, // Allows for the parsing of modern ECMAScript features
+    "sourceType": "module", // Allows for the use of imports
+    "ecmaFeatures": {
+      "jsx": true // Allows for the parsing of JSX
+    }
+  },
+  "plugins": ["@typescript-eslint", "react"],
   "rules": {
     "no-unused-vars": "warn",
     "no-use-before-define": "warn",
@@ -25,5 +27,10 @@
     "no-underscore-dangle": ["warn", { "enforceInMethodNames": true }],
     "react/display-name": "warn",
     "react/prop-types": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
