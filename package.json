@@ -39,7 +39,9 @@
     "npm": ">=6 <7"
   },
   "husky": {
-    "pre-push": "npm run validate"
+    "hooks": {
+      "pre-push": "npm run validate"
+    }
   },
   "rearguard": {
     "project": {
