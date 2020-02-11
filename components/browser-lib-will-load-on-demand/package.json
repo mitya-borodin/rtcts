@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -104,7 +104,8 @@
     "project": {
       "runtime": "browser",
       "type": "lib",
-      "will_load_on_demand": true
+      "will_load_on_demand": true,
+      "unPublishedDependency": []
     },
     "distribution": {
       "publish_to_git": false

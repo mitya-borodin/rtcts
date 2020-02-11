@@ -1,5 +1,5 @@
 {
-  "name": "@rtcts/vendors",
+  "name": "@rtcts/vendor-antd",
   "description": "Contains all basic dependencies for browser development (lib, app)",
   "license": "MIT",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.4",
+  "version": "1.0.2",
   "main": "index.js",
   "bin": "",
   "files": [
@@ -23,23 +23,8 @@
   },
   "types": "",
   "dependencies": {
-    "@types/history": "4.7.5",
-    "@types/hoist-non-react-statics": "3.3.1",
-    "@types/numeral": "0.0.26",
-    "@types/react": "16.9.19",
-    "@types/react-dom": "16.9.5",
-    "@types/react-helmet": "5.0.15",
-    "history": "4.10.1",
-    "hoist-non-react-statics": "3.3.2",
-    "isomorphic-style-loader": "5.1.0",
-    "mobx": "5.15.4",
-    "mobx-react": "6.1.7",
-    "mobx-utils": "5.5.3",
-    "moment": "2.24.0",
-    "numeral": "2.0.6",
-    "react": "16.12.0",
-    "react-dom": "16.12.0",
-    "react-helmet": "5.2.1",
+    "@rtcts/vendor-react": "1.0.1",
+    "antd": "3.26.9",
     "tslib": "1.10.0"
   },
   "devDependencies": {
@@ -82,11 +67,12 @@
   "rearguard": {
     "webpack": {
       "context": "src",
-      "dll_entry": "vendors.ts"
+      "dll_entry": "vendor-antd.ts"
     },
     "project": {
       "runtime": "browser",
-      "type": "dll"
+      "type": "dll",
+      "unPublishedDependency": []
     },
     "distribution": {
       "publish_to_git": false

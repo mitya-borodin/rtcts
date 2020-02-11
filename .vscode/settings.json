@@ -28,7 +28,23 @@
       "changeProcessCWD": true
     },
     {
+      "directory": "./components/vendor-react",
+      "changeProcessCWD": true
+    },
+    {
       "directory": "./components/browser-lib-will-load-on-demand",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "./components/vendor-other",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "./components/vendor-mobx",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "./components/vendor-antd",
       "changeProcessCWD": true
     },
     {
@@ -36,11 +52,11 @@
       "changeProcessCWD": true
     },
     {
-      "directory": "./components/node-lib",
+      "directory": "./components/isomorphic",
       "changeProcessCWD": true
     },
     {
-      "directory": "./components/isomorphic",
+      "directory": "./components/node-lib",
       "changeProcessCWD": true
     },
     {
@@ -56,8 +72,6 @@
   "workbench.iconTheme": "vscode-icons",
   "workbench.editor.revealIfOpen": true,
   "vsicons.dontShowNewVersionMessage": true,
-  "cSpell.words": [
-    "rtcts"
-  ],
+  "cSpell.words": ["rtcts"],
   "cSpell.language": "en,ru"
 }
