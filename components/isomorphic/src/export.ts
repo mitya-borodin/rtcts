@@ -1,4 +1,4 @@
-export { SimpleObject, ValueObject, Entity } from "./Entity";
+export { SimpleObject, ValueObject, Entity, EntityID } from "./Entity";
 
 export { userEventEnum } from "./user/userEventEnum";
 export { userGroupEnum } from "./user/userGroupEnum";

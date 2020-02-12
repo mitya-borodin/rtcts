@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -38,7 +38,7 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@rtcts/isomorphic": "1.0.2",
+    "@rtcts/isomorphic": "1.0.3",
     "@rtcts/utils": "1.0.4",
     "@rtcts/vendor-mobx": "1.0.1",
     "@rtcts/vendor-react": "1.0.1",

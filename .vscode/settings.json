@@ -24,10 +24,6 @@
   "eslint.packageManager": "npm",
   "eslint.workingDirectories": [
     {
-      "directory": "./components/vendors",
-      "changeProcessCWD": true
-    },
-    {
       "directory": "./components/vendor-react",
       "changeProcessCWD": true
     },
