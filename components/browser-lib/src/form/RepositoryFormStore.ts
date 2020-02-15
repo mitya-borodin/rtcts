@@ -12,12 +12,11 @@ export class RepositoryFormStore<
   HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  CHANGE,
   REP extends Repository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB>,
   VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends FormStore<CHANGE, ENTITY, DATA, VA> {
+> extends FormStore<ENTITY, DATA, VA> {
   public static events = {
     submit: `[ RepositoryFormStore ][ SUBMIT ]`,
   };

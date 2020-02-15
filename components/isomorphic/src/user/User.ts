@@ -32,7 +32,7 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
 
     if (data) {
       for (const field of [...noSecureFields, ...secureFields]) {
-        if (isString(data[name])) {
+        if (isString(data[field])) {
           this[field] = data[field];
         }
       }

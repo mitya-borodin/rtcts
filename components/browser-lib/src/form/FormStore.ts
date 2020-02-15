@@ -6,7 +6,6 @@ import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
 
 export class FormStore<
-  CHANGE,
   ENTITY extends Entity<DATA, VA>,
   DATA,
   VA extends object = object
@@ -77,7 +76,7 @@ export class FormStore<
     }
   }
 
-  public async change(change: CHANGE): Promise<void> {
+  public async change(change: DATA): Promise<void> {
     const title = `Change (${this.constructor.name}) has been`;
 
     try {
@@ -158,10 +157,10 @@ export class FormStore<
   protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
     console.log(`External handler for open action (${this.constructor.name})`, { id });
 
-    return new this.Entity();
+    return new this.Entity({});
   }
 
-  protected async changeForm(form: ENTITY, change: CHANGE, ...args: any[]): Promise<ENTITY> {
+  protected async changeForm(form: ENTITY, change: DATA, ...args: any[]): Promise<ENTITY> {
     console.log(`External handler for change action (${this.constructor.name})`, { change, form });
 
     return new this.Entity({ ...form.toObject(), ...change });

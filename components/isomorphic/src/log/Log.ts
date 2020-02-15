@@ -22,7 +22,7 @@ export class Log<DATA extends LogData = LogData> extends SimpleObject<DATA> {
 
     if (data) {
       for (const field of fields) {
-        if (isString(data[name])) {
+        if (isString(data[field])) {
           this[field] = data[field];
         } else {
           throw new Error(`Log.${field} should be String`);
