@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.4",
+  "version": "1.0.7",
   "main": "index.js",
   "bin": "",
   "files": [
@@ -25,6 +25,12 @@
   },
   "types": "",
   "dependencies": {
+    "@types/react": "16.9.19",
+    "@types/react-dom": "16.9.5",
+    "@types/react-helmet": "5.0.15",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "react-helmet": "5.2.1",
     "tslib": "1.10.0"
   },
   "devDependencies": {
