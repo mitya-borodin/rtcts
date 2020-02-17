@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "index.js",
   "bin": "",
   "files": [
