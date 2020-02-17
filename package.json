@@ -16,6 +16,7 @@
   "scripts": {
     "bootstrap": "rearguard group bootstrap",
     "clear": "rearguard group clear",
+    "install": "rearguard group install",
     "link": "rearguard group link",
     "lint": "rearguard group lint",
     "start": "rearguard group start",
