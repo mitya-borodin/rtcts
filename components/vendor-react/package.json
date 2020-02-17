@@ -19,30 +19,28 @@
     "dll_bundle"
   ],
   "scripts": {
-    "build": "rearguard build"
+    "build": "rearguard build",
+    "sync": "rearguard sync",
+    "refresh": "rearguard refresh"
   },
   "types": "",
   "dependencies": {
-    "@types/react": "16.9.19",
-    "@types/react-dom": "16.9.5",
-    "react": "16.12.0",
-    "react-dom": "16.12.0",
     "tslib": "1.10.0"
   },
   "devDependencies": {
     "@types/eslint": "6.1.8",
     "@types/prettier": "1.19.0",
     "@types/stylelint": "9.10.1",
-    "@typescript-eslint/eslint-plugin": "2.19.2",
-    "@typescript-eslint/parser": "2.19.2",
+    "@typescript-eslint/eslint-plugin": "2.20.0",
+    "@typescript-eslint/parser": "2.20.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-react": "7.18.3",
-    "husky": "4.2.1",
+    "husky": "4.2.3",
     "normalize.css": "8.0.1",
     "prettier": "1.19.1",
     "pretty-quick": "2.0.1",
-    "stylelint": "13.1.0",
+    "stylelint": "13.2.0",
     "stylelint-config-css-modules": "2.2.0",
     "stylelint-config-prettier": "8.0.1",
     "stylelint-config-standard": "20.0.0",
@@ -73,7 +71,8 @@
     },
     "project": {
       "runtime": "browser",
-      "type": "dll"
+      "type": "dll",
+      "unPublishedDependency": []
     },
     "distribution": {
       "publish_to_git": false

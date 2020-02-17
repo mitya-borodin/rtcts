@@ -89,7 +89,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      const insert: InsertWriteOpResult<any> = await collection.insertMany(
+      const insert: InsertWriteOpResult = await collection.insertMany(
         items
           .filter((item: ValueObject<DATA>) => item.canBeInsert())
           .map((item) => this.removeID(item.toObject())),
@@ -112,7 +112,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
       if (item.canBeInsert()) {
         const collection: Collection<any> = await this.getCollection();
 
-        const insert: InsertOneWriteOpResult<any> = await collection.insertOne(
+        const insert: InsertOneWriteOpResult = await collection.insertOne(
           this.removeID(item.toObject()),
           this.getOptions(options),
         );

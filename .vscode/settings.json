@@ -28,11 +28,11 @@
       "changeProcessCWD": true
     },
     {
-      "directory": "./components/browser-lib-will-load-on-demand",
+      "directory": "./components/vendor-other",
       "changeProcessCWD": true
     },
     {
-      "directory": "./components/vendor-other",
+      "directory": "./components/browser-lib-will-load-on-demand",
       "changeProcessCWD": true
     },
     {
