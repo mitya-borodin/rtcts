@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.0.10",
+  "version": "1.1.0",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -38,7 +38,7 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@rtcts/utils": "1.0.10",
+    "@rtcts/utils": "1.1.0",
     "lodash.omit": "4.5.0",
     "lodash.pick": "4.4.0",
     "tslib": "1.10.0"
