@@ -1,4 +1,4 @@
-import { User } from "@rtcts/isomorphic";
+import { User, UserData } from "@rtcts/isomorphic";
 import jwt from "jsonwebtoken";
 import Koa from "koa";
 import ms from "ms";
@@ -21,9 +21,11 @@ export const unsetCookieForAuthenticate = (ctx: Koa.Context): void => {
 };
 
 export const getAuthenticateStrategyMiddleware = <
-  CONFIG extends Config = Config,
-  USER extends User = User,
-  MODEL extends UserModel<USER> = UserModel<USER>
+  MODEL extends UserModel<USER, USER_DATA>,
+  USER extends User<USER_DATA, VA>,
+  USER_DATA extends UserData = UserData,
+  VA extends object = object,
+  CONFIG extends Config = Config
 >(
   config: CONFIG,
   userModel: MODEL,

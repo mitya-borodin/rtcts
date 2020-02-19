@@ -1,6 +1,7 @@
 // Application
 export {
   setCookieForAuthenticate,
+  unsetCookieForAuthenticate,
   getAuthenticateStrategyMiddleware,
   getAuthenticateMiddleware,
 } from "./app/auth";
