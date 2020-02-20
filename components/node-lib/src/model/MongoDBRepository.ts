@@ -311,7 +311,9 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
       return { ...data, _id: new ObjectId(data.id) };
     }
 
-    throw new Error("The incoming object does not contain a suitable ObjectID");
+    if (data._id || data.id) {
+      throw new Error("The incoming object does not contain a suitable ObjectID");
+    }
   }
 
   private createEntity({ _id, ...data }: { [key: string]: any }): ENTITY {

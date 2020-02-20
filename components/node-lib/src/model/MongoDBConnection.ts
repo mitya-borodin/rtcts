@@ -15,7 +15,7 @@ export class MongoDBConnection extends EventEmitter {
   protected config: Config;
   protected pingTimer: NodeJS.Timer;
 
-  protected client: MongoClient | undefined;
+  protected client: MongoClient | void;
   protected db: Db | undefined;
 
   constructor(config: Config) {
@@ -36,7 +36,7 @@ export class MongoDBConnection extends EventEmitter {
     if (this.status === Status.CLOSED) {
       console.log("");
       console.log(
-        chalk.blue.bold(
+        chalk.green.bold(
           `[ ${this.name} ][ Started trying to connect on: ${this.config.db.url}/${this.config.db.name} ]`,
         ),
       );
@@ -44,15 +44,20 @@ export class MongoDBConnection extends EventEmitter {
       this.status = Status.CONNECTING;
 
       try {
-        this.client = await MongoClient.connect(this.config.db.url, { useNewUrlParser: true });
+        this.client = await MongoClient.connect(this.config.db.url, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
 
         this.status = Status.OPEN;
 
         console.log(
-          chalk.blue.bold(
+          chalk.green.bold(
             `[ ${this.name} ][ The connection is established on: ${this.config.db.url}/${this.config.db.name} ]`,
           ),
         );
+        console.log("");
 
         // Если ошибок не возникло, то подписывается на события закрытия процесса;
         process.once("beforeExit", async (code) => {
@@ -139,7 +144,7 @@ export class MongoDBConnection extends EventEmitter {
         } else if (this.client instanceof MongoClient) {
           this.db = this.client.db(this.config.db.name);
 
-          await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "3.6" });
+          await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" });
 
           resolve(this.db);
         } else {
@@ -147,7 +152,7 @@ export class MongoDBConnection extends EventEmitter {
             if (this.client instanceof MongoClient) {
               this.db = this.client.db(this.config.db.name);
 
-              await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "3.6" });
+              await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" });
 
               resolve(this.db);
             } else {

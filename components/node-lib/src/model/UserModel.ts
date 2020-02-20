@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  ListResponse,
+  Response,
   Send,
   User,
   UserData,
   userGroupEnum,
-  ListResponse,
-  Response,
   ValidateResult,
 } from "@rtcts/isomorphic";
 import { checkPassword, isString } from "@rtcts/utils";
 import { ObjectId } from "bson";
 import jwt from "jsonwebtoken";
 import omit from "lodash.omit";
-import { FindOneAndReplaceOption, FindOneOptions, CollectionInsertOneOptions } from "mongodb";
+import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
 import { Config } from "../app/Config";
 import { authenticate } from "../utils/authenticate";
 import { encryptPassword } from "../utils/encryptPassword";
@@ -211,7 +211,7 @@ export class UserModel<
 
       const existingUser: ENTITY | null = await this.repository.findOne({ login });
 
-      if (!existingUser === null) {
+      if (existingUser !== null) {
         throw new Error(`User with login: ${data.login} already exist`);
       }
 
@@ -229,7 +229,7 @@ export class UserModel<
         const user: ENTITY | null = await this.repository.insertOne(insert);
 
         if (user && user.isEntity()) {
-          return jwt.sign(user.id, this.config.jwt.secretKey, { expiresIn: "12h" });
+          return jwt.sign({ id: user.id }, this.config.jwt.secretKey, { expiresIn: "12h" });
         }
       }
     } catch (error) {
@@ -256,7 +256,7 @@ export class UserModel<
           throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
         }
 
-        return jwt.sign(user.id, this.config.jwt.secretKey, { expiresIn: "12h" });
+        return jwt.sign({ id: user.id }, this.config.jwt.secretKey, { expiresIn: "12h" });
       }
     } catch (error) {
       console.error(error);

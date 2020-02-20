@@ -54,8 +54,8 @@ export class KoaServer {
 
               if (!isString(addressInfo) && addressInfo !== null) {
                 console.log(
-                  chalk.blueBright.bold(
-                    `Server has been run on: http://${addressInfo.address}:${addressInfo.port} `,
+                  chalk.green.bold(
+                    `[ HTTP ][ the connection is open at http://${addressInfo.address}:${addressInfo.port} ]`,
                   ),
                 );
               }

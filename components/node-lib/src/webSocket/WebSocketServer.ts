@@ -64,7 +64,7 @@ export class WebSocketServer<
     try {
       if (!this.wasRun) {
         console.log(
-          chalk.green(
+          chalk.green.bold(
             `[ WS ][ the connection is open at ws://${this.config.ws.host}:${this.config.ws.port} ]`,
           ),
         );

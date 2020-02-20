@@ -2,9 +2,9 @@ import { User, UserData } from "@rtcts/isomorphic";
 import jwt from "jsonwebtoken";
 import Koa from "koa";
 import ms from "ms";
-import { isString } from "util";
 import { UserModel } from "../model/UserModel";
 import { Config } from "./Config";
+import { isObject, isString } from "@rtcts/utils";
 
 export const setCookieForAuthenticate = (ctx: Koa.Context, token: string): void => {
   ctx.cookies.set("jwt", token, { maxAge: ms("12h"), signed: true, secure: false, httpOnly: true });
@@ -36,10 +36,10 @@ export const getAuthenticateStrategyMiddleware = <
     ctx.state.user = null;
 
     if (isString(token)) {
-      const userId = jwt.verify(token, config.jwt.secretKey, { maxAge: "12h" });
+      const jwtUser = jwt.verify(token, config.jwt.secretKey, { maxAge: "12h" });
 
-      if (isString(userId)) {
-        const user: USER | null = await userModel.getUserById(userId);
+      if (isObject<{ id: string }>(jwtUser) && isString(jwtUser.id)) {
+        const user: USER | null = await userModel.getUserById(jwtUser.id);
 
         if (user) {
           ctx.state.user = user;
