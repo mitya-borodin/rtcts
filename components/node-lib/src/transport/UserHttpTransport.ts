@@ -77,7 +77,7 @@ export class UserHttpTransport<
     } = {
       getList: true,
       getItem: false,
-      create: false,
+      create: true,
       update: true,
       remove: true,
       channel: true,
@@ -184,7 +184,7 @@ export class UserHttpTransport<
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(ctx, URL, this.ACL.signUp, this.switchers.signUp, async () => {
-        const token: string | null = await this.model.signUp(ctx.body);
+        const token: string | Response | null = await this.model.signUp(ctx.body);
 
         if (isString(token)) {
           setCookieForAuthenticate(ctx, token);
@@ -194,6 +194,27 @@ export class UserHttpTransport<
           ctx.body = "";
         } else {
           const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
+
+          ctx.throw(message, 404);
+        }
+      });
+    });
+  }
+
+  // ! Этот метод необходим для системного администратора, которому нужно мочь создавать пользователй.
+  protected create(): void {
+    const URL = `/${this.name}`;
+
+    this.router.put(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
+      await this.executor(ctx, URL, this.ACL.create, this.switchers.create, async () => {
+        const response: string | Response | null = await this.model.signUp(ctx.body, true);
+
+        if (response instanceof Response && response.result) {
+          ctx.status = 200;
+          ctx.type = "application/json";
+          ctx.body = JSON.stringify(response);
+        } else {
+          const message = `Create (${this.constructor.name})(${URL}) has been failed`;
 
           ctx.throw(message, 404);
         }

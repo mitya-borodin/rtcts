@@ -188,7 +188,7 @@ export class UserModel<
           group: userGroupEnum.admin,
           login: "admin@admin.com",
           password: "admin",
-          password_confirm: "admin",
+          passwordConfirm: "admin",
         });
       }
     } catch (error) {
@@ -196,14 +196,17 @@ export class UserModel<
     }
   }
 
-  public async signUp(data: { [key: string]: any }): Promise<string | null> {
+  public async signUp(
+    data: { [key: string]: any },
+    onlyCreate = false,
+  ): Promise<string | Response | null> {
     try {
-      const { login, password, password_confirm, group, ...other } = data;
+      const { login, password, passwordConfirm, group, ...other } = data;
 
       if (
         !isString(login) ||
         !isString(password) ||
-        !isString(password_confirm) ||
+        !isString(passwordConfirm) ||
         !isString(group)
       ) {
         throw new Error(`Incorrect signUp data: ${JSON.stringify(data)}`);
@@ -215,10 +218,10 @@ export class UserModel<
         throw new Error(`User with login: ${data.login} already exist`);
       }
 
-      const isValidPassword = checkPassword(password, password_confirm);
+      const isValidPassword = checkPassword(password, passwordConfirm);
 
       if (!isValidPassword) {
-        throw new Error(`Password incorrect, ${JSON.stringify({ password, password_confirm })} }`);
+        throw new Error(`Password incorrect, ${JSON.stringify({ password, passwordConfirm })} }`);
       }
 
       const salt = getSalt();
@@ -229,7 +232,14 @@ export class UserModel<
         const user: ENTITY | null = await this.repository.insertOne(insert);
 
         if (user && user.isEntity()) {
-          return jwt.sign({ id: user.id }, this.config.jwt.secretKey, { expiresIn: "12h" });
+          if (onlyCreate) {
+            return new Response({
+              result: user.getUnSecureData(),
+              validates: new ValidateResult(),
+            });
+          } else {
+            return jwt.sign({ id: user.id }, this.config.jwt.secretKey, { expiresIn: "12h" });
+          }
         }
       }
     } catch (error) {
@@ -303,11 +313,11 @@ export class UserModel<
     wsid: string,
   ): Promise<ENTITY | null> {
     try {
-      if (!isString(data.id) || !isString(data.password) || !isString(data.password_confirm)) {
+      if (!isString(data.id) || !isString(data.password) || !isString(data.passwordConfirm)) {
         throw new Error(`Incorrect updatePassword data: ${JSON.stringify(data)}`);
       }
 
-      const isValidPassword = checkPassword(data.password, data.password_confirm);
+      const isValidPassword = checkPassword(data.password, data.passwordConfirm);
 
       if (!isValidPassword) {
         throw new Error(`Incorrect password: ${JSON.stringify(data)}`);

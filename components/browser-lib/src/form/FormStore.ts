@@ -157,7 +157,7 @@ export class FormStore<
   protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
     console.log(`External handler for open action (${this.constructor.name})`, { id });
 
-    return new this.Entity({});
+    return new this.Entity({ id });
   }
 
   protected async changeForm(form: ENTITY, change: DATA, ...args: any[]): Promise<ENTITY> {

@@ -177,14 +177,14 @@ export class UserRepository<
   }
 
   @action("UserRepository.signUp")
-  public async signUp(data: { [key: string]: any }): Promise<void> {
+  public async signUp(data: { [key: string]: any }, onlyCreate = false): Promise<void> {
     try {
-      const { login, password, password_confirm, group } = data;
+      const { login, password, passwordConfirm, group } = data;
 
       if (
         !isString(login) ||
         !isString(password) ||
-        !isString(password_confirm) ||
+        !isString(passwordConfirm) ||
         !isString(group)
       ) {
         throw new Error(`signUp data isn't correct: ${JSON.stringify(data)}`);
@@ -192,8 +192,25 @@ export class UserRepository<
 
       this.start();
 
-      await this.httpTransport.signUp(data);
-      await this.init();
+      if (onlyCreate) {
+        const response: Response<ENTITY> | void = await this.httpTransport.create(data);
+        if (!response) {
+          throw new Error(`response is empty`);
+        }
+
+        const entity = response.result;
+
+        if (!entity.isEntity()) {
+          return;
+        }
+
+        runInAction(`Create (${this.constructor.name}) has been succeed`, () => {
+          this.collection.set(entity.id, entity);
+        });
+      } else {
+        await this.httpTransport.signUp(data);
+        await this.init();
+      }
     } catch (error) {
       console.error(`SignUp (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`);
 
@@ -250,9 +267,9 @@ export class UserRepository<
   @action("UserRepository.updatePassword")
   public async updatePassword(data: { [key: string]: any }): Promise<void> {
     try {
-      const { id, password, password_confirm } = data;
+      const { id, password, passwordConfirm } = data;
 
-      if (!isString(id) || !isString(password) || !isString(password_confirm)) {
+      if (!isString(id) || !isString(password) || !isString(passwordConfirm)) {
         throw new Error(`updatePassword data isn't correct: ${JSON.stringify(data)}`);
       }
 
