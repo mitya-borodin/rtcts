@@ -7,14 +7,12 @@ import { Config } from "./Config";
 import { isObject, isString } from "@rtcts/utils";
 
 export const setCookieForAuthenticate = (ctx: Koa.Context, token: string): void => {
-  ctx.cookies.set("jwt", token, { maxAge: ms("12h"), signed: true, secure: false, httpOnly: true });
+  ctx.cookies.set("jwt", token, { maxAge: ms("12h"), httpOnly: true });
 };
 
 export const unsetCookieForAuthenticate = (ctx: Koa.Context): void => {
   ctx.cookies.set("jwt", "", {
     maxAge: ms("12h"),
-    signed: false,
-    secure: true,
     httpOnly: true,
     overwrite: true,
   });
@@ -31,7 +29,7 @@ export const getAuthenticateStrategyMiddleware = <
   userModel: MODEL,
 ): Koa.Middleware => {
   return async (ctx: Koa.Context, next: Koa.Next): Promise<void> => {
-    const token = ctx.cookies.get("jwt", { signed: true });
+    const token = ctx.cookies.get("jwt");
 
     ctx.state.user = null;
 

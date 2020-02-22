@@ -57,7 +57,7 @@ export class SingleObjectHttpTransport<
   }
 
   protected getItem(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.get(
       URL,
@@ -81,7 +81,7 @@ export class SingleObjectHttpTransport<
   }
 
   protected update(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.post(
       URL,
@@ -93,7 +93,7 @@ export class SingleObjectHttpTransport<
           this.ACL.update,
           this.switchers.update,
           async (userId: string, wsid: string) => {
-            const response = await this.model.updateResponse(ctx.body, userId, wsid);
+            const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
 
             if (response.result) {
               ctx.status = 200;

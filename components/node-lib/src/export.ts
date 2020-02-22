@@ -29,5 +29,4 @@ export { getSalt } from "./utils/getSalt";
 // WEB_SOCKET
 export { Channels } from "./webSocket/Channels";
 export { Connection } from "./webSocket/Connection";
-export { webSocketMiddleware } from "./webSocket/webSocketMiddleware";
 export { WebSocketServer } from "./webSocket/WebSocketServer";

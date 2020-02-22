@@ -101,7 +101,7 @@ export class UserHttpTransport<
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
   protected update(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.post(
       URL,
@@ -113,11 +113,11 @@ export class UserHttpTransport<
           this.ACL.update,
           this.switchers.update,
           async (userId: string, wsid: string) => {
-            if (userId !== ctx.body.id) {
+            if (userId !== ctx.request.body.id) {
               throw new Error("The model wasn't updated");
             }
 
-            const response = await this.model.updateResponse(ctx.body, userId, wsid);
+            const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
 
             if (response.result) {
               ctx.status = 200;
@@ -134,10 +134,12 @@ export class UserHttpTransport<
 
   // ! Returns the user object that was retrieved after authorization
   protected current(): void {
-    const URL = `/${this.name}/current`;
+    const URL = `${this.basePath}/current`;
 
     this.router.get(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       const user = new this.Entity(ctx.state.user);
+
+      console.log(user);
 
       if (user.isEntity()) {
         const response = new Response({
@@ -149,42 +151,44 @@ export class UserHttpTransport<
         ctx.type = "application/json";
         ctx.body = JSON.stringify(response);
       } else {
-        ctx.throw(404, `Current user is not available (${this.constructor.name})(${URL})`);
+        ctx.throw(`Current user is not available (${this.constructor.name})(${URL})`, 404);
       }
     });
   }
 
   protected signIn(): void {
-    const URL = `/${this.name}/signIn`;
+    const URL = `${this.basePath}/signIn`;
 
     this.router.post(
       URL,
       async (ctx: Koa.Context): Promise<void> => {
-        await this.executor(ctx, URL, [], true, async () => {
-          const token: string | null = await this.model.signIn(ctx.body);
+        console.log("ctx.body", ctx.request.body);
 
-          if (isString(token)) {
-            setCookieForAuthenticate(ctx, token);
+        const token: string | null = await this.model.signIn(ctx.request.body);
 
-            ctx.status = 200;
-            ctx.type = "text/plain";
-            ctx.body = "";
-          } else {
-            const message = `SingIn (${this.constructor.name})(${URL}) has been failed`;
+        console.log("token", token);
 
-            ctx.throw(message, 404);
-          }
-        });
+        if (isString(token)) {
+          setCookieForAuthenticate(ctx, token);
+
+          ctx.status = 200;
+          ctx.type = "text/plain";
+          ctx.body = "";
+        } else {
+          const message = `SingIn (${this.constructor.name})(${URL}) has been failed`;
+
+          ctx.throw(message, 404);
+        }
       },
     );
   }
 
   protected signUp(): void {
-    const URL = `/${this.name}/signUp`;
+    const URL = `${this.basePath}/signUp`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(ctx, URL, this.ACL.signUp, this.switchers.signUp, async () => {
-        const token: string | Response | null = await this.model.signUp(ctx.body);
+        const token: string | Response | null = await this.model.signUp(ctx.request.body);
 
         if (isString(token)) {
           setCookieForAuthenticate(ctx, token);
@@ -203,11 +207,11 @@ export class UserHttpTransport<
 
   // ! Этот метод необходим для системного администратора, которому нужно мочь создавать пользователй.
   protected create(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.put(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(ctx, URL, this.ACL.create, this.switchers.create, async () => {
-        const response: string | Response | null = await this.model.signUp(ctx.body, true);
+        const response: string | Response | null = await this.model.signUp(ctx.request.body, true);
 
         if (response instanceof Response && response.result) {
           ctx.status = 200;
@@ -223,7 +227,7 @@ export class UserHttpTransport<
   }
 
   protected signOut(): void {
-    const URL = `/${this.name}/signOut`;
+    const URL = `${this.basePath}/signOut`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(ctx, URL, this.ACL.signOut, this.switchers.signOut, async () => {
@@ -237,7 +241,7 @@ export class UserHttpTransport<
   }
 
   protected updateLogin(): void {
-    const URL = `/${this.name}/updateLogin`;
+    const URL = `${this.basePath}/updateLogin`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(
@@ -246,7 +250,11 @@ export class UserHttpTransport<
         this.ACL.updateLogin,
         this.switchers.updateLogin,
         async (userId: string, wsid: string) => {
-          const response: Response = await this.model.updateLoginResponse(ctx.body, userId, wsid);
+          const response: Response = await this.model.updateLoginResponse(
+            ctx.request.body,
+            userId,
+            wsid,
+          );
 
           if (response.result) {
             ctx.status = 200;
@@ -263,7 +271,7 @@ export class UserHttpTransport<
   }
 
   protected updatePassword(): void {
-    const URL = `/${this.name}/updatePassword`;
+    const URL = `${this.basePath}/updatePassword`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(
@@ -272,7 +280,7 @@ export class UserHttpTransport<
         this.ACL.updatePassword,
         this.switchers.updatePassword,
         async (userId: string, wsid: string) => {
-          if (ctx.body.id !== userId) {
+          if (ctx.request.body.id !== userId) {
             throw new Error("Password isn't updating");
           }
 
@@ -297,7 +305,7 @@ export class UserHttpTransport<
   }
 
   protected updateGroup(): void {
-    const URL = `/${this.name}/updateGroup`;
+    const URL = `${this.basePath}/updateGroup`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(
@@ -306,7 +314,7 @@ export class UserHttpTransport<
         this.ACL.updateGroup,
         this.switchers.updateGroup,
         async (userId: string, wsid: string): Promise<void> => {
-          const { ids, group } = ctx.body;
+          const { ids, group } = ctx.request.body;
 
           if (ids.length === 1 && ids[0] !== userId) {
             throw new Error("Group isn't updating");

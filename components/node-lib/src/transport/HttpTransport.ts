@@ -72,7 +72,7 @@ export class HttpTransport<
   }
 
   protected getList(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.get(
       URL,
@@ -90,7 +90,7 @@ export class HttpTransport<
   }
 
   protected getItem(): void {
-    const URL = `/${this.name}/:id`;
+    const URL = `${this.basePath}/:id`;
 
     this.router.get(
       URL,
@@ -115,7 +115,7 @@ export class HttpTransport<
   }
 
   protected create(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.put(
       URL,
@@ -127,7 +127,7 @@ export class HttpTransport<
           this.ACL.create,
           this.switchers.create,
           async (userId: string, wsid: string) => {
-            const response = await this.model.createResponse(ctx.body, userId, wsid);
+            const response = await this.model.createResponse(ctx.request.body, userId, wsid);
 
             if (response.result) {
               ctx.status = 200;
@@ -143,7 +143,7 @@ export class HttpTransport<
   }
 
   protected update(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.post(
       URL,
@@ -155,7 +155,7 @@ export class HttpTransport<
           this.ACL.update,
           this.switchers.update,
           async (userId: string, wsid: string) => {
-            const response = await this.model.updateResponse(ctx.body, userId, wsid);
+            const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
 
             if (response.result) {
               ctx.status = 200;
@@ -171,7 +171,7 @@ export class HttpTransport<
   }
 
   protected remove(): void {
-    const URL = `/${this.name}`;
+    const URL = `${this.basePath}`;
 
     this.router.delete(
       URL,
@@ -183,7 +183,7 @@ export class HttpTransport<
           this.ACL.remove,
           this.switchers.remove,
           async (userId: string, wsid: string) => {
-            const { id } = ctx.body;
+            const { id } = ctx.request.body;
             const response = await this.model.removeResponse(id, userId, wsid);
 
             if (response.result) {
@@ -191,7 +191,7 @@ export class HttpTransport<
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
             } else {
-              const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${ctx.body.id} ]`;
+              const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${ctx.request.body.id} ]`;
 
               ctx.throw(message, 404);
             }

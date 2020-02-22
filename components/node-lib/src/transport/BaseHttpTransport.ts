@@ -5,6 +5,9 @@ import Koa from "koa";
 import Router from "koa-router";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { Channels } from "../webSocket/Channels";
+import koaCompress from "koa-compress";
+import koaLogger from "koa-logger";
+import body from "co-body";
 
 export interface BaseHttpTransportACL {
   readonly channel: string[];
@@ -25,6 +28,8 @@ export abstract class BaseHttpTransport<
   protected readonly router: Router;
 
   protected readonly User: new (data?: any) => USER;
+  protected readonly root: string;
+  protected readonly webSocketIdHeaderKey: string;
 
   constructor(
     name: string,
@@ -36,6 +41,8 @@ export abstract class BaseHttpTransport<
       channel: true,
     },
     User: new (data?: any) => USER,
+    root = "/api",
+    webSocketIdHeaderKey = "x-ws-id",
   ) {
     this.name = name;
     this.channels = channels;
@@ -43,16 +50,36 @@ export abstract class BaseHttpTransport<
     this.switchers = switchers;
     this.router = new Router();
     this.User = User;
+    this.root = root;
+    this.webSocketIdHeaderKey = webSocketIdHeaderKey;
 
     this.channel();
+
+    this.router.use(koaCompress());
+    this.router.use(koaLogger());
+    this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
+      try {
+        ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
+        ctx.request.body = await body.json(ctx);
+        ctx.request.files = {};
+
+        await next();
+      } catch (error) {
+        ctx.throw(error, 500);
+      }
+    });
   }
 
   public getRouter(): Router {
     return this.router;
   }
 
+  protected get basePath(): string {
+    return `${this.root}/${this.name}`;
+  }
+
   protected channel(): void {
-    const URL = `/${this.name}/channel`;
+    const URL = `${this.basePath}/channel`;
 
     this.router.post(
       URL,
@@ -64,7 +91,7 @@ export abstract class BaseHttpTransport<
           this.ACL.channel,
           this.switchers.channel,
           async (userId: string, wsid: string) => {
-            const { action, channelName } = ctx.body;
+            const { action, channelName } = ctx.request.body;
 
             if (action === "on") {
               this.channels.on(channelName, userId, wsid);
@@ -102,9 +129,9 @@ export abstract class BaseHttpTransport<
         // ! components/node-lib/src/app/auth.ts
         const user = ctx.state.user;
 
-        // ! ctx.body.wsid -  provided by webSocketMiddleware -> { ctx.body.wsid = ctx.headers["x-ws-id"]; }
+        // ! ctx.request.wsid -  provided by webSocketMiddleware -> { ctx.request.wsid = ctx.headers["x-ws-id"]; }
         // ! components/node-lib/src/webSocket/webSocketMiddleware.ts
-        const { wsid } = ctx.body;
+        const { wsid } = ctx.request;
 
         if (
           user instanceof this.User &&

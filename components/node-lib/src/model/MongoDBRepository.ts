@@ -182,7 +182,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
       );
 
       if (item) {
-        return this.createEntity(item);
+        return item;
       }
     } catch (error) {
       console.error(error);

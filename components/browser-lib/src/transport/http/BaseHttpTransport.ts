@@ -89,27 +89,27 @@ export class BaseHttpTransport<
     return await this.makeHttpRequest(path, "GET", options);
   }
 
-  protected async postHttpRequest(path: string, options = {}, body?: object): Promise<any | void> {
-    return await this.makeHttpRequest(path, "POST", options, body);
+  protected async postHttpRequest(path: string, body?: object, options = {}): Promise<any | void> {
+    return await this.makeHttpRequest(path, "POST", body, options);
   }
 
-  protected async putHttpRequest(path: string, options = {}, body?: object): Promise<any | void> {
-    return await this.makeHttpRequest(path, "PUT", options, body);
+  protected async putHttpRequest(path: string, body?: object, options = {}): Promise<any | void> {
+    return await this.makeHttpRequest(path, "PUT", body, options);
   }
 
   protected async deleteHttpRequest(
     path: string,
-    options = {},
     body?: object,
+    options = {},
   ): Promise<any | void> {
-    return await this.makeHttpRequest(path, "DELETE", options, body);
+    return await this.makeHttpRequest(path, "DELETE", body, options);
   }
 
   private async makeHttpRequest(
     path = "",
     method = "GET",
+    body?: object,
     options = {},
-    body = {},
   ): Promise<any | void> {
     try {
       const res = await fetch(
