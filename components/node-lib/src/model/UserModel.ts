@@ -329,6 +329,8 @@ export class UserModel<
         throw new Error(`User with id: ${data.id} not found`);
       }
 
+      console.log(result, result.isEntityWithSecureFields());
+
       if (result.isEntityWithSecureFields()) {
         const salt = getSalt();
         const hashedPassword = encryptPassword(data.password, salt);
@@ -358,7 +360,7 @@ export class UserModel<
 
       await this.repository.updateMany(query, update);
 
-      const users: ENTITY[] = await super.repository.find(query, offset, limit);
+      const users: ENTITY[] = await this.repository.find(query, offset, limit);
 
       this.sendThroughWebSocket(
         {

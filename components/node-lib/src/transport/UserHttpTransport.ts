@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Response, User, userGroupEnum, ValidateResult, UserData } from "@rtcts/isomorphic";
+import { Response, User, UserData, userGroupEnum, ValidateResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import Koa from "koa";
 import {
@@ -183,25 +183,23 @@ export class UserHttpTransport<
   protected signUp(): void {
     const URL = `${this.basePath}/signUp`;
 
-    this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
-      await this.executor(ctx, URL, this.ACL.signUp, this.switchers.signUp, async () => {
-        const token: string | Response | null = await this.model.signUp(ctx.request.body);
+    this.router.post(URL, async (ctx: Koa.Context) => {
+      const token: string | Response | null = await this.model.signUp(ctx.request.body);
 
-        if (isString(token)) {
-          setCookieForAuthenticate(ctx, token);
+      if (isString(token)) {
+        setCookieForAuthenticate(ctx, token);
 
-          ctx.status = 200;
-          ctx.type = "application/json";
-          ctx.body = new Response({
-            result: {},
-            validates: new ValidateResult(),
-          });
-        } else {
-          const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
+        ctx.status = 200;
+        ctx.type = "application/json";
+        ctx.body = new Response({
+          result: {},
+          validates: new ValidateResult(),
+        });
+      } else {
+        const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
 
-          ctx.throw(message, 404);
-        }
-      });
+        ctx.throw(message, 404);
+      }
     });
   }
 
@@ -283,12 +281,8 @@ export class UserHttpTransport<
         this.ACL.updatePassword,
         this.switchers.updatePassword,
         async (userId: string, wsid: string) => {
-          if (ctx.request.body.id !== userId) {
-            throw new Error("Password isn't updating");
-          }
-
           const response: Response = await this.model.updatePasswordResponse(
-            ctx.body,
+            ctx.request.body,
             userId,
             wsid,
           );
@@ -318,10 +312,6 @@ export class UserHttpTransport<
         this.switchers.updateGroup,
         async (userId: string, wsid: string): Promise<void> => {
           const { ids, group } = ctx.request.body;
-
-          if (ids.length === 1 && ids[0] !== userId) {
-            throw new Error("Group isn't updating");
-          }
 
           const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
 

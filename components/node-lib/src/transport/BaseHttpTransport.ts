@@ -63,7 +63,7 @@ export abstract class BaseHttpTransport<
 
         await next();
       } catch (error) {
-        ctx.throw(error, 500);
+        ctx.throw(500, error);
       }
     });
 
@@ -148,15 +148,16 @@ export abstract class BaseHttpTransport<
           return await worker(user.id, wsid);
         }
 
-        ctx.throw(`Access denied (${this.constructor.name})(${URL}) for ${user.group}`, 403);
+        ctx.throw(403, `Access denied (${this.constructor.name})(${URL}) for ${user.group}`);
       } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        const message = `[ ${this.constructor.name} ][ ${URL} ][ ${errorMessage} ]`;
-
-        ctx.throw(message, 500);
+        ctx.throw(
+          500,
+          `[ ${this.constructor.name} ][ URL: ${URL} ][ ACL: ${ACL} ]` +
+            `[ switcher: ${switcher} ][ ${getErrorMessage(error)} ][ 500 ]`,
+        );
       }
     } else {
-      ctx.throw(404);
+      ctx.throw(404, `[ executor ][ URL: ${URL} ][ ACL: ${ACL} ][ switcher: ${switcher} ][ 404 ]`);
     }
   }
 }

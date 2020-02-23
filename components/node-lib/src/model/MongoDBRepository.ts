@@ -278,7 +278,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      await collection.updateMany(this.normalizeObjectID(query), this.removeID(update), options);
+      await collection.updateMany(query, update, options);
     } catch (error) {
       console.error(error);
     }
@@ -300,19 +300,27 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      await collection.deleteMany(this.normalizeObjectID(query), options);
+      await collection.deleteMany(query, options);
     } catch (error) {
       console.error(error);
     }
   }
 
   private normalizeObjectID(data: any): any {
+    if (isObject(data._id) && !ObjectId.isValid(data._id)) {
+      return data;
+    }
+
     if (ObjectId.isValid(data._id)) {
-      return { ...data, _id: new ObjectId(data._id) };
+      const { _id, ...other } = data;
+
+      return { ...other, _id: new ObjectId(_id) };
     }
 
     if (ObjectId.isValid(data.id)) {
-      return { ...data, _id: new ObjectId(data.id) };
+      const { id, ...other } = data;
+
+      return { ...other, _id: new ObjectId(id) };
     }
 
     if (data._id || data.id) {
