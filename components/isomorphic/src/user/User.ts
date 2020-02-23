@@ -52,6 +52,16 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
     return true;
   }
 
+  public isEntityWithNoSecureFields<T = DATA>(): this is Required<EntityID> & Required<T> {
+    if (!isString(this.id)) {
+      throw new Error(`${this.constructor.name}.id should be String`);
+    }
+
+    this.checkNoSecureFields();
+
+    return true;
+  }
+
   public checkNoSecureFields(): this is Pick<Required<UserData>, "login" | "group"> {
     for (const field of noSecureFields) {
       if (!isString(this[field])) {

@@ -57,7 +57,7 @@ export class SingleObjectHttpTransport<
   }
 
   protected getItem(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/item`;
 
     this.router.get(
       URL,
@@ -81,7 +81,7 @@ export class SingleObjectHttpTransport<
   }
 
   protected update(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/update`;
 
     this.router.post(
       URL,

@@ -101,7 +101,7 @@ export class UserHttpTransport<
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
   protected update(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/update`;
 
     this.router.post(
       URL,
@@ -137,9 +137,7 @@ export class UserHttpTransport<
     const URL = `${this.basePath}/current`;
 
     this.router.get(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
-      const user = new this.Entity(ctx.state.user);
-
-      console.log(user);
+      const user = new this.Entity(ctx.request.user);
 
       if (user.isEntity()) {
         const response = new Response({
@@ -162,18 +160,17 @@ export class UserHttpTransport<
     this.router.post(
       URL,
       async (ctx: Koa.Context): Promise<void> => {
-        console.log("ctx.body", ctx.request.body);
-
         const token: string | null = await this.model.signIn(ctx.request.body);
-
-        console.log("token", token);
 
         if (isString(token)) {
           setCookieForAuthenticate(ctx, token);
 
           ctx.status = 200;
-          ctx.type = "text/plain";
-          ctx.body = "";
+          ctx.type = "application/json";
+          ctx.body = new Response({
+            result: {},
+            validates: new ValidateResult(),
+          });
         } else {
           const message = `SingIn (${this.constructor.name})(${URL}) has been failed`;
 
@@ -194,8 +191,11 @@ export class UserHttpTransport<
           setCookieForAuthenticate(ctx, token);
 
           ctx.status = 200;
-          ctx.type = "text/plain";
-          ctx.body = "";
+          ctx.type = "application/json";
+          ctx.body = new Response({
+            result: {},
+            validates: new ValidateResult(),
+          });
         } else {
           const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
 
@@ -207,7 +207,7 @@ export class UserHttpTransport<
 
   // ! Этот метод необходим для системного администратора, которому нужно мочь создавать пользователй.
   protected create(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/create`;
 
     this.router.put(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
       await this.executor(ctx, URL, this.ACL.create, this.switchers.create, async () => {
@@ -234,8 +234,11 @@ export class UserHttpTransport<
         unsetCookieForAuthenticate(ctx);
 
         ctx.status = 200;
-        ctx.type = "text/plain";
-        ctx.body = "";
+        ctx.type = "application/json";
+        ctx.body = new Response({
+          result: {},
+          validates: new ValidateResult(),
+        });
       });
     });
   }

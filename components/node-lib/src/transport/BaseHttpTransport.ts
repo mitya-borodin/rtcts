@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { User, UserData } from "@rtcts/isomorphic";
+import { User, UserData, ValidateResult, Response } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";
 import Router from "koa-router";
@@ -74,6 +74,10 @@ export abstract class BaseHttpTransport<
     return this.router;
   }
 
+  public setMiddleware(middleware: Koa.Middleware): void {
+    this.router.use(middleware);
+  }
+
   protected get basePath(): string {
     return `${this.root}/${this.name}`;
   }
@@ -91,20 +95,27 @@ export abstract class BaseHttpTransport<
           this.ACL.channel,
           this.switchers.channel,
           async (userId: string, wsid: string) => {
+            console.log(URL, ctx.request.body);
             const { action, channelName } = ctx.request.body;
 
             if (action === "on") {
               this.channels.on(channelName, userId, wsid);
 
               ctx.status = 200;
-              ctx.type = "text/plain";
-              ctx.body = "";
+              ctx.type = "application/json";
+              ctx.body = new Response({
+                result: {},
+                validates: new ValidateResult(),
+              });
             } else if (action === "off") {
               this.channels.off(channelName, userId, wsid);
 
               ctx.status = 200;
-              ctx.type = "text/plain";
-              ctx.body = "";
+              ctx.type = "application/json";
+              ctx.body = new Response({
+                result: {},
+                validates: new ValidateResult(),
+              });
             } else {
               const message = `[ ${this.constructor.name} ][ ${URL} ][ UNEXPECTED ACTION: ${action} ]`;
 
@@ -123,15 +134,12 @@ export abstract class BaseHttpTransport<
     switcher: boolean,
     worker: (userId: string, wsid: string) => Promise<void>,
   ): Promise<void> {
+    console.log(URL, ACL, switcher, ctx.request);
     if (switcher) {
       try {
-        // ! ctx.state.user - provided by getAuthenticateStrategyMiddleware
+        // ! ctx.request.user - provided by getAuthenticateStrategyMiddleware
         // ! components/node-lib/src/app/auth.ts
-        const user = ctx.state.user;
-
-        // ! ctx.request.wsid -  provided by webSocketMiddleware -> { ctx.request.wsid = ctx.headers["x-ws-id"]; }
-        // ! components/node-lib/src/webSocket/webSocketMiddleware.ts
-        const { wsid } = ctx.request;
+        const { wsid, user } = ctx.request;
 
         if (
           user instanceof this.User &&

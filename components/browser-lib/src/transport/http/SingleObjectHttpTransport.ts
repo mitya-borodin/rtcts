@@ -42,7 +42,7 @@ export class SingleObjectHttpTransport<
         return;
       }
 
-      const result: any | void = await this.getHttpRequest(`/${this.name}`);
+      const result: any | void = await this.getHttpRequest(`/${this.name}/item`);
 
       if (!result) {
         return;
@@ -65,7 +65,7 @@ export class SingleObjectHttpTransport<
         return;
       }
 
-      const result: any | void = await this.postHttpRequest(`/${this.name}`, data);
+      const result: any | void = await this.postHttpRequest(`/${this.name}/update`, data);
 
       if (!result) {
         return;

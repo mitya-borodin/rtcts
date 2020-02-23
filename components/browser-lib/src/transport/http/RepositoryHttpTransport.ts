@@ -48,7 +48,7 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.getHttpRequest(`/${this.name}`);
+      const result: any | void = await this.getHttpRequest(`/${this.name}/list`);
 
       if (!result) {
         return;
@@ -78,7 +78,7 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.getHttpRequest(`/${this.name}/${id}`);
+      const result: any | void = await this.getHttpRequest(`/${this.name}/item/${id}`);
 
       if (!result) {
         return;
@@ -101,7 +101,7 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.putHttpRequest(`/${this.name}`, input);
+      const result: any | void = await this.putHttpRequest(`/${this.name}/create`, input);
 
       if (!result) {
         return;
@@ -124,7 +124,7 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.postHttpRequest(`/${this.name}`, input);
+      const result: any | void = await this.postHttpRequest(`/${this.name}/update`, input);
 
       if (!result) {
         return;
@@ -147,7 +147,7 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.deleteHttpRequest(`/${this.name}`, { id });
+      const result: any | void = await this.deleteHttpRequest(`/${this.name}/remove`, { id });
 
       if (!result) {
         return;

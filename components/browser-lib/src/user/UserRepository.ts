@@ -390,7 +390,7 @@ export class UserRepository<
 
       const entity = response.result;
 
-      if (!entity.isEntity()) {
+      if (!entity.isEntityWithNoSecureFields()) {
         return;
       }
 
@@ -402,7 +402,7 @@ export class UserRepository<
 
           const observableUser = this.collection.get(entity.id);
 
-          if (observableUser instanceof this.Entity && observableUser.isEntity()) {
+          if (observableUser instanceof this.Entity && observableUser.checkNoSecureFields()) {
             this.pubSub.emit(userEventEnum.SET_USER, observableUser);
             this.pubSub.emit(userEventEnum.SET_USER_GROUP, observableUser.group);
           }

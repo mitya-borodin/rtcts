@@ -56,7 +56,7 @@ export class Response<T = any> {
         throw new Error("Response.result isn't valid");
       }
 
-      if (isArray(data.validates)) {
+      if (isArray(data.validates) || data.validates instanceof ValidateResult) {
         this.validates = new ValidateResult(data.validates);
       } else {
         throw new Error("Response.validates isn't valid");

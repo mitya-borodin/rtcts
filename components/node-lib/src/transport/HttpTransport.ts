@@ -72,7 +72,7 @@ export class HttpTransport<
   }
 
   protected getList(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/list`;
 
     this.router.get(
       URL,
@@ -90,7 +90,7 @@ export class HttpTransport<
   }
 
   protected getItem(): void {
-    const URL = `${this.basePath}/:id`;
+    const URL = `${this.basePath}/item/:id`;
 
     this.router.get(
       URL,
@@ -115,7 +115,7 @@ export class HttpTransport<
   }
 
   protected create(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/create`;
 
     this.router.put(
       URL,
@@ -143,7 +143,7 @@ export class HttpTransport<
   }
 
   protected update(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/update`;
 
     this.router.post(
       URL,
@@ -171,7 +171,7 @@ export class HttpTransport<
   }
 
   protected remove(): void {
-    const URL = `${this.basePath}`;
+    const URL = `${this.basePath}/remove`;
 
     this.router.delete(
       URL,

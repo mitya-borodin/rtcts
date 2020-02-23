@@ -31,7 +31,7 @@ export const getAuthenticateStrategyMiddleware = <
   return async (ctx: Koa.Context, next: Koa.Next): Promise<void> => {
     const token = ctx.cookies.get("jwt");
 
-    ctx.state.user = null;
+    ctx.request.user = null;
 
     if (isString(token)) {
       const jwtUser = jwt.verify(token, config.jwt.secretKey, { maxAge: "12h" });
@@ -40,7 +40,7 @@ export const getAuthenticateStrategyMiddleware = <
         const user: USER | null = await userModel.getUserById(jwtUser.id);
 
         if (user) {
-          ctx.state.user = user;
+          ctx.request.user = user;
 
           return await next();
         }
@@ -53,7 +53,7 @@ export const getAuthenticateStrategyMiddleware = <
 
 export const getAuthenticateMiddleware = (): Koa.Middleware => {
   return async (ctx: Koa.Context, next: Koa.Next): Promise<void> => {
-    if (ctx.state.user !== null) {
+    if (ctx.request.user !== null) {
       return await next();
     }
 
