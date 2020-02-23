@@ -41,22 +41,26 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
     }
   }
 
-  // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
-  public canBeInsert<T = DATA>(): this is Required<T> {
-    for (const field of [...noSecureFields, ...secureFields]) {
-      if (!isString(this[field])) {
-        throw new Error(`User.${field} should be String`);
-      }
-    }
-
-    return true;
-  }
-
-  public isEntityWithNoSecureFields<T = DATA>(): this is Required<EntityID> & Required<T> {
+  public isEntityWithSecureFields<T = DATA>(): this is Required<EntityID> & Required<T> {
     if (!isString(this.id)) {
       throw new Error(`${this.constructor.name}.id should be String`);
     }
 
+    this.checkNoSecureFields();
+    this.checkSecureFields();
+
+    return true;
+  }
+
+  public canBeInsertWithSecureFields<T = DATA>(): this is Required<T> {
+    this.checkNoSecureFields();
+    this.checkSecureFields();
+
+    return true;
+  }
+
+  // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
+  public canBeInsert<T = DATA>(): this is Required<T> {
     this.checkNoSecureFields();
 
     return true;

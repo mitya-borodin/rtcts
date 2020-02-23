@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -38,7 +38,7 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@rtcts/vendor-other": "1.1.1",
+    "@rtcts/vendor-other": "1.1.2",
     "tslib": "1.10.0"
   },
   "devDependencies": {

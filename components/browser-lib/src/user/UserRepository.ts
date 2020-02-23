@@ -390,7 +390,7 @@ export class UserRepository<
 
       const entity = response.result;
 
-      if (!entity.isEntityWithNoSecureFields()) {
+      if (!entity.isEntity()) {
         return;
       }
 

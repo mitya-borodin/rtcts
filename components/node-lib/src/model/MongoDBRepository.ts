@@ -136,10 +136,14 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     try {
       const collection: Collection<any> = await this.getCollection();
 
+      // TODO разобраться как работать с лимитами.
+
       const cursor: AggregationCursor = collection.aggregate([
-        {
+        /*  {
           $skip: offset,
           $limit: limit,
+        }, */
+        {
           $match: this.normalizeObjectID(query),
         },
         ...(options ? [{ $project: { _id: true, ...options.projection } }] : []),
@@ -314,6 +318,8 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     if (data._id || data.id) {
       throw new Error("The incoming object does not contain a suitable ObjectID");
     }
+
+    return data;
   }
 
   private createEntity({ _id, ...data }: { [key: string]: any }): ENTITY {

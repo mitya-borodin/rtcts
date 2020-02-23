@@ -53,8 +53,6 @@ export abstract class BaseHttpTransport<
     this.root = root;
     this.webSocketIdHeaderKey = webSocketIdHeaderKey;
 
-    this.channel();
-
     this.router.use(koaCompress());
     this.router.use(koaLogger());
     this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
@@ -68,6 +66,8 @@ export abstract class BaseHttpTransport<
         ctx.throw(error, 500);
       }
     });
+
+    this.channel();
   }
 
   public getRouter(): Router {
@@ -95,7 +95,6 @@ export abstract class BaseHttpTransport<
           this.ACL.channel,
           this.switchers.channel,
           async (userId: string, wsid: string) => {
-            console.log(URL, ctx.request.body);
             const { action, channelName } = ctx.request.body;
 
             if (action === "on") {
@@ -134,7 +133,6 @@ export abstract class BaseHttpTransport<
     switcher: boolean,
     worker: (userId: string, wsid: string) => Promise<void>,
   ): Promise<void> {
-    console.log(URL, ACL, switcher, ctx.request);
     if (switcher) {
       try {
         // ! ctx.request.user - provided by getAuthenticateStrategyMiddleware

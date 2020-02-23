@@ -21,7 +21,7 @@ export class ListResponse<T = any> {
         throw new Error("ListResponse.results isn't valid");
       }
 
-      if (isArray<ValidateData>(data.validates)) {
+      if (isArray<ValidateData>(data.validates) || data.validates instanceof ValidateResult) {
         this.validates = new ValidateResult(data.validates);
       } else {
         throw new Error("ListResponse.validates isn't valid");

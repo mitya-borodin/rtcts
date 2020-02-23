@@ -228,10 +228,10 @@ export class UserModel<
       const hashedPassword = encryptPassword(password, salt);
       const insert = new this.Entity({ login, group, salt, hashedPassword, ...other });
 
-      if (insert.canBeInsert()) {
+      if (insert.canBeInsertWithSecureFields()) {
         const user: ENTITY | null = await this.repository.insertOne(insert);
 
-        if (user && user.isEntity()) {
+        if (user && user.isEntityWithSecureFields()) {
           if (onlyCreate) {
             return new Response({
               result: user.getUnSecureData(),
@@ -261,7 +261,7 @@ export class UserModel<
         throw new Error(`User with login: ${data.login} not found`);
       }
 
-      if (user.isEntity<UserData>() && user.checkSecureFields()) {
+      if (user.isEntityWithSecureFields<UserData>()) {
         if (!authenticate(data.password, user.salt, user.hashedPassword)) {
           throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
         }
@@ -291,10 +291,10 @@ export class UserModel<
         throw new Error(`User with id: ${data.id} and login: ${data.login} not found`);
       }
 
-      if (result.isEntity()) {
+      if (result.isEntityWithSecureFields()) {
         const updatedEntity = new this.Entity({ ...result.toObject(), login: data.login });
 
-        if (!updatedEntity.isEntity()) {
+        if (!updatedEntity.isEntityWithSecureFields()) {
           throw new Error(`Updated entity wrong`);
         }
 
@@ -329,7 +329,7 @@ export class UserModel<
         throw new Error(`User with id: ${data.id} not found`);
       }
 
-      if (result.isEntity()) {
+      if (result.isEntityWithSecureFields()) {
         const salt = getSalt();
         const hashedPassword = encryptPassword(data.password, salt);
         const query = { ...result.toObject(), salt, hashedPassword };
@@ -363,7 +363,7 @@ export class UserModel<
       this.sendThroughWebSocket(
         {
           bulkUpdate: users.map((user) => {
-            if (user.isEntity()) {
+            if (user.isEntityWithSecureFields()) {
               return user.getUnSecureData();
             }
 
@@ -393,7 +393,7 @@ export class UserModel<
     try {
       const insert: ENTITY = new this.Entity(data);
 
-      if (insert.checkNoSecureFields() && isString(insert.id)) {
+      if (insert.isEntity()) {
         const currentUser: ENTITY | null = await this.repository.findById(insert.id);
 
         if (currentUser) {
