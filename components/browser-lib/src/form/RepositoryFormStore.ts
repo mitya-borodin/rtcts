@@ -47,7 +47,7 @@ export class RepositoryFormStore<
       }
     }
 
-    return new this.Entity();
+    return new this.Entity({});
   }
 
   protected async submitForm(submit: ENTITY): Promise<void> {

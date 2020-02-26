@@ -277,7 +277,7 @@ export class Repository<
     }
 
     try {
-      if (this.channelName !== channelName) {
+      if (this.channelName === channelName) {
         console.log(
           `%cReceive message for (${this.constructor.name}) from channel ${channelName}`,
           "color: #1890ff;",
