@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Entity } from "@rtcts/isomorphic";
-import { isArray, isString } from "@rtcts/utils";
+import { isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { Repository } from "../repository/Repository";
 import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTransport";
@@ -36,15 +36,6 @@ export class RepositoryFormStore<
 
     // ! SUBSCRIPTIONS
     this.repository.on(Repository.events.removeSubmit, this.cancel);
-    this.repository.on(Repository.events.update, (entities) => {
-      if (isArray(entities) && entities.length > 0) {
-        const entity = new this.Entity(entities[0]);
-
-        if (this.isEdit && entity.isEntity()) {
-          this.change(entity);
-        }
-      }
-    });
   }
 
   protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
