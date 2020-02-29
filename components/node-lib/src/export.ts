@@ -16,10 +16,13 @@ export { SingleObjectModel } from "./model/SingleObjectModel";
 export { UserModel } from "./model/UserModel";
 
 // Transport
-export { BaseHttpTransport } from "./transport/BaseHttpTransport";
-export { HttpTransport } from "./transport/HttpTransport";
-export { SingleObjectHttpTransport } from "./transport/SingleObjectHttpTransport";
-export { UserHttpTransport } from "./transport/UserHttpTransport";
+export { BaseHttpTransport, BaseHttpTransportACL } from "./transport/BaseHttpTransport";
+export { HttpTransport, HttpTransportACL } from "./transport/HttpTransport";
+export {
+  SingleObjectHttpTransport,
+  SingleObjectHttpTransportACL,
+} from "./transport/SingleObjectHttpTransport";
+export { UserHttpTransport, UserHttpTransportACL } from "./transport/UserHttpTransport";
 
 // UTILS
 export { authenticate } from "./utils/authenticate";

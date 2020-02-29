@@ -1,13 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { User, UserData, ValidateResult, Response } from "@rtcts/isomorphic";
-import { getErrorMessage } from "@rtcts/utils";
+import { Response, User, UserData, ValidateResult } from "@rtcts/isomorphic";
+import { getErrorMessage, isNumber } from "@rtcts/utils";
+import body from "co-body";
+import fs from "fs";
 import Koa from "koa";
-import Router from "koa-router";
-import { getAuthenticateMiddleware } from "../app/auth";
-import { Channels } from "../webSocket/Channels";
 import koaCompress from "koa-compress";
 import koaLogger from "koa-logger";
-import body from "co-body";
+import Router from "koa-router";
+import path from "path";
+import typeIs from "type-is";
+import { promisify } from "util";
+import { getAuthenticateMiddleware } from "../app/auth";
+import { Channels } from "../webSocket/Channels";
+import { SizeControllerStream } from "./SizeControllerStream";
+
+const exists = promisify(fs.exists);
+const stat = promisify(fs.stat);
 
 export interface BaseHttpTransportACL {
   readonly channel: string[];
@@ -58,8 +66,11 @@ export abstract class BaseHttpTransport<
     this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
       try {
         ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
-        ctx.request.body = await body.json(ctx);
-        ctx.request.files = {};
+        ctx.request.body = {};
+
+        if (typeIs(ctx.req, ["application/json"])) {
+          ctx.request.body = await body.json(ctx);
+        }
 
         await next();
       } catch (error) {
@@ -159,5 +170,133 @@ export abstract class BaseHttpTransport<
     } else {
       ctx.throw(404, `[ executor ][ URL: ${URL} ][ ACL: ${ACL} ][ switcher: ${switcher} ][ 404 ]`);
     }
+  }
+
+  protected async downloadFile(ctx: Koa.Context, sourceFilePath: string): Promise<void> {
+    if (!(await exists(sourceFilePath))) {
+      ctx.throw(`Source file (${sourceFilePath}) isn't exist`, 500);
+    }
+
+    const fileStat = await stat(sourceFilePath);
+
+    ctx.res.setHeader("Content-Length", fileStat.size);
+
+    return new Promise((resolve, reject) => {
+      // ! Request
+      ctx.req.on("error", (error: Error): void => {
+        reject(error);
+      });
+
+      ctx.req.on("abort", () => {
+        reject(new Error("Request has been aborted by the client."));
+      });
+
+      ctx.req.on("aborted", () => {
+        reject(new Error("Request has been aborted."));
+      });
+
+      // ! Response
+      ctx.res.on("error", (error: Error): void => {
+        reject(error);
+      });
+
+      ctx.res.on("finish", () => {
+        resolve();
+      });
+
+      const sourceStream = fs.createReadStream(sourceFilePath);
+
+      sourceStream.on("error", (error: Error): void => {
+        reject(error);
+      });
+
+      sourceStream.pipe(ctx.res);
+    });
+  }
+
+  protected async uploadFile(
+    ctx: Koa.Context,
+    destinationDirectory: string,
+    fileName: string,
+    config = {
+      maxFileSize: 10 * 1024 * 1024, // 10 mb
+      mimeTypes: [
+        "image/gif",
+        "image/jpeg",
+        "image/pjpeg",
+        "image/png",
+        "image/webp",
+        "image/heic",
+      ],
+    },
+  ): Promise<void> {
+    if (!(await exists(destinationDirectory))) {
+      ctx.throw(`Destination directory (${destinationDirectory}) isn't exist`, 500);
+    }
+
+    if (await exists(path.resolve(destinationDirectory, fileName))) {
+      ctx.throw(`File (${fileName}) already exist in (${destinationDirectory})`, 500);
+    }
+
+    // * Getting Headers
+    const contentLength = parseInt(ctx.req.headers["content-length"] || "0");
+    const mimeType = ctx.req.headers["content-type"];
+
+    if (!isNumber(contentLength) || (isNumber(contentLength) && contentLength === 0)) {
+      ctx.throw(`Content-Light must be Number and more then zero`, 500);
+    }
+
+    if (contentLength > config.maxFileSize) {
+      ctx.throw(
+        `Content-Light (${contentLength}) more then max file size (${config.maxFileSize})`,
+        413,
+      );
+    }
+
+    if (!typeIs(ctx.req, config.mimeTypes)) {
+      ctx.throw(`Mime type (${mimeType}) does not match valid values (${config.mimeTypes})`, 422);
+    }
+
+    return new Promise((resolve, reject) => {
+      ctx.req.on("error", (error: Error): void => {
+        reject(error);
+      });
+
+      ctx.res.on("error", (error: Error): void => {
+        reject(error);
+      });
+
+      ctx.req.on("abort", () => {
+        reject(new Error("Request has been aborted by the client."));
+      });
+
+      ctx.req.on("aborted", () => {
+        reject(new Error("Request has been aborted."));
+      });
+
+      // * Green Zone
+      const sizeControllerStream = new SizeControllerStream();
+
+      sizeControllerStream.on("progress", () => {
+        if (sizeControllerStream.bytes > config.maxFileSize) {
+          ctx.throw(
+            `More data is received (${contentLength}) than is allowed (${config.maxFileSize})`,
+            500,
+          );
+        }
+      });
+
+      const destinationStream = fs.createWriteStream(path.resolve(destinationDirectory, fileName));
+
+      destinationStream.on("finish", () => {
+        resolve();
+      });
+
+      destinationStream.on("error", (error: Error): void => {
+        reject(error);
+      });
+
+      ctx.req.pipe(sizeControllerStream).pipe(destinationStream);
+    });
   }
 }
