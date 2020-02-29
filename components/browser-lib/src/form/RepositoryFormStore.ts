@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Repository } from "../repository/Repository";
-import { FormStore } from "./FormStore";
-import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTransport";
 import { Entity } from "@rtcts/isomorphic";
-import { WSClient } from "../transport/ws/WSClient";
+import { isArray, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
-import { isString } from "@rtcts/utils";
+import { Repository } from "../repository/Repository";
+import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTransport";
+import { WSClient } from "../transport/ws/WSClient";
+import { FormStore } from "./FormStore";
 
 export class RepositoryFormStore<
   HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
@@ -36,6 +36,15 @@ export class RepositoryFormStore<
 
     // ! SUBSCRIPTIONS
     this.repository.on(Repository.events.removeSubmit, this.cancel);
+    this.repository.on(Repository.events.update, (entities) => {
+      if (isArray(entities) && entities.length > 0) {
+        const entity = new this.Entity(entities[0]);
+
+        if (this.isEdit && entity.isEntity()) {
+          this.change(entity);
+        }
+      }
+    });
   }
 
   protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
@@ -50,10 +59,12 @@ export class RepositoryFormStore<
     return new this.Entity({});
   }
 
-  protected async submitForm(submit: ENTITY): Promise<void> {
+  protected async submitForm(submit: ENTITY): Promise<ENTITY | void> {
     const result: ENTITY | void = await this.submitToRepository(submit);
 
     this.emit(RepositoryFormStore.events.submit, result);
+
+    return result;
   }
 
   protected async submitToRepository(submit: ENTITY): Promise<ENTITY | void> {

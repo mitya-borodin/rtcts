@@ -85,30 +85,157 @@ export class BaseHttpTransport<
     }
   }
 
-  protected async getHttpRequest(path: string, options = {}): Promise<any | void> {
-    return await this.makeHttpRequest(path, "GET", options);
+  public async downloadFile(
+    path: string,
+    body: Blob,
+    callBack: (receivedLength: number, contentLength: number) => void,
+    options = {},
+  ): Promise<void> {
+    // Шаг 1: начинаем загрузку fetch, получаем поток для чтения
+    const response = await fetch(
+      this.rootPath + path,
+      Object.assign(
+        {
+          headers: {
+            "x-ws-id": this.ws.wsid,
+          },
+          method: "PUT",
+          body,
+        },
+        options,
+      ),
+    );
+
+    if (response.body) {
+      // Вместо response.json() и других методов
+      const reader = response.body.getReader();
+
+      // Шаг 2: получаем длину содержимого ответа
+      let contentLength = 0;
+      const contentLengthHeader = response.headers.get("Content-Length");
+
+      if (contentLengthHeader) {
+        contentLength = parseInt(contentLengthHeader);
+      }
+
+      // Шаг 3: считываем данные:
+      let receivedLength = 0; // количество байт, полученных на данный момент
+      const chunks = []; // массив полученных двоичных фрагментов (составляющих тело ответа)
+
+      // Бесконечный цикл, пока идёт загрузка
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        chunks.push(value);
+        receivedLength += value.length;
+
+        console.log(`Получено ${receivedLength} из ${contentLength}`);
+
+        callBack(receivedLength, contentLength);
+      }
+
+      const blob = new Blob(chunks);
+
+      console.log(`Получение завершено.`);
+      console.log(`Получено: ${receivedLength} из ${contentLength}`);
+      console.log(`Длинна Blob: ${blob.size}, ${blob.type}`);
+      console.log(blob);
+    }
   }
 
-  protected async postHttpRequest(path: string, body?: object, options = {}): Promise<any | void> {
-    return await this.makeHttpRequest(path, "POST", body, options);
+  public async uploadFile(
+    path: string,
+    body: Blob,
+    callBack: (receivedLength: number, contentLength: number) => void,
+    options = {},
+  ): Promise<void> {
+    // Шаг 1: начинаем загрузку fetch, получаем поток для чтения
+    const response = await fetch(
+      this.rootPath + path,
+      Object.assign(
+        {
+          headers: {
+            "x-ws-id": this.ws.wsid,
+          },
+          method: "PUT",
+          body,
+        },
+        options,
+      ),
+    );
+
+    if (response.body) {
+      // Вместо response.json() и других методов
+      const reader = response.body.getReader();
+
+      // Шаг 2: получаем длину содержимого ответа
+      const size = body.size;
+
+      // Шаг 3: считываем данные:
+      let sentLength = 0; // количество байт, полученных на данный момент
+
+      // Бесконечный цикл, пока идёт загрузка
+      while (true) {
+        // done становится true в последнем фрагменте
+        // value - Uint8Array из байтов каждого фрагмента
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        sentLength += value.length;
+
+        console.log(`Отправлено ${sentLength} из ${size}`);
+
+        callBack(sentLength, size);
+      }
+
+      console.log(`Отправка завершена.`);
+      console.log(`Отправлено: ${sentLength} из ${size}`);
+    }
   }
 
-  protected async putHttpRequest(path: string, body?: object, options = {}): Promise<any | void> {
-    return await this.makeHttpRequest(path, "PUT", body, options);
+  protected async getHttpRequest(path: string, json = true, options = {}): Promise<any | void> {
+    return await this.makeHttpRequest(path, "GET", {}, json, options);
+  }
+
+  protected async postHttpRequest(
+    path: string,
+    body?: object,
+    json = true,
+    options = {},
+  ): Promise<any | void> {
+    return await this.makeHttpRequest(path, "POST", body, json, options);
+  }
+
+  protected async putHttpRequest(
+    path: string,
+    body?: object,
+    json = true,
+    options = {},
+  ): Promise<any | void> {
+    return await this.makeHttpRequest(path, "PUT", body, json, options);
   }
 
   protected async deleteHttpRequest(
     path: string,
     body?: object,
+    json = true,
     options = {},
   ): Promise<any | void> {
-    return await this.makeHttpRequest(path, "DELETE", body, options);
+    return await this.makeHttpRequest(path, "DELETE", body, json, options);
   }
 
   private async makeHttpRequest(
     path = "",
     method = "GET",
     body?: object,
+    json = true,
     options = {},
   ): Promise<any | void> {
     try {
@@ -129,7 +256,11 @@ export class BaseHttpTransport<
       );
 
       if (res.status === 200) {
-        return await res.json();
+        if (json) {
+          return await res.json();
+        }
+
+        return await res.text();
       } else if (res.status === 404) {
         console.info(`[ ${this.constructor.name} ][ path: ${this.rootPath + path} ][ NOT_FOUND ]`);
       } else {

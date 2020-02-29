@@ -29,13 +29,13 @@ export class Config {
         chalk.cyan.bold("production:    "),
         chalk.cyan(`${process.env.NODE_ENV === "production"}`),
       );
-      console.log(chalk.cyan.bold("jwt.secret_key:"), chalk.cyan(`${process.env.JWT_SECRET_KEY}`));
-      console.log(chalk.cyan.bold("db.name:       "), chalk.cyan(`${process.env.DB}`));
-      console.log(chalk.cyan.bold("db.name:       "), chalk.cyan(`${process.env.DB_URL}`));
-      console.log(chalk.cyan.bold("server.host:   "), chalk.cyan(`${process.env.SERVER_HOST}`));
-      console.log(chalk.cyan.bold("server.port:   "), chalk.cyan(`${process.env.SERVER_PORT}`));
-      console.log(chalk.cyan.bold("ws.host:       "), chalk.cyan(`${process.env.WS_HOST}`));
-      console.log(chalk.cyan.bold("ws.port:       "), chalk.cyan(`${process.env.WS_PORT}`));
+      console.log(chalk.cyan.bold("jwt.secret_key: "), chalk.cyan(`${process.env.JWT_SECRET_KEY}`));
+      console.log(chalk.cyan.bold("db.name: "), chalk.cyan(`${process.env.DB}`));
+      console.log(chalk.cyan.bold("db.name: "), chalk.cyan(`${process.env.DB_URL}`));
+      console.log(chalk.cyan.bold("server.host: "), chalk.cyan(`${process.env.SERVER_HOST}`));
+      console.log(chalk.cyan.bold("server.port: "), chalk.cyan(`${process.env.SERVER_PORT}`));
+      console.log(chalk.cyan.bold("ws.host: "), chalk.cyan(`${process.env.WS_HOST}`));
+      console.log(chalk.cyan.bold("ws.port: "), chalk.cyan(`${process.env.WS_PORT}`));
       console.log("");
     }
 

@@ -18,6 +18,9 @@ export class FormStore<
   @observable
   public form: ENTITY | undefined;
 
+  @observable
+  public inputFiles: File[] = [];
+
   protected readonly Entity: new (data?: any) => ENTITY;
 
   constructor(Entity: new (data?: any) => ENTITY) {
@@ -76,7 +79,7 @@ export class FormStore<
     }
   }
 
-  public async change(change: DATA): Promise<void> {
+  public async change(change: DATA & { inputFiles?: File[] }): Promise<void> {
     const title = `Change (${this.constructor.name}) has been`;
 
     try {
@@ -84,6 +87,16 @@ export class FormStore<
 
       if (!(this.form instanceof this.Entity)) {
         throw new Error(`tried change on closed form`);
+      }
+
+      if (change.inputFiles instanceof FileList) {
+        const files: File[] = [];
+
+        for (let i = 0; i < change.inputFiles.length; i++) {
+          files.push(change.inputFiles[i]);
+        }
+
+        this.inputFiles = files;
       }
 
       const form = await this.changeForm(this.form, change);
@@ -126,7 +139,10 @@ export class FormStore<
   public cancel(): void {
     runInAction(`Cancel (${this.constructor.name}) has been succeed`, () => {
       this.pending = false;
+      this.inputFiles = [];
       this.form = undefined;
+
+      this.removeAllListeners();
 
       this.hideValidation();
     });
@@ -160,13 +176,17 @@ export class FormStore<
     return new this.Entity({ id });
   }
 
-  protected async changeForm(form: ENTITY, change: DATA, ...args: any[]): Promise<ENTITY> {
+  protected async changeForm(
+    form: ENTITY,
+    change: DATA & { inputFiles?: File[] },
+    ...args: any[]
+  ): Promise<ENTITY> {
     console.log(`External handler for change action (${this.constructor.name})`, { change, form });
 
     return new this.Entity({ ...form.toObject(), ...change });
   }
 
-  protected async submitForm(submit: ENTITY, ...args: any[]): Promise<void> {
+  protected async submitForm(submit: ENTITY, ...args: any[]): Promise<ENTITY | void> {
     console.log(`External handler for submit action (${this.constructor.name})`, { submit });
   }
 }
