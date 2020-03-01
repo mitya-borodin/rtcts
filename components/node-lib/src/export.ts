@@ -23,6 +23,8 @@ export {
   SingleObjectHttpTransportACL,
 } from "./transport/SingleObjectHttpTransport";
 export { UserHttpTransport, UserHttpTransportACL } from "./transport/UserHttpTransport";
+export { uploadFile } from "./transport/uploadFile";
+export { downloadFile } from "./transport/downloadFile";
 
 // UTILS
 export { authenticate } from "./utils/authenticate";
