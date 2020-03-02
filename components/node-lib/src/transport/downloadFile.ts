@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { fromStream } from "file-type";
 import fs from "fs";
 import Koa from "koa";
+import path from "path";
 import { promisify } from "util";
 
 const exists = promisify(fs.exists);
@@ -17,29 +19,22 @@ export const downloadFile = async (ctx: Koa.Context, sourceFilePath: string): Pr
     ctx.throw(400, `Source file (${sourceFilePath}) is directory`);
   }
 
-  ctx.res.setHeader("Content-Length", fileStat.size);
+  const readStream = fs.createReadStream(sourceFilePath);
 
-  // ! Request
-  ctx.req.on("error", (error: Error): void => {
-    ctx.throw(500, error);
-  });
+  const fileType = await fromStream(readStream);
 
-  ctx.req.on("abort", () => {
-    ctx.throw(500, new Error("Request has been aborted by the client."));
-  });
+  if (fileType) {
+    const fileName = path.basename(sourceFilePath);
+    const fileExtension = path.extname(sourceFilePath);
+    const fileNameWithOutExt = fileName.replace(fileExtension, "");
 
-  ctx.req.on("aborted", () => {
-    ctx.throw(500, new Error("Request has been aborted."));
-  });
+    ctx.type = fileType.mime;
+    ctx.attachment(`${fileNameWithOutExt}.${fileType.ext}`);
+  } else {
+    ctx.attachment(path.basename(sourceFilePath));
+  }
 
-  // ! Response
-  ctx.res.on("error", (error: Error): void => {
-    ctx.throw(500, error);
-  });
-
-  const sourceStream = fs.createReadStream(sourceFilePath);
-
-  sourceStream.on("error", ctx.onerror);
-
-  ctx.body = sourceStream;
+  ctx.length = fileStat.size;
+  ctx.lastModified = fileStat.mtime;
+  ctx.body = readStream;
 };

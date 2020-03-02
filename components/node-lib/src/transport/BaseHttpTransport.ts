@@ -6,7 +6,6 @@ import Koa from "koa";
 import koaCompress from "koa-compress";
 import koaLogger from "koa-logger";
 import Router from "koa-router";
-import typeIs from "type-is";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { Channels } from "../webSocket/Channels";
 
@@ -61,7 +60,7 @@ export abstract class BaseHttpTransport<
         ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
         ctx.request.body = {};
 
-        if (typeIs(ctx.req, ["application/json"])) {
+        if (ctx.is("application/json")) {
           ctx.request.body = await body.json(ctx);
         }
 
