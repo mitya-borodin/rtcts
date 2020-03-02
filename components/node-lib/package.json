@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.1.29",
+  "version": "1.1.30",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -53,6 +53,7 @@
     "@types/ms": "0.7.31",
     "@types/node": "12.7.12",
     "@types/prettier": "1.19.0",
+    "@types/type-is": "1.6.3",
     "@types/uuid": "3.4.4",
     "@types/ws": "6.0.1",
     "bson": "4.0.3",
@@ -70,6 +71,7 @@
     "mongodb": "3.5.3",
     "ms": "2.1.2",
     "tslib": "1.10.0",
+    "type-is": "1.6.18",
     "uuid": "3.4.0",
     "ws": "7.2.1"
   },
