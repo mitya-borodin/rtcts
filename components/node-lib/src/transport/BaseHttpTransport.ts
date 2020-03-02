@@ -122,7 +122,7 @@ export abstract class BaseHttpTransport<
             } else {
               const message = `[ ${this.constructor.name} ][ ${URL} ][ UNEXPECTED ACTION: ${action} ]`;
 
-              ctx.throw(message, 404);
+              ctx.throw(404, message);
             }
           },
         );

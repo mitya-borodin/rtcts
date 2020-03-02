@@ -19,11 +19,11 @@ export const uploadFile = async (
   },
 ): Promise<void> => {
   if (!(await exists(destinationDirectory))) {
-    ctx.throw(`Destination directory (${destinationDirectory}) isn't exist`, 500);
+    ctx.throw(500, `Destination directory (${destinationDirectory}) isn't exist`);
   }
 
   if (await exists(path.resolve(destinationDirectory, fileName))) {
-    ctx.throw(`File (${fileName}) already exist in (${destinationDirectory})`, 500);
+    ctx.throw(500, `File (${fileName}) already exist in (${destinationDirectory})`);
   }
 
   // * Getting Headers
@@ -31,18 +31,18 @@ export const uploadFile = async (
   const mimeType = ctx.req.headers["content-type"];
 
   if (!isNumber(contentLength) || (isNumber(contentLength) && contentLength === 0)) {
-    ctx.throw(`Content-Light must be Number and more then zero`, 500);
+    ctx.throw(500, `Content-Light must be Number and more then zero`);
   }
 
   if (contentLength > config.maxFileSize) {
     ctx.throw(
-      `Content-Light (${contentLength}) more then max file size (${config.maxFileSize})`,
       413,
+      `Content-Light (${contentLength}) more then max file size (${config.maxFileSize})`,
     );
   }
 
   if (!typeIs(ctx.req, config.mimeTypes)) {
-    ctx.throw(`Mime type (${mimeType}) does not match valid values (${config.mimeTypes})`, 422);
+    ctx.throw(422, `Mime type (${mimeType}) does not match valid values (${config.mimeTypes})`);
   }
 
   return new Promise((resolve, reject) => {
@@ -68,8 +68,8 @@ export const uploadFile = async (
     sizeControllerStream.on("progress", () => {
       if (sizeControllerStream.bytes > config.maxFileSize) {
         ctx.throw(
-          `More data is received (${contentLength}) than is allowed (${config.maxFileSize})`,
           500,
+          `More data is received (${contentLength}) than is allowed (${config.maxFileSize})`,
         );
       }
     });

@@ -73,7 +73,7 @@ export class SingleObjectHttpTransport<
           } else {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ MODELS_NOT_FOUND ]`;
 
-            ctx.throw(message, 404);
+            ctx.throw(404, message);
           }
         });
       },

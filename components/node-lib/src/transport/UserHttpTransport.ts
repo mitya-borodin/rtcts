@@ -149,7 +149,7 @@ export class UserHttpTransport<
         ctx.type = "application/json";
         ctx.body = JSON.stringify(response);
       } else {
-        ctx.throw(`Current user is not available (${this.constructor.name})(${URL})`, 404);
+        ctx.throw(404, `Current user is not available (${this.constructor.name})(${URL})`);
       }
     });
   }
@@ -174,7 +174,7 @@ export class UserHttpTransport<
         } else {
           const message = `SingIn (${this.constructor.name})(${URL}) has been failed`;
 
-          ctx.throw(message, 404);
+          ctx.throw(404, message);
         }
       },
     );
@@ -198,7 +198,7 @@ export class UserHttpTransport<
       } else {
         const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
 
-        ctx.throw(message, 404);
+        ctx.throw(404, message);
       }
     });
   }
@@ -218,7 +218,7 @@ export class UserHttpTransport<
         } else {
           const message = `Create (${this.constructor.name})(${URL}) has been failed`;
 
-          ctx.throw(message, 404);
+          ctx.throw(404, message);
         }
       });
     });
@@ -264,7 +264,7 @@ export class UserHttpTransport<
           } else {
             const message = `UpdateLogin (${this.constructor.name})(${URL}) has been failed`;
 
-            ctx.throw(message, 404);
+            ctx.throw(404, message);
           }
         },
       );
@@ -294,7 +294,7 @@ export class UserHttpTransport<
           } else {
             const message = `UpdatePassword (${this.constructor.name})(${URL}) has been failed`;
 
-            ctx.throw(message, 404);
+            ctx.throw(404, message);
           }
         },
       );
@@ -318,7 +318,7 @@ export class UserHttpTransport<
           if (listResponse.results.length === 0) {
             const message = `UpdateGroup (${this.constructor.name})(${URL}) has been failed`;
 
-            ctx.throw(message, 404);
+            ctx.throw(404, message);
           }
 
           ctx.status = 200;

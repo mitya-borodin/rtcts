@@ -107,7 +107,7 @@ export class HttpTransport<
           } else {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${id} ]`;
 
-            ctx.throw(message, 404);
+            ctx.throw(404, message);
           }
         });
       },
@@ -193,7 +193,7 @@ export class HttpTransport<
             } else {
               const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${ctx.request.body.id} ]`;
 
-              ctx.throw(message, 404);
+              ctx.throw(404, message);
             }
           },
         );
