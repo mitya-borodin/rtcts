@@ -19,9 +19,7 @@ export const downloadFile = async (ctx: Koa.Context, sourceFilePath: string): Pr
     ctx.throw(400, `Source file (${sourceFilePath}) is directory`);
   }
 
-  const readStream = fs.createReadStream(sourceFilePath);
-
-  const fileType = await fromStream(readStream);
+  const fileType = await fromStream(fs.createReadStream(sourceFilePath));
 
   if (fileType) {
     const fileName = path.basename(sourceFilePath);
@@ -36,5 +34,5 @@ export const downloadFile = async (ctx: Koa.Context, sourceFilePath: string): Pr
 
   ctx.length = fileStat.size;
   ctx.lastModified = fileStat.mtime;
-  ctx.body = readStream;
+  ctx.body = fs.createReadStream(sourceFilePath);
 };
