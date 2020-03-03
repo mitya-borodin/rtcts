@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response, User, UserData, ValidateResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
-import body from "co-body";
+
 import Koa from "koa";
 import koaCompress from "koa-compress";
 import koaLogger from "koa-logger";
 import Router from "koa-router";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { Channels } from "../webSocket/Channels";
+import { getRequestBodyJson } from "../app/getRequestBodyJson";
 
 export interface BaseHttpTransportACL {
   readonly channel: string[];
@@ -56,18 +57,9 @@ export abstract class BaseHttpTransport<
     this.router.use(koaCompress());
     this.router.use(koaLogger());
     this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
-      try {
-        ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
-        ctx.request.body = {};
+      ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
 
-        if (ctx.is("application/json")) {
-          ctx.request.body = await body.json(ctx);
-        }
-
-        await next();
-      } catch (error) {
-        ctx.throw(500, error);
-      }
+      await next();
     });
 
     this.channel();
@@ -91,6 +83,7 @@ export abstract class BaseHttpTransport<
     this.router.post(
       URL,
       getAuthenticateMiddleware(),
+      getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(
           ctx,

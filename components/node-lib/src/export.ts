@@ -5,6 +5,7 @@ export {
   getAuthenticateStrategyMiddleware,
   getAuthenticateMiddleware,
 } from "./app/auth";
+export { getRequestBodyJson } from "./app/getRequestBodyJson";
 export { Config } from "./app/Config";
 export { KoaServer } from "./app/KoaServer";
 

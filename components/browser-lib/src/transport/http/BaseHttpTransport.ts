@@ -87,7 +87,6 @@ export class BaseHttpTransport<
 
   public async downloadFile(
     path: string,
-    body: Blob,
     callBack: (receivedLength: number, contentLength: number) => void,
     options = {},
   ): Promise<void> {
@@ -99,8 +98,7 @@ export class BaseHttpTransport<
           headers: {
             "x-ws-id": this.ws.wsid,
           },
-          method: "PUT",
-          body,
+          method: "GET",
         },
         options,
       ),

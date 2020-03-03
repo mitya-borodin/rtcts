@@ -11,6 +11,7 @@ import { Config } from "../app/Config";
 import { UserModel } from "../model/UserModel";
 import { Channels } from "../webSocket/Channels";
 import { HttpTransport, HttpTransportACL } from "./HttpTransport";
+import { getRequestBodyJson } from "../app/getRequestBodyJson";
 
 export interface UserHttpTransportACL extends HttpTransportACL {
   readonly updateLogin: string[];
@@ -106,6 +107,7 @@ export class UserHttpTransport<
     this.router.post(
       URL,
       getAuthenticateMiddleware(),
+      getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(
           ctx,
@@ -159,6 +161,7 @@ export class UserHttpTransport<
 
     this.router.post(
       URL,
+      getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
         const token: string | null = await this.model.signIn(ctx.request.body);
 
@@ -183,7 +186,7 @@ export class UserHttpTransport<
   protected signUp(): void {
     const URL = `${this.basePath}/signUp`;
 
-    this.router.post(URL, async (ctx: Koa.Context) => {
+    this.router.post(URL, getRequestBodyJson(), async (ctx: Koa.Context) => {
       const token: string | Response | null = await this.model.signUp(ctx.request.body);
 
       if (isString(token)) {
@@ -207,21 +210,29 @@ export class UserHttpTransport<
   protected create(): void {
     const URL = `${this.basePath}/create`;
 
-    this.router.put(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
-      await this.executor(ctx, URL, this.ACL.create, this.switchers.create, async () => {
-        const response: string | Response | null = await this.model.signUp(ctx.request.body, true);
+    this.router.put(
+      URL,
+      getAuthenticateMiddleware(),
+      getRequestBodyJson(),
+      async (ctx: Koa.Context) => {
+        await this.executor(ctx, URL, this.ACL.create, this.switchers.create, async () => {
+          const response: string | Response | null = await this.model.signUp(
+            ctx.request.body,
+            true,
+          );
 
-        if (response instanceof Response && response.result) {
-          ctx.status = 200;
-          ctx.type = "application/json";
-          ctx.body = JSON.stringify(response);
-        } else {
-          const message = `Create (${this.constructor.name})(${URL}) has been failed`;
+          if (response instanceof Response && response.result) {
+            ctx.status = 200;
+            ctx.type = "application/json";
+            ctx.body = JSON.stringify(response);
+          } else {
+            const message = `Create (${this.constructor.name})(${URL}) has been failed`;
 
-          ctx.throw(404, message);
-        }
-      });
-    });
+            ctx.throw(404, message);
+          }
+        });
+      },
+    );
   }
 
   protected signOut(): void {
@@ -244,88 +255,103 @@ export class UserHttpTransport<
   protected updateLogin(): void {
     const URL = `${this.basePath}/updateLogin`;
 
-    this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
-      await this.executor(
-        ctx,
-        URL,
-        this.ACL.updateLogin,
-        this.switchers.updateLogin,
-        async (userId: string, wsid: string) => {
-          const response: Response = await this.model.updateLoginResponse(
-            ctx.request.body,
-            userId,
-            wsid,
-          );
+    this.router.post(
+      URL,
+      getAuthenticateMiddleware(),
+      getRequestBodyJson(),
+      async (ctx: Koa.Context) => {
+        await this.executor(
+          ctx,
+          URL,
+          this.ACL.updateLogin,
+          this.switchers.updateLogin,
+          async (userId: string, wsid: string) => {
+            const response: Response = await this.model.updateLoginResponse(
+              ctx.request.body,
+              userId,
+              wsid,
+            );
 
-          if (response.result) {
-            ctx.status = 200;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(response);
-          } else {
-            const message = `UpdateLogin (${this.constructor.name})(${URL}) has been failed`;
+            if (response.result) {
+              ctx.status = 200;
+              ctx.type = "application/json";
+              ctx.body = JSON.stringify(response);
+            } else {
+              const message = `UpdateLogin (${this.constructor.name})(${URL}) has been failed`;
 
-            ctx.throw(404, message);
-          }
-        },
-      );
-    });
+              ctx.throw(404, message);
+            }
+          },
+        );
+      },
+    );
   }
 
   protected updatePassword(): void {
     const URL = `${this.basePath}/updatePassword`;
 
-    this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
-      await this.executor(
-        ctx,
-        URL,
-        this.ACL.updatePassword,
-        this.switchers.updatePassword,
-        async (userId: string, wsid: string) => {
-          const response: Response = await this.model.updatePasswordResponse(
-            ctx.request.body,
-            userId,
-            wsid,
-          );
+    this.router.post(
+      URL,
+      getAuthenticateMiddleware(),
+      getRequestBodyJson(),
+      async (ctx: Koa.Context) => {
+        await this.executor(
+          ctx,
+          URL,
+          this.ACL.updatePassword,
+          this.switchers.updatePassword,
+          async (userId: string, wsid: string) => {
+            const response: Response = await this.model.updatePasswordResponse(
+              ctx.request.body,
+              userId,
+              wsid,
+            );
 
-          if (response.result) {
-            ctx.status = 200;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(response);
-          } else {
-            const message = `UpdatePassword (${this.constructor.name})(${URL}) has been failed`;
+            if (response.result) {
+              ctx.status = 200;
+              ctx.type = "application/json";
+              ctx.body = JSON.stringify(response);
+            } else {
+              const message = `UpdatePassword (${this.constructor.name})(${URL}) has been failed`;
 
-            ctx.throw(404, message);
-          }
-        },
-      );
-    });
+              ctx.throw(404, message);
+            }
+          },
+        );
+      },
+    );
   }
 
   protected updateGroup(): void {
     const URL = `${this.basePath}/updateGroup`;
 
-    this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
-      await this.executor(
-        ctx,
-        URL,
-        this.ACL.updateGroup,
-        this.switchers.updateGroup,
-        async (userId: string, wsid: string): Promise<void> => {
-          const { ids, group } = ctx.request.body;
+    this.router.post(
+      URL,
+      getAuthenticateMiddleware(),
+      getRequestBodyJson(),
+      async (ctx: Koa.Context) => {
+        await this.executor(
+          ctx,
+          URL,
+          this.ACL.updateGroup,
+          this.switchers.updateGroup,
+          async (userId: string, wsid: string): Promise<void> => {
+            const { ids, group } = ctx.request.body;
 
-          const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
+            const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
 
-          if (listResponse.results.length === 0) {
-            const message = `UpdateGroup (${this.constructor.name})(${URL}) has been failed`;
+            if (listResponse.results.length === 0) {
+              const message = `UpdateGroup (${this.constructor.name})(${URL}) has been failed`;
 
-            ctx.throw(404, message);
-          }
+              ctx.throw(404, message);
+            }
 
-          ctx.status = 200;
-          ctx.type = "application/json";
-          ctx.body = JSON.stringify(listResponse);
-        },
-      );
-    });
+            ctx.status = 200;
+            ctx.type = "application/json";
+            ctx.body = JSON.stringify(listResponse);
+          },
+        );
+      },
+    );
   }
 }

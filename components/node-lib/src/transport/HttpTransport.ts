@@ -5,6 +5,7 @@ import { getAuthenticateMiddleware } from "../app/auth";
 import { Model } from "../model/Model";
 import { Channels } from "../webSocket/Channels";
 import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
+import { getRequestBodyJson } from "../app/getRequestBodyJson";
 
 export interface HttpTransportACL extends BaseHttpTransportACL {
   readonly getList: string[];
@@ -120,6 +121,7 @@ export class HttpTransport<
     this.router.put(
       URL,
       getAuthenticateMiddleware(),
+      getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(
           ctx,
@@ -148,6 +150,7 @@ export class HttpTransport<
     this.router.post(
       URL,
       getAuthenticateMiddleware(),
+      getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(
           ctx,
@@ -176,6 +179,7 @@ export class HttpTransport<
     this.router.delete(
       URL,
       getAuthenticateMiddleware(),
+      getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(
           ctx,

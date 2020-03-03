@@ -41,7 +41,11 @@ export const uploadFile = async (
     );
   }
 
-  if (!typeIs(ctx.req, config.mimeTypes)) {
+  if (
+    Array.isArray(config.mimeTypes) &&
+    config.mimeTypes.length > 0 &&
+    !typeIs(ctx.req, config.mimeTypes)
+  ) {
     ctx.throw(422, `Mime type (${mimeType}) does not match valid values (${config.mimeTypes})`);
   }
 

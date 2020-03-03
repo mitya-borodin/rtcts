@@ -5,6 +5,7 @@ import { getAuthenticateMiddleware } from "../app/auth";
 import { SingleObjectModel } from "../model/SingleObjectModel";
 import { Channels } from "../webSocket/Channels";
 import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
+import { getRequestBodyJson } from "../app/getRequestBodyJson";
 
 export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
   readonly getItem: string[];
@@ -86,6 +87,7 @@ export class SingleObjectHttpTransport<
     this.router.post(
       URL,
       getAuthenticateMiddleware(),
+      getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(
           ctx,
