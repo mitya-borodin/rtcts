@@ -19,20 +19,24 @@ export const downloadFile = async (ctx: Koa.Context, sourceFilePath: string): Pr
     ctx.throw(400, `Source file (${sourceFilePath}) is directory`);
   }
 
-  const fileType = await fromStream(fs.createReadStream(sourceFilePath));
+  try {
+    const fileType = await fromStream(fs.createReadStream(sourceFilePath));
 
-  if (fileType) {
-    const fileName = path.basename(sourceFilePath);
-    const fileExtension = path.extname(sourceFilePath);
-    const fileNameWithOutExt = fileName.replace(fileExtension, "");
+    if (fileType) {
+      const fileName = path.basename(sourceFilePath);
+      const fileExtension = path.extname(sourceFilePath);
+      const fileNameWithOutExt = fileName.replace(fileExtension, "");
 
-    ctx.type = fileType.mime;
-    ctx.attachment(`${fileNameWithOutExt}.${fileType.ext}`);
-  } else {
-    ctx.attachment(path.basename(sourceFilePath));
+      ctx.type = fileType.mime;
+      ctx.attachment(`${fileNameWithOutExt}.${fileType.ext}`);
+    } else {
+      ctx.attachment(path.basename(sourceFilePath));
+    }
+
+    ctx.length = fileStat.size;
+    ctx.lastModified = fileStat.mtime;
+    ctx.body = fs.createReadStream(sourceFilePath);
+  } catch (error) {
+    ctx.throw(500, error);
   }
-
-  ctx.length = fileStat.size;
-  ctx.lastModified = fileStat.mtime;
-  ctx.body = fs.createReadStream(sourceFilePath);
 };
