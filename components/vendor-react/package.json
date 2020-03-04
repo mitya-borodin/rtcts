@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.1.2",
+  "version": "1.1.3",
   "main": "index.js",
   "bin": "",
   "files": [
@@ -78,7 +78,8 @@
     "project": {
       "runtime": "browser",
       "type": "dll",
-      "unPublishedDependency": []
+      "unPublishedDependency": [],
+      "createListOfLoadOnDemandForAll": false
     },
     "distribution": {
       "publish_to_git": false
