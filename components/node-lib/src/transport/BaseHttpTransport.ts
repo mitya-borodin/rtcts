@@ -3,7 +3,7 @@ import { Response, User, UserData, ValidateResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 
 import Koa from "koa";
-import koaCompress from "koa-compress";
+// import koaCompress from "koa-compress";
 import koaLogger from "koa-logger";
 import Router from "koa-router";
 import { getAuthenticateMiddleware } from "../app/auth";
@@ -54,7 +54,7 @@ export abstract class BaseHttpTransport<
     this.root = root;
     this.webSocketIdHeaderKey = webSocketIdHeaderKey;
 
-    this.router.use(koaCompress());
+    // this.router.use(koaCompress());
     this.router.use(koaLogger());
     this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
       ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
