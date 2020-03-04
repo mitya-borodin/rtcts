@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { fromStream } from "file-type";
 import fs from "fs";
 import Koa from "koa";
-import path from "path";
 import { promisify } from "util";
 
 const exists = promisify(fs.exists);
@@ -20,19 +18,8 @@ export const downloadFile = async (ctx: Koa.Context, sourceFilePath: string): Pr
   }
 
   try {
-    const fileType = await fromStream(fs.createReadStream(sourceFilePath));
-
-    if (fileType) {
-      const fileName = path.basename(sourceFilePath);
-      const fileExtension = path.extname(sourceFilePath);
-      const fileNameWithOutExt = fileName.replace(fileExtension, "");
-
-      ctx.type = fileType.mime;
-      ctx.attachment(`${fileNameWithOutExt}.${fileType.ext}`);
-    } else {
-      ctx.attachment(path.basename(sourceFilePath));
-    }
-
+    ctx.set("Accept-Ranges", "bytes");
+    ctx.set("Cache-Control", "no-transform");
     ctx.length = fileStat.size;
     ctx.lastModified = fileStat.mtime;
     ctx.body = fs.createReadStream(sourceFilePath);
