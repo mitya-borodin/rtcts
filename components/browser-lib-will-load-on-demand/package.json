@@ -105,6 +105,7 @@
       "runtime": "browser",
       "type": "lib",
       "will_load_on_demand": true,
+      "createListOfLoadOnDemandForAll": false,
       "unPublishedDependency": []
     },
     "distribution": {

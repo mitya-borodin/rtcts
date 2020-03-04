@@ -35,7 +35,7 @@ export const downloadFile = async (ctx: Koa.Context, sourceFilePath: string): Pr
     }
 
     ctx.set("Accept-Ranges", "bytes");
-    ctx.set("Cache-Control", "no-transform");
+    ctx.set("Сache-Сontrol", "no-cache, no-store, no-transform");
     ctx.length = fileStat.size;
     ctx.lastModified = fileStat.mtime;
     ctx.etag = crypto

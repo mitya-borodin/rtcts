@@ -76,7 +76,8 @@
     "project": {
       "runtime": "browser",
       "type": "dll",
-      "unPublishedDependency": []
+      "unPublishedDependency": [],
+      "createListOfLoadOnDemandForAll": false
     },
     "distribution": {
       "publish_to_git": false

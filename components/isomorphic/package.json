@@ -111,6 +111,7 @@
       "runtime": "isomorphic",
       "type": "lib",
       "will_load_on_demand": false,
+      "createListOfLoadOnDemandForAll": false,
       "unPublishedDependency": []
     },
     "distribution": {

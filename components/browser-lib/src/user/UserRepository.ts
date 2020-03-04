@@ -51,6 +51,11 @@ export class UserRepository<
     return this.user instanceof this.Entity ? this.user.id : undefined;
   }
 
+  @computed({ name: "UserRepository.group" })
+  get group(): string | undefined {
+    return this.user instanceof this.Entity ? this.user.group : undefined;
+  }
+
   @computed({ name: "UserRepository.isAdmin" })
   get isAdmin(): boolean {
     if (this.user instanceof this.Entity) {
