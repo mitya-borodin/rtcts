@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.1.16",
+  "version": "1.1.17",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -38,11 +38,11 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@rtcts/isomorphic": "1.1.5",
-    "@rtcts/utils": "1.1.5",
-    "@rtcts/vendor-mobx": "1.1.5",
-    "@rtcts/vendor-other": "1.1.5",
-    "@rtcts/vendor-react": "1.1.5",
+    "@rtcts/isomorphic": "1.1.6",
+    "@rtcts/utils": "1.1.6",
+    "@rtcts/vendor-mobx": "1.1.6",
+    "@rtcts/vendor-other": "1.1.6",
+    "@rtcts/vendor-react": "1.1.6",
     "eventemitter3": "4.0.0",
     "tslib": "1.11.1"
   },
