@@ -92,4 +92,4 @@ lib
 src/typings.d.ts
 rearguard-dev.json
 examples
-list_for_load_on_demand.ts
+listOfModulesWhichLoadOnDemand.ts

@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code/issues"
   },
-  "version": "1.1.3",
+  "version": "1.1.5",
   "main": "index.js",
   "bin": "",
   "files": [
@@ -25,30 +25,30 @@
   },
   "types": "",
   "dependencies": {
-    "@rtcts/vendor-react": "1.1.3",
+    "@rtcts/vendor-react": "1.1.5",
     "mobx": "5.15.4",
     "mobx-react": "6.1.7",
     "mobx-utils": "5.5.3",
-    "tslib": "1.10.0"
+    "tslib": "1.11.1"
   },
   "devDependencies": {
     "@types/eslint": "6.1.8",
     "@types/prettier": "1.19.0",
     "@types/stylelint": "9.10.1",
-    "@typescript-eslint/eslint-plugin": "2.20.0",
-    "@typescript-eslint/parser": "2.20.0",
+    "@typescript-eslint/eslint-plugin": "2.23.0",
+    "@typescript-eslint/parser": "2.23.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
-    "eslint-plugin-react": "7.18.3",
+    "eslint-plugin-react": "7.19.0",
     "husky": "4.2.3",
     "normalize.css": "8.0.1",
     "prettier": "1.19.1",
     "pretty-quick": "2.0.1",
-    "stylelint": "13.2.0",
+    "stylelint": "13.2.1",
     "stylelint-config-css-modules": "2.2.0",
     "stylelint-config-prettier": "8.0.1",
     "stylelint-config-standard": "20.0.0",
-    "typescript": "3.7.5"
+    "typescript": "3.8.3"
   },
   "keywords": [],
   "engines": {
@@ -71,13 +71,18 @@
   "rearguard": {
     "webpack": {
       "context": "src",
-      "dll_entry": "vendor-mobx.ts"
+      "dll_entry": "vendor-mobx.ts",
+      "output": {
+        "path": "dist",
+        "publicPath": "/",
+        "libraryTarget": "system"
+      }
     },
     "project": {
       "runtime": "browser",
       "type": "dll",
       "unPublishedDependency": [],
-      "createListOfLoadOnDemandForAll": false
+      "buildListOfLoadOnDemandModulesForAll": false
     },
     "distribution": {
       "publish_to_git": false

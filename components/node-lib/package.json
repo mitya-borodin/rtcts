@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.1.36",
+  "version": "1.1.38",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -36,8 +36,9 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@rtcts/isomorphic": "1.1.3",
-    "@rtcts/utils": "1.1.3",
+    "@rtcts/isomorphic": "1.1.5",
+    "@rtcts/utils": "1.1.5",
+    "@rtcts/vendor-other": "1.1.5",
     "@types/bson": "1.0.11",
     "@types/chai": "4.1.7",
     "@types/co-body": "0.0.3",
@@ -70,14 +71,14 @@
     "moment": "2.24.0",
     "mongodb": "3.5.3",
     "ms": "2.1.2",
-    "tslib": "1.10.0",
+    "tslib": "1.11.1",
     "type-is": "1.6.18",
     "uuid": "3.4.0",
     "ws": "7.2.1"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "2.20.0",
-    "@typescript-eslint/parser": "2.20.0",
+    "@typescript-eslint/eslint-plugin": "2.23.0",
+    "@typescript-eslint/parser": "2.23.0",
     "chai": "4.2.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
@@ -86,7 +87,7 @@
     "nyc": "14.1.1",
     "prettier": "1.19.1",
     "pretty-quick": "2.0.1",
-    "typescript": "3.7.5"
+    "typescript": "3.8.3"
   },
   "keywords": [],
   "engines": {
@@ -111,16 +112,16 @@
       "runtime": "node",
       "type": "lib",
       "unPublishedDependency": [],
-      "createListOfLoadOnDemandForAll": false
-    },
-    "distribution": {
-      "publish_to_git": false
+      "buildListOfLoadOnDemandModulesForAll": false
     },
     "configs": {
       "noOverwriteTSConfig": false,
       "noOverwriteTSTestConfig": false,
       "noOverwriteLintConfig": false,
       "noOverwriteGitIgnore": false
+    },
+    "distribution": {
+      "publish_to_git": false
     }
   }
 }

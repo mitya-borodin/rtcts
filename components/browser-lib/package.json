@@ -12,7 +12,7 @@
     "email": "dmitriy@borodin.site",
     "url": "https://gitlab.com/mitya-borodin/base-code"
   },
-  "version": "1.1.14",
+  "version": "1.1.16",
   "main": "./lib/export.js",
   "bin": "",
   "files": [
@@ -38,12 +38,13 @@
   },
   "types": "./lib/export.d.ts",
   "dependencies": {
-    "@rtcts/isomorphic": "1.1.3",
-    "@rtcts/utils": "1.1.3",
-    "@rtcts/vendor-mobx": "1.1.3",
-    "@rtcts/vendor-react": "1.1.3",
+    "@rtcts/isomorphic": "1.1.5",
+    "@rtcts/utils": "1.1.5",
+    "@rtcts/vendor-mobx": "1.1.5",
+    "@rtcts/vendor-other": "1.1.5",
+    "@rtcts/vendor-react": "1.1.5",
     "eventemitter3": "4.0.0",
-    "tslib": "1.10.0"
+    "tslib": "1.11.1"
   },
   "devDependencies": {
     "@types/chai": "4.1.7",
@@ -57,25 +58,25 @@
     "@types/react": "16.9.5",
     "@types/react-dom": "16.9.1",
     "@types/stylelint": "9.10.1",
-    "@typescript-eslint/eslint-plugin": "2.20.0",
-    "@typescript-eslint/parser": "2.20.0",
+    "@typescript-eslint/eslint-plugin": "2.23.0",
+    "@typescript-eslint/parser": "2.23.0",
     "chai": "4.2.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
-    "eslint-plugin-react": "7.18.3",
+    "eslint-plugin-react": "7.19.0",
     "husky": "4.2.3",
     "mocha": "6.1.4",
     "normalize.css": "8.0.1",
     "prettier": "1.19.1",
     "pretty-quick": "2.0.1",
-    "stylelint": "13.2.0",
+    "stylelint": "13.2.1",
     "stylelint-config-css-modules": "2.2.0",
     "stylelint-config-prettier": "8.0.1",
     "stylelint-config-standard": "20.0.0",
     "ts-node": "8.1.0",
     "ts-node-dev": "1.0.0-pre.32",
     "tslint": "5.14.0",
-    "typescript": "3.7.5"
+    "typescript": "3.8.3"
   },
   "keywords": [],
   "engines": {
@@ -106,18 +107,23 @@
       ],
       "output": {
         "path": "dist",
-        "publicPath": "/"
+        "publicPath": "/",
+        "libraryTarget": "var"
       }
+    },
+    "html": {
+      "noInjectAssets": false
+    },
+    "css": {
+      "postcssPlugins": "postcss.config.js",
+      "useOnlyIsomorphicStyleLoader": false
     },
     "project": {
       "runtime": "browser",
       "type": "lib",
-      "will_load_on_demand": false,
-      "createListOfLoadOnDemandForAll": false,
+      "thisModuleWillLoadOnDemand": false,
+      "buildListOfLoadOnDemandModulesForAll": false,
       "unPublishedDependency": []
-    },
-    "distribution": {
-      "publish_to_git": false
     },
     "configs": {
       "noOverwriteTSConfig": false,
@@ -125,9 +131,8 @@
       "noOverwriteLintConfig": false,
       "noOverwriteGitIgnore": false
     },
-    "css": {
-      "postcssPlugins": "postcss.config.js",
-      "useOnlyIsomorphicStyleLoader": false
+    "distribution": {
+      "publish_to_git": false
     }
   }
 }

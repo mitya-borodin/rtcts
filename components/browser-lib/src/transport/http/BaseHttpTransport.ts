@@ -118,7 +118,7 @@ export class BaseHttpTransport<
 
       // Шаг 3: считываем данные:
       let receivedLength = 0; // количество байт, полученных на данный момент
-      const chunks = []; // массив полученных двоичных фрагментов (составляющих тело ответа)
+      const chunks: Uint8Array[] = []; // массив полученных двоичных фрагментов (составляющих тело ответа)
 
       // Бесконечный цикл, пока идёт загрузка
       while (true) {
@@ -128,8 +128,10 @@ export class BaseHttpTransport<
           break;
         }
 
-        chunks.push(value);
-        receivedLength += value.length;
+        if (value) {
+          chunks.push(value);
+          receivedLength += value.length;
+        }
 
         console.log(`Получено ${receivedLength} из ${contentLength}`);
 
@@ -186,7 +188,9 @@ export class BaseHttpTransport<
           break;
         }
 
-        sentLength += value.length;
+        if (value) {
+          sentLength += value.length;
+        }
 
         console.log(`Отправлено ${sentLength} из ${size}`);
 
