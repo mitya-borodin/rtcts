@@ -23,49 +23,22 @@
   "eslint.enable": true,
   "eslint.packageManager": "npm",
   "eslint.workingDirectories": [
-    {
-      "directory": "./components/vendor-react",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/vendor-other",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/browser-lib-will-load-on-demand",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/vendor-mobx",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/vendor-antd",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/utils",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/isomorphic",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/node-lib",
-      "changeProcessCWD": true
-    },
-    {
-      "directory": "./components/browser-lib",
-      "changeProcessCWD": true
-    }
+    { "directory": "./components/vendor-react", "changeProcessCWD": true },
+    { "directory": "./components/vendor-other", "changeProcessCWD": true },
+    { "directory": "./components/browser-lib-will-load-on-demand", "changeProcessCWD": true },
+    { "directory": "./components/vendor-mobx", "changeProcessCWD": true },
+    { "directory": "./components/vendor-antd", "changeProcessCWD": true },
+    { "directory": "./components/utils", "changeProcessCWD": true },
+    { "directory": "./components/isomorphic", "changeProcessCWD": true },
+    { "directory": "./components/node-lib", "changeProcessCWD": true },
+    { "directory": "./components/browser-lib", "changeProcessCWD": true }
   ],
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
   "npm.enableScriptExplorer": false,
-  "workbench.colorTheme": "Darcula - WebStorm Edition",
-  "workbench.iconTheme": "vscode-icons",
+  "workbench.colorTheme": "One Dark Pro",
+  "workbench.iconTheme": "material-icon-theme",
   "workbench.editor.revealIfOpen": true,
   "vsicons.dontShowNewVersionMessage": true,
   "cSpell.words": ["rtcts"],
