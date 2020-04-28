@@ -14,6 +14,4 @@ export function getAttribute(attr: string, element: any): string | null {
       return getAttribute(attr, parentElement);
     }
   }
-
-  return null;
 }
