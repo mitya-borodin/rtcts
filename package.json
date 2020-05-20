@@ -16,7 +16,6 @@
   "scripts": {
     "bootstrap": "rearguard group bootstrap",
     "clear": "rearguard group clear",
-    "install": "rearguard group install",
     "link": "rearguard group link",
     "lint": "rearguard group lint",
     "start": "rearguard group start",
@@ -32,7 +31,7 @@
     "sync": "rearguard group sync"
   },
   "devDependencies": {
-    "husky": "^4.2.1"
+    "husky": "4.2.5"
   },
   "keywords": [],
   "engines": {
@@ -40,15 +39,13 @@
     "npm": ">=6 <7"
   },
   "husky": {
-    "hooks": {
-      "pre-push": "npm run validate"
-    }
+    "pre-push": "npm run validate"
   },
   "rearguard": {
     "project": {
       "type": "mono",
       "components": [
-        "components"
+        "packages"
       ]
     }
   }
