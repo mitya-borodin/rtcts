@@ -33,28 +33,13 @@
     "hoist-non-react-statics": "3.3.2",
     "isomorphic-style-loader": "5.1.0",
     "moment": "2.24.0",
+    "normalize.css": "8.0.1",
     "numeral": "2.0.6",
-    "react-helmet": "6.0.0",
-    "tslib": "2.0.0"
+    "react-helmet": "6.0.0"
   },
   "devDependencies": {
-    "@types/eslint": "6.1.8",
-    "@types/prettier": "1.19.0",
     "@types/react-helmet": "6.0.0",
-    "@types/stylelint": "9.10.1",
-    "@typescript-eslint/eslint-plugin": "2.34.0",
-    "@typescript-eslint/parser": "2.34.0",
-    "eslint": "7.0.0",
-    "eslint-config-prettier": "6.11.0",
-    "eslint-plugin-react": "7.20.0",
-    "husky": "4.2.5",
-    "normalize.css": "8.0.1",
-    "prettier": "2.0.5",
-    "pretty-quick": "2.0.1",
-    "stylelint": "13.5.0",
-    "stylelint-config-css-modules": "2.2.0",
-    "stylelint-config-prettier": "8.0.1",
-    "stylelint-config-standard": "20.0.0",
+    "tslib": "2.0.0",
     "typescript": "3.9.3"
   },
   "keywords": [],
@@ -69,12 +54,6 @@
   "browserslist": [
     "last 2 versions"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged",
-      "pre-push": "npm run validate"
-    }
-  },
   "rearguard": {
     "webpack": {
       "context": "src",

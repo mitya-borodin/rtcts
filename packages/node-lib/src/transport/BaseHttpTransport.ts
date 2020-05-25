@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response, User, UserData, ValidateResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
-
 import Koa from "koa";
 // import koaCompress from "koa-compress";
 import koaLogger from "koa-logger";
 import Router from "koa-router";
 import { getAuthenticateMiddleware } from "../app/auth";
-import { Channels } from "../webSocket/Channels";
 import { getRequestBodyJson } from "../app/getRequestBodyJson";
+import { Channels } from "../webSocket/Channels";
 
 export interface BaseHttpTransportACL {
   readonly channel: string[];
@@ -90,7 +89,7 @@ export abstract class BaseHttpTransport<
           URL,
           this.ACL.channel,
           this.switchers.channel,
-          async (userId: string, wsid: string) => {
+          (userId: string, wsid: string) => {
             const { action, channelName } = ctx.request.body;
 
             if (action === "on") {
@@ -127,7 +126,7 @@ export abstract class BaseHttpTransport<
     URL: string,
     ACL: string[],
     switcher: boolean,
-    worker: (userId: string, wsid: string) => Promise<void>,
+    worker: (userId: string, wsid: string) => Promise<void> | void,
   ): Promise<void> {
     if (switcher) {
       try {

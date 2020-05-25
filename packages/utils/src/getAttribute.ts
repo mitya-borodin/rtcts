@@ -1,6 +1,6 @@
 import { isString } from "./isType";
 
-export function getAttribute(attr: string, element: any): string | null {
+export function getAttribute(attr: string, element: HTMLElement): string | null {
   const result = element.getAttribute(attr);
 
   if (isString(result)) {

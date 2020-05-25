@@ -124,11 +124,11 @@ export class Connection {
     return false;
   }
 
-  public close(message?: string): void {
+  public close(message = ""): void {
     try {
       this.ws.removeEventListener("pong", this.heartbeat);
       this.ws.removeAllListeners();
-      this.ws.close(1000, "[ CLOSE ] " + message);
+      this.ws.close(1000, `[ CLOSE ] ${message}`);
 
       console.log(
         chalk.white(`[ CONNECTION ][ the connection was closed with a message: ${message} ]`),

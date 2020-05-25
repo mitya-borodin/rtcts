@@ -28,26 +28,10 @@
     "@rtcts/vendor-react": "1.1.6",
     "mobx": "5.15.4",
     "mobx-react": "6.1.7",
-    "mobx-utils": "5.5.3",
-    "tslib": "2.0.0"
+    "mobx-utils": "5.5.3"
   },
   "devDependencies": {
-    "@types/eslint": "6.1.8",
-    "@types/prettier": "1.19.0",
-    "@types/stylelint": "9.10.1",
-    "@typescript-eslint/eslint-plugin": "2.34.0",
-    "@typescript-eslint/parser": "2.34.0",
-    "eslint": "7.0.0",
-    "eslint-config-prettier": "6.11.0",
-    "eslint-plugin-react": "7.20.0",
-    "husky": "4.2.5",
-    "normalize.css": "8.0.1",
-    "prettier": "2.0.5",
-    "pretty-quick": "2.0.1",
-    "stylelint": "13.5.0",
-    "stylelint-config-css-modules": "2.2.0",
-    "stylelint-config-prettier": "8.0.1",
-    "stylelint-config-standard": "20.0.0",
+    "tslib": "2.0.0",
     "typescript": "3.9.3"
   },
   "keywords": [],
@@ -62,12 +46,6 @@
   "browserslist": [
     "last 2 versions"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged",
-      "pre-push": "npm run validate"
-    }
-  },
   "rearguard": {
     "webpack": {
       "context": "src",

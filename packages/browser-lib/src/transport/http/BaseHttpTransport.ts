@@ -121,6 +121,7 @@ export class BaseHttpTransport<
       const chunks: Uint8Array[] = []; // массив полученных двоичных фрагментов (составляющих тело ответа)
 
       // Бесконечный цикл, пока идёт загрузка
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
 
@@ -179,6 +180,7 @@ export class BaseHttpTransport<
       let sentLength = 0; // количество байт, полученных на данный момент
 
       // Бесконечный цикл, пока идёт загрузка
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         // done становится true в последнем фрагменте
         // value - Uint8Array из байтов каждого фрагмента

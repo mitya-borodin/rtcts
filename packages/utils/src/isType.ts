@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 export function isString<T = string>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object String]";
 }
@@ -16,7 +21,7 @@ export function isUndefined<T = undefined | null | void>(test: any): test is T {
   return result === "[object Undefined]" || result === "[object Null]";
 }
 
-export function isObject<T = object>(test: any): test is T {
+export function isObject<T = { [key: string]: any }>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Object]";
 }
 
@@ -32,8 +37,5 @@ export function isDate<T = Date>(test: any): test is T {
 }
 
 export function isArray<T>(test: any): test is T[] {
-  return (
-    Object.prototype.toString.call(test) === "[object Array]" ||
-    (test && isNumber(test.length) && isFunction(test.map))
-  );
+  return Array.isArray(test) || (test && isNumber(test.length) && isFunction(test.map));
 }

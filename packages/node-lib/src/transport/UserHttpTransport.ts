@@ -138,7 +138,7 @@ export class UserHttpTransport<
   protected current(): void {
     const URL = `${this.basePath}/current`;
 
-    this.router.get(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
+    this.router.get(URL, getAuthenticateMiddleware(), (ctx: Koa.Context) => {
       const user = new this.Entity(ctx.request.user);
 
       if (user.isEntity()) {
@@ -239,7 +239,7 @@ export class UserHttpTransport<
     const URL = `${this.basePath}/signOut`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
-      await this.executor(ctx, URL, this.ACL.signOut, this.switchers.signOut, async () => {
+      await this.executor(ctx, URL, this.ACL.signOut, this.switchers.signOut, (): void => {
         unsetCookieForAuthenticate(ctx);
 
         ctx.status = 200;

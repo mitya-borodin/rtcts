@@ -1,6 +1,6 @@
 import { isString, isUndefined } from "./isType";
 
-export function getErrorMessage(error: any): string {
+export function getErrorMessage(error?: Error | string): string {
   const message = "error message not found";
 
   if (isUndefined(error)) {
@@ -11,7 +11,7 @@ export function getErrorMessage(error: any): string {
     return error;
   }
 
-  if (error instanceof Error || isString(error.message)) {
+  if (error instanceof Error) {
     return error.message;
   }
 

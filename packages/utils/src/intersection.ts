@@ -1,7 +1,12 @@
-import { Moment } from "moment";
+import moment from "moment";
 import { overlaps } from "./overlaps";
 
-function makeLength(big_0: Moment, big_1: Moment, small_0: Moment, small_1: Moment): number {
+function makeLength(
+  big_0: moment.Moment,
+  big_1: moment.Moment,
+  small_0: moment.Moment,
+  small_1: moment.Moment,
+): number {
   if (small_0.isSameOrAfter(big_0) && small_0.isBefore(big_1)) {
     return big_1.diff(small_0, "minutes");
   }
@@ -17,7 +22,12 @@ function makeLength(big_0: Moment, big_1: Moment, small_0: Moment, small_1: Mome
   return 0;
 }
 
-export function intersection(x_0: Moment, x_1: Moment, y_0: Moment, y_1: Moment): number {
+export function intersection(
+  x_0: moment.Moment,
+  x_1: moment.Moment,
+  y_0: moment.Moment,
+  y_1: moment.Moment,
+): number {
   if (overlaps(x_0, x_1, y_0, y_1)) {
     if (Math.abs(x_0.diff(x_1, "ms")) > Math.abs(y_0.diff(y_1, "ms"))) {
       return Math.abs(makeLength(x_0, x_1, y_0, y_1));

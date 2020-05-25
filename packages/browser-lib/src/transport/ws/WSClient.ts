@@ -99,11 +99,11 @@ export class WSClient extends EventEmitter {
           resolve();
         };
 
-        this.connection.onclose = (event: CloseEvent): void => {
+        this.connection.onclose = async (event: CloseEvent): Promise<void> => {
           this.emit(wsEventEnum.CLOSE, {});
 
           if (event.code !== 1000) {
-            this.reconnect();
+            await this.reconnect();
           }
 
           console.warn(event);
@@ -335,7 +335,7 @@ export class WSClient extends EventEmitter {
 
             this.connection.close(1000, "The server does not respond on PONG_CHANNEL.");
           } else {
-            this.reconnect();
+            await this.reconnect();
           }
         }
       }, this.pingPongDelay);

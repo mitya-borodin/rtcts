@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ListResponse,
@@ -172,7 +171,7 @@ export class UserModel<
   // ! Model API
 
   public async getUsers(offset = 0, limit = 20): Promise<ENTITY[]> {
-    return await await this.repository.find({}, offset, limit);
+    return await this.repository.find({}, offset, limit);
   }
 
   public async getUserById(id: string): Promise<ENTITY | null> {

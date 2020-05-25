@@ -1,16 +1,21 @@
 /* eslint-disable prefer-rest-params */
-import { Moment } from "moment";
+import moment from "moment";
 import { isBoolean } from "./isType";
 
 export function overlaps(
-  x_0: Moment,
-  x_1: Moment,
-  y_0: Moment,
-  y_1: Moment,
+  x_0: moment.Moment,
+  x_1: moment.Moment,
+  y_0: moment.Moment,
+  y_1: moment.Moment,
   a_includeLeftBoundary?: boolean,
   a_includeRightBoundary?: boolean,
 ): boolean;
-export function overlaps(x_0: Moment, x_1: Moment, y_0: Moment, y_1: Moment): boolean {
+export function overlaps(
+  x_0: moment.Moment,
+  x_1: moment.Moment,
+  y_0: moment.Moment,
+  y_1: moment.Moment,
+): boolean {
   let includeBoundary = false;
   let includeLeftBoundary = false;
   let includeRightBoundary = false;
@@ -23,7 +28,7 @@ export function overlaps(x_0: Moment, x_1: Moment, y_0: Moment, y_1: Moment): bo
 
   if (arguments.length === 6) {
     includeLeftBoundary = isBoolean(arguments[4]) ? arguments[4] : false;
-    includeRightBoundary = isBoolean(arguments[5]) ? arguments[4] : false;
+    includeRightBoundary = isBoolean(arguments[5]) ? arguments[5] : false;
     includeBoundary = includeLeftBoundary || includeRightBoundary;
   }
 

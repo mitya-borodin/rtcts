@@ -1,32 +1,53 @@
 {
   "parser": "@typescript-eslint/parser",
-  "extends": [
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "eslint-config-prettier"
-  ],
   "parserOptions": {
-    "ecmaVersion": 2018, // Allows for the parsing of modern ECMAScript features
+    "project": "./tsconfig.json",
+    "ecmaVersion": 2020, // Allows for the parsing of modern ECMAScript features
     "sourceType": "module", // Allows for the use of imports
     "ecmaFeatures": {
       "jsx": true // Allows for the parsing of JSX
     }
   },
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": [
+    "@typescript-eslint",
+    /* "eslint-plugin-import", */
+    "eslint-plugin-react",
+    "eslint-plugin-react-hooks",
+    "eslint-plugin-jest"
+  ],
+  "extends": [
+    "eslint:recommended",
+    /* "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript", */
+    "plugin:react/recommended",
+    "plugin:jest/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier",
+    "prettier/@typescript-eslint",
+    "prettier/react"
+  ],
+
   "rules": {
-    "no-unused-vars": "warn",
-    "no-use-before-define": "warn",
-    "no-console": "off",
-    "variable-name": "off",
     "object-literal-sort-keys": "off",
-    "@typescript-eslint/interface-name-prefix": "warn",
-    "@typescript-eslint/no-use-before-define": "warn",
-    "@typescript-eslint/camelcase": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "no-unused-expressions": "error",
+    "no-console": "off",
+    "no-unused-vars": "warn",
+    "no-unused-expressions": "warn",
+    "no-use-before-define": "warn",
+    "no-async-promise-executor": "warn",
     "no-underscore-dangle": ["warn", { "enforceInMethodNames": true }],
-    "react/display-name": "warn",
-    "react/prop-types": "off"
+    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unsafe-member-access": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-unsafe-return": "warn",
+    "@typescript-eslint/no-unsafe-call": "warn",
+    "@typescript-eslint/ban-types": "warn",
+    "@typescript-eslint/unbound-method": "warn",
+    "@typescript-eslint/no-misused-promises": "warn",
+    "@typescript-eslint/restrict-template-expressions": ["warn", { "allowAny": true }]
   },
   "settings": {
     "react": {

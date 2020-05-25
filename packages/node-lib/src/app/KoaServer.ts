@@ -60,7 +60,7 @@ export class KoaServer {
     }
   }
 
-  public async stop(): Promise<void> {
+  public stop(): void {
     if (this.httpServer) {
       this.httpServer.close();
     }
