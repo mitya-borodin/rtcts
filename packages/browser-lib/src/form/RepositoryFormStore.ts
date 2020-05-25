@@ -38,6 +38,7 @@ export class RepositoryFormStore<
     this.repository.on(Repository.events.removeSubmit, this.cancel);
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
     if (isString(id) && id.length > 0) {
       const entity: ENTITY | void = this.repository.map.get(id);

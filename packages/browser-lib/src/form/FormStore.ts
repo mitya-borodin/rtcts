@@ -170,12 +170,14 @@ export class FormStore<
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
     console.log(`External handler for open action (${this.constructor.name})`, { id });
 
     return new this.Entity({ id });
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   protected async changeForm(
     form: ENTITY,
     change: DATA & { inputFiles?: File[] },
@@ -186,6 +188,7 @@ export class FormStore<
     return new this.Entity({ ...form.toObject(), ...change });
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   protected async submitForm(submit: ENTITY, ...args: any[]): Promise<ENTITY | void> {
     console.log(`External handler for submit action (${this.constructor.name})`, { submit });
   }

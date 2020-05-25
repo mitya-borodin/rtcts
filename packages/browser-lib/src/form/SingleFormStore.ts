@@ -29,6 +29,7 @@ export class SingleFormStore<
     this.submitForm = this.submitForm.bind(this);
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   protected async openForm(): Promise<ENTITY> {
     if (this.repository.entity instanceof this.Entity) {
       return new this.Entity(this.repository.entity.toObject());

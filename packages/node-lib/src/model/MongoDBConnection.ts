@@ -32,7 +32,7 @@ export class MongoDBConnection extends EventEmitter {
     return this.constructor.name;
   }
 
-  public async connect(): Promise<void> {
+  public connect(): void {
     if (this.status === Status.CLOSED) {
       console.log("");
       console.log(
@@ -44,7 +44,7 @@ export class MongoDBConnection extends EventEmitter {
       this.status = Status.CONNECTING;
 
       try {
-        this.client = await MongoClient.connect(this.config.db.url, {
+        this.client = MongoClient.connect(this.config.db.url, {
           useNewUrlParser: true,
           useUnifiedTopology: true,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,7 +75,7 @@ export class MongoDBConnection extends EventEmitter {
             clearInterval(this.pingTimer);
 
             await this.disconnect();
-            await this.connect();
+            this.connect();
           }
         }, 1000);
       } catch (error) {
@@ -160,7 +160,7 @@ export class MongoDBConnection extends EventEmitter {
             }
           });
 
-          await this.connect();
+          this.connect();
         }
       } catch (error) {
         console.error(`[ ${this.name} ][ getDB ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
