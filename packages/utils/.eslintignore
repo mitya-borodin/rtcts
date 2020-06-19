@@ -3,9 +3,5 @@ node_modules
 # don't lint nyc coverage output
 coverage
 
-dll_bundle
-lib_bundle
-lib
 dist
-src/typings.d.ts
-examples
+node_modules

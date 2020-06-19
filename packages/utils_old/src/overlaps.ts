@@ -1,16 +1,21 @@
 /* eslint-disable prefer-rest-params */
-import { Moment } from "moment";
+import moment from "moment";
 import { isBoolean } from "./isType";
 
 export function overlaps(
-  x0: Moment,
-  x1: Moment,
-  y0: Moment,
-  y1: Moment,
-  argIncludeLeftBoundary?: boolean,
-  argIncludeRightBoundary?: boolean,
+  x_0: moment.Moment,
+  x_1: moment.Moment,
+  y_0: moment.Moment,
+  y_1: moment.Moment,
+  a_includeLeftBoundary?: boolean,
+  a_includeRightBoundary?: boolean,
 ): boolean;
-export function overlaps(x0: Moment, x1: Moment, y0: Moment, y1: Moment): boolean {
+export function overlaps(
+  x_0: moment.Moment,
+  x_1: moment.Moment,
+  y_0: moment.Moment,
+  y_1: moment.Moment,
+): boolean {
   let includeBoundary = false;
   let includeLeftBoundary = false;
   let includeRightBoundary = false;
@@ -28,67 +33,67 @@ export function overlaps(x0: Moment, x1: Moment, y0: Moment, y1: Moment): boolea
   }
 
   // Частный случа, когда временные отрезки одинаковы
-  if (x0.isSame(y0) && x1.isSame(y1)) {
+  if (x_0.isSame(y_0) && x_1.isSame(y_1)) {
     return true;
   }
 
-  if (Math.abs(x0.diff(x1, "ms")) > Math.abs(y0.diff(y1, "ms"))) {
+  if (Math.abs(x_0.diff(x_1, "ms")) > Math.abs(y_0.diff(y_1, "ms"))) {
     if (includeBoundary) {
       if (includeLeftBoundary) {
-        if (y0.isSameOrAfter(x0) && y0.isSameOrBefore(x1)) {
+        if (y_0.isSameOrAfter(x_0) && y_0.isSameOrBefore(x_1)) {
           return true;
         }
       } else {
-        if (y0.isAfter(x0) && y0.isBefore(x1)) {
+        if (y_0.isAfter(x_0) && y_0.isBefore(x_1)) {
           return true;
         }
       }
 
       if (includeRightBoundary) {
-        if (y1.isSameOrAfter(x0) && y1.isSameOrBefore(x1)) {
+        if (y_1.isSameOrAfter(x_0) && y_1.isSameOrBefore(x_1)) {
           return true;
         }
       } else {
-        if (y1.isAfter(x0) && y1.isBefore(x1)) {
+        if (y_1.isAfter(x_0) && y_1.isBefore(x_1)) {
           return true;
         }
       }
     } else {
-      if (y0.isAfter(x0) && y0.isBefore(x1)) {
+      if (y_0.isAfter(x_0) && y_0.isBefore(x_1)) {
         return true;
       }
 
-      if (y1.isAfter(x0) && y1.isBefore(x1)) {
+      if (y_1.isAfter(x_0) && y_1.isBefore(x_1)) {
         return true;
       }
     }
   } else {
     if (includeBoundary) {
       if (includeLeftBoundary) {
-        if (x0.isSameOrAfter(y0) && x0.isSameOrBefore(y1)) {
+        if (x_0.isSameOrAfter(y_0) && x_0.isSameOrBefore(y_1)) {
           return true;
         }
       } else {
-        if (x0.isAfter(y0) && x0.isBefore(y1)) {
+        if (x_0.isAfter(y_0) && x_0.isBefore(y_1)) {
           return true;
         }
       }
 
       if (includeRightBoundary) {
-        if (x1.isSameOrAfter(y0) && x1.isSameOrBefore(y1)) {
+        if (x_1.isSameOrAfter(y_0) && x_1.isSameOrBefore(y_1)) {
           return true;
         }
       } else {
-        if (x1.isAfter(y0) && x1.isBefore(y1)) {
+        if (x_1.isAfter(y_0) && x_1.isBefore(y_1)) {
           return true;
         }
       }
     } else {
-      if (x0.isAfter(y0) && x0.isBefore(y1)) {
+      if (x_0.isAfter(y_0) && x_0.isBefore(y_1)) {
         return true;
       }
 
-      if (x1.isAfter(y0) && x1.isBefore(y1)) {
+      if (x_1.isAfter(y_0) && x_1.isBefore(y_1)) {
         return true;
       }
     }

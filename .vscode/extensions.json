@@ -1,11 +1,8 @@
 {
   "recommendations": [
-    "formulahendry.auto-close-tag",
-    "formulahendry.auto-rename-tag",
+    "svelte.svelte-vscode",
     "aaron-bond.better-comments",
     "streetsidesoftware.code-spell-checker",
-    "clinyong.vscode-css-modules",
-    "andrewleedham.vscode-css-modules",
     "ms-azuretools.vscode-docker",
     "mikestead.dotenv",
     "editorconfig.editorconfig",
@@ -13,6 +10,7 @@
     "eamodio.gitlens",
     "yzhang.markdown-all-in-one",
     "davidanson.vscode-markdownlint",
+    "pkief.material-icon-theme",
     "eg2.vscode-npm-script",
     "christian-kohler.npm-intellisense",
     "zhuangtongfa.material-theme",
@@ -29,6 +27,4 @@
     "hookyqr.beautify",
     "dbaeumer.jshint"
   ]
-}
-
 }

@@ -1,38 +1,28 @@
-import moment from "moment";
+import { Moment } from "moment";
 import { overlaps } from "./overlaps";
 
-function makeLength(
-  big_0: moment.Moment,
-  big_1: moment.Moment,
-  small_0: moment.Moment,
-  small_1: moment.Moment,
-): number {
-  if (small_0.isSameOrAfter(big_0) && small_0.isBefore(big_1)) {
-    return big_1.diff(small_0, "minutes");
+function makeLength(bigZero: Moment, bigOne: Moment, smallZero: Moment, smallOne: Moment): number {
+  if (smallZero.isSameOrAfter(bigZero) && smallZero.isBefore(bigOne)) {
+    return bigOne.diff(smallZero, "minutes");
   }
 
-  if (small_0.isBefore(big_0) && small_1.isAfter(big_0) && small_1.isSameOrBefore(big_1)) {
-    return small_1.diff(big_0, "minutes");
+  if (smallZero.isBefore(bigZero) && smallOne.isAfter(bigZero) && smallOne.isSameOrBefore(bigOne)) {
+    return smallOne.diff(bigZero, "minutes");
   }
 
-  if (small_0.isSameOrBefore(big_0) && small_1.isSameOrAfter(big_1)) {
-    return big_1.diff(big_0, "minutes");
+  if (smallZero.isSameOrBefore(bigZero) && smallOne.isSameOrAfter(bigOne)) {
+    return bigOne.diff(bigZero, "minutes");
   }
 
   return 0;
 }
 
-export function intersection(
-  x_0: moment.Moment,
-  x_1: moment.Moment,
-  y_0: moment.Moment,
-  y_1: moment.Moment,
-): number {
-  if (overlaps(x_0, x_1, y_0, y_1)) {
-    if (Math.abs(x_0.diff(x_1, "ms")) > Math.abs(y_0.diff(y_1, "ms"))) {
-      return Math.abs(makeLength(x_0, x_1, y_0, y_1));
+export function intersection(xZero: Moment, xOne: Moment, yZero: Moment, yOne: Moment): number {
+  if (overlaps(xZero, xOne, yZero, yOne)) {
+    if (Math.abs(xZero.diff(xOne, "ms")) > Math.abs(yZero.diff(yOne, "ms"))) {
+      return Math.abs(makeLength(xZero, xOne, yZero, yOne));
     } else {
-      return Math.abs(makeLength(y_0, y_1, x_0, x_1));
+      return Math.abs(makeLength(yZero, yOne, xZero, xOne));
     }
   }
 

@@ -1,5 +1,8 @@
 {
   "files.autoSave": "afterDelay",
+  "files.associations": {
+    "*.svelte": "html"
+  },
   "window.zoomLevel": 0,
   "editor.minimap.enabled": true,
   "editor.formatOnSave": true,
@@ -23,15 +26,10 @@
   "eslint.enable": true,
   "eslint.packageManager": "npm",
   "eslint.workingDirectories": [
-    { "directory": "./packages/vendor-react", "changeProcessCWD": true },
-    { "directory": "./packages/vendor-other", "changeProcessCWD": true },
-    { "directory": "./packages/browser-lib-will-load-on-demand", "changeProcessCWD": true },
-    { "directory": "./packages/vendor-mobx", "changeProcessCWD": true },
-    { "directory": "./packages/vendor-antd", "changeProcessCWD": true },
-    { "directory": "./packages/utils", "changeProcessCWD": true },
-    { "directory": "./packages/isomorphic", "changeProcessCWD": true },
-    { "directory": "./packages/node-lib", "changeProcessCWD": true },
-    { "directory": "./packages/browser-lib", "changeProcessCWD": true }
+    "./packages/browser",
+    "./packages/isomorphic",
+    "./packages/node",
+    "./packages/utils",
   ],
   "css.validate": false,
   "less.validate": false,
@@ -41,6 +39,8 @@
   "workbench.iconTheme": "material-icon-theme",
   "workbench.editor.revealIfOpen": true,
   "vsicons.dontShowNewVersionMessage": true,
-  "cSpell.words": ["rtcts"],
+  "cSpell.words": [
+    "rtcts"
+  ],
   "cSpell.language": "en,ru"
 }

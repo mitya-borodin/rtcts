@@ -83,13 +83,4 @@ lerna-debug.log
 .DS_Store
 Thumbs.db
 
-# Rearguard Project
-
-dll_bundle
-lib_bundle
-lib
-
 src/typings.d.ts
-rearguard-dev.json
-examples
-listOfModulesWhichLoadOnDemand.ts

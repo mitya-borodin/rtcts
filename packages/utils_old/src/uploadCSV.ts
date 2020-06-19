@@ -1,5 +1,5 @@
-export function uploadCSV(CSVText: string, fileName: string): void {
-  const blob = new Blob([CSVText], { type: "text/csv" });
+export function uploadCSV(CSV_text: string, fileName: string): void {
+  const blob = new Blob([CSV_text], { type: "text/csv" });
 
   const a = document.createElement("a");
   const url = URL.createObjectURL(blob);

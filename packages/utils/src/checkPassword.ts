@@ -1,3 +1,3 @@
-export function checkPassword(password: string, password_confirm: string): boolean {
-  return password === password_confirm;
+export function checkPassword(password: string, passwordСonfirm: string): boolean {
+  return password === passwordСonfirm;
 }

@@ -1,0 +1,76 @@
+{
+  "name": "@rtcts/utils",
+  "description": "Contains utility functions",
+  "license": "MIT",
+  "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
+  "homepage": "https://github.com/mitya-borodin/rtcts",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:mitya-borodin/rtcts.git"
+  },
+  "bugs": {
+    "email": "dmitriy@borodin.site",
+    "url": "https://gitlab.com/mitya-borodin/base-code/issues"
+  },
+  "version": "1.1.6",
+  "main": "./lib/export.js",
+  "bin": "",
+  "files": [
+    "lib",
+    "lib_bundle"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "rearguard start",
+    "start:ts_node_dev": "rearguard start --ts_node_dev",
+    "build": "rearguard build",
+    "test": "rearguard test",
+    "lint": "rearguard lint",
+    "lint-fix": "rearguard lint --fix",
+    "typecheck": "tsc --noEmit",
+    "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
+    "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
+    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'",
+    "sync": "rearguard sync",
+    "refresh": "rearguard refresh",
+    "watch": "rearguard watch"
+  },
+  "types": "./lib/export.d.ts",
+  "dependencies": {
+    "@rtcts/vendor-other": "1.1.6",
+    "tslib": "2.0.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "6.1.3",
+    "@types/prettier": "1.19.0",
+    "@types/stylelint": "9.10.1",
+    "@typescript-eslint/eslint-plugin": "3.0.0",
+    "@typescript-eslint/parser": "3.0.0",
+    "eslint": "7.1.0",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-plugin-import": "2.20.2",
+    "eslint-plugin-jest": "23.13.1",
+    "eslint-plugin-react": "7.20.0",
+    "eslint-plugin-react-hooks": "4.0.2",
+    "husky": "4.2.5",
+    "normalize.css": "8.0.1",
+    "prettier": "2.0.5",
+    "pretty-quick": "2.0.1",
+    "stylelint": "13.5.0",
+    "stylelint-config-css-modules": "2.2.0",
+    "stylelint-config-prettier": "8.0.1",
+    "stylelint-config-standard": "20.0.0",
+    "typescript": "3.9.3"
+  },
+  "keywords": [],
+  "engines": {
+    "node": ">=10 <13",
+    "npm": ">=6 <7"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

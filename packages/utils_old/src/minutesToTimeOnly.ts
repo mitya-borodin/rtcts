@@ -1,6 +1,6 @@
-import moment, { Moment } from "moment";
+import moment from "moment";
 
-export function minutesToTimeOnly(minutes: number): Moment {
+export function minutesToTimeOnly(minutes: number): moment.Moment {
   const date = moment()
     .year(0)
     .month(0)
