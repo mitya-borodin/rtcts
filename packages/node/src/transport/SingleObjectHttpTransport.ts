@@ -50,6 +50,9 @@ export class SingleObjectHttpTransport<
   ) {
     super(name, channels, ACL, switchers, User);
 
+    this.ACL = ACL;
+    this.switchers = switchers;
+
     this.Entity = Entity;
     this.model = model;
 
@@ -57,7 +60,7 @@ export class SingleObjectHttpTransport<
     this.update();
   }
 
-  protected getItem(): void {
+  protected getItem = (): void => {
     const URL = `${this.basePath}/item`;
 
     this.router.get(
@@ -79,9 +82,9 @@ export class SingleObjectHttpTransport<
         });
       },
     );
-  }
+  };
 
-  protected update(): void {
+  protected update = (): void => {
     const URL = `${this.basePath}/update`;
 
     this.router.post(
@@ -108,5 +111,5 @@ export class SingleObjectHttpTransport<
         );
       },
     );
-  }
+  };
 }

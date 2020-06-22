@@ -87,7 +87,7 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
   // ! Model API
 
   public async getMap(offset = 0, limit = 20): Promise<Map<string, ENTITY>> {
-    const map: Map<string, ENTITY> = new Map();
+    const map: Map<string, ENTITY> = new Map<string, ENTITY>();
 
     try {
       const items: ENTITY[] = await this.repository.find({}, offset, limit);
@@ -141,9 +141,9 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
       const entity = new this.Entity(data);
 
       if (entity.isEntity()) {
-        const { id, ...$set } = entity.toObject();
-        const result: ENTITY | null = await this.repository.findOneAndUpdate(
-          { id },
+        const { id: _id, ...$set } = entity.toObject();
+        const result: ENTITY | null = await this.repository.findOneAndUpdate<{ _id: string }>(
+          { _id },
           { $set },
           {
             returnOriginal: false,

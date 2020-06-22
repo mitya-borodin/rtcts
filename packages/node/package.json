@@ -1,131 +1,105 @@
 {
-  "name": "@rtcts/node-lib",
-  "description": "Contains basic abstractions and implementations for creating a node application",
+  "version": "1.1.40",
   "license": "MIT",
-  "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
-  "homepage": "https://gitlab.com/mitya-borodin/base-code",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@gitlab.com/mitya-borodin/base-code.git"
-  },
-  "bugs": {
-    "email": "dmitriy@borodin.site",
-    "url": "https://gitlab.com/mitya-borodin/base-code"
-  },
-  "version": "1.1.39",
-  "main": "./lib/export.js",
-  "bin": "",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "files": [
-    "lib"
+    "dist",
+    "src"
   ],
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "start": "rearguard start",
-    "build": "rearguard build",
-    "test": "rearguard test",
-    "lint": "rearguard lint",
-    "lint-fix": "rearguard lint --fix",
-    "typecheck": "tsc --noEmit",
-    "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
-    "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
-    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'",
-    "sync": "rearguard sync",
-    "refresh": "rearguard refresh",
-    "watch": "rearguard watch"
-  },
-  "types": "./lib/export.d.ts",
-  "dependencies": {
-    "@rtcts/isomorphic": "1.1.6",
-    "@rtcts/utils": "1.1.6",
-    "@rtcts/vendor-other": "1.1.6",
-    "@types/bson": "1.0.11",
-    "@types/chai": "4.1.7",
-    "@types/co-body": "0.0.3",
-    "@types/eslint": "6.1.3",
-    "@types/jsonwebtoken": "8.3.5",
-    "@types/koa": "2.11.0",
-    "@types/koa-compress": "2.0.9",
-    "@types/koa-logger": "3.1.1",
-    "@types/koa-router": "7.0.42",
-    "@types/lodash.omit": "4.5.6",
-    "@types/mocha": "5.2.6",
-    "@types/mongodb": "3.1.22",
-    "@types/ms": "0.7.31",
-    "@types/node": "12.7.12",
-    "@types/prettier": "1.19.0",
-    "@types/type-is": "1.6.3",
-    "@types/uuid": "3.4.4",
-    "@types/ws": "6.0.1",
-    "bson": "4.0.3",
-    "chalk": "3.0.0",
-    "co-body": "6.0.0",
-    "eslint-plugin-node": "11.1.0",
-    "eventemitter3": "4.0.0",
-    "file-type": "14.1.3",
-    "jsonwebtoken": "8.5.1",
-    "koa": "2.11.0",
-    "koa-compress": "3.0.0",
-    "koa-logger": "3.2.1",
-    "koa-router": "7.4.0",
-    "lodash.omit": "4.5.0",
-    "moment": "2.24.0",
-    "mongodb": "3.5.3",
-    "ms": "2.1.2",
-    "tslib": "2.0.0",
-    "type-is": "1.6.18",
-    "uuid": "3.4.0",
-    "ws": "7.2.1"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "3.0.0",
-    "@typescript-eslint/parser": "3.0.0",
-    "chai": "4.2.0",
-    "eslint": "7.1.0",
-    "eslint-config-prettier": "6.11.0",
-    "eslint-plugin-import": "2.20.2",
-    "eslint-plugin-jest": "23.13.1",
-    "husky": "4.2.5",
-    "mocha": "7.0.1",
-    "nyc": "14.1.1",
-    "prettier": "2.0.5",
-    "pretty-quick": "2.0.1",
-    "typescript": "3.9.3"
-  },
-  "keywords": [],
   "engines": {
-    "node": ">=10 <11",
-    "npm": ">=6 <7"
+    "node": ">=10"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "browserslist": [
-    "last 2 versions"
-  ],
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint src test",
+    "prepare": "tsdx build"
+  },
+  "peerDependencies": {
+    "@rtcts/isomorphic": "^1.1.7",
+    "@rtcts/utils": "^1.1.7",
+    "mongodb": "^3.5.3",
+    "bson": "^4.0.3",
+    "uuid": "^3.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "co-body": "^6.0.0",
+    "file-type": "^14.1.3",
+    "type-is": "^1.6.18",
+    "koa": "^2.11.0",
+    "koa-compress": "^3.0.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^7.4.0",
+    "ws": "^7.2.1",
+    "eventemitter3": "^4.0.0",
+    "moment": "^2.24.0",
+    "ms": "^2.1.2",
+    "lodash.omit": "^4.5.0",
+    "chalk": "^3.0.0"
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged",
-      "pre-push": "npm run validate"
+      "pre-commit": "tsdx lint src test"
     }
   },
-  "rearguard": {
-    "project": {
-      "runtime": "node",
-      "type": "lib",
-      "unPublishedDependency": [],
-      "buildListOfLoadOnDemandModulesForAll": false
-    },
-    "configs": {
-      "noOverwriteTSConfig": false,
-      "noOverwriteTSTestConfig": false,
-      "noOverwriteLintConfig": false,
-      "noOverwriteGitIgnore": false
-    },
-    "distribution": {
-      "publish_to_git": false
-    }
+  "name": "@rtcts/node",
+  "description": "Contains basic abstractions and implementations for creating a node application",
+  "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
+  "homepage": "https://github.com/mitya-borodin/rtcts",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:mitya-borodin/rtcts.git"
+  },
+  "bugs": {
+    "email": "dmitriy@borodin.site",
+    "url": "https://github.com/mitya-borodin/rtcts/issues"
+  },
+  "module": "dist/node.esm.js",
+  "devDependencies": {
+    "@types/node": "^14.0.13",
+    "@types/mongodb": "^3.1.22",
+    "@types/ws": "^6.0.1",
+    "@types/bson": "^1.0.11",
+    "@types/uuid": "^3.4.4",
+    "@types/ms": "^0.7.31",
+    "@types/chai": "^4.1.7",
+    "@types/co-body": "^0.0.3",
+    "@types/jsonwebtoken": "^8.3.5",
+    "@types/koa": "^2.11.0",
+    "@types/koa-compress": "^2.0.9",
+    "@types/koa-logger": "^3.1.1",
+    "@types/koa-router": "^7.0.42",
+    "@types/type-is": "^1.6.3",
+    "@types/lodash.omit": "^4.5.6",
+    "@types/moment": "^2.13.0",
+    "@types/jest": "^26.0.0",
+    "@rtcts/isomorphic": "^1.1.7",
+    "@rtcts/utils": "^1.1.7",
+    "mongodb": "^3.5.3",
+    "bson": "^4.0.3",
+    "uuid": "^3.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "co-body": "^6.0.0",
+    "file-type": "^14.1.3",
+    "type-is": "^1.6.18",
+    "koa": "^2.11.0",
+    "koa-compress": "^3.0.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^7.4.0",
+    "ws": "^7.2.1",
+    "eventemitter3": "^4.0.0",
+    "moment": "^2.24.0",
+    "ms": "^2.1.2",
+    "lodash.omit": "^4.5.0",
+    "chalk": "^3.0.0",
+    "husky": "^4.2.5",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.5"
   }
 }

@@ -1,7 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-/dist
+dist
 /tmp
 /out-tsc
 
@@ -83,4 +83,4 @@ lerna-debug.log
 .DS_Store
 Thumbs.db
 
-src/typings.d.ts
+typings.d.ts

@@ -1,5 +1,5 @@
 {
-  "version": "1.1.6",
+  "version": "1.1.7",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
-    "lint": "tsdx lint src",
+    "lint": "tsdx lint src test",
     "prepare": "tsdx build"
   },
   "peerDependencies": {
@@ -26,13 +26,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint src"
+      "pre-commit": "tsdx lint src test"
     }
-  },
-  "prettier": {
-    "printWidth": 100,
-    "trailingComma": "all",
-    "arrowParens": "always"
   },
   "name": "@rtcts/utils",
   "description": "Contains utility functions",

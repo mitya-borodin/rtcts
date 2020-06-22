@@ -357,9 +357,9 @@ export class UserModel<
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
       const update = { $set: { group } };
 
-      await this.repository.updateMany(query, update);
+      await this.repository.updateMany<UserData>(query, update);
 
-      const users: ENTITY[] = await this.repository.find(query, offset, limit);
+      const users: ENTITY[] = await this.repository.find<UserData>(query, offset, limit);
 
       this.sendThroughWebSocket(
         {

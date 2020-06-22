@@ -28,7 +28,8 @@ export const getAuthenticateStrategyMiddleware = <
   config: CONFIG,
   userModel: MODEL,
 ): Koa.Middleware => {
-  return async (ctx: Koa.Context, next: Koa.Next): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return async (ctx: Koa.Context, next: Koa.Next): Promise<any> => {
     const token = ctx.cookies.get("jwt");
 
     ctx.request.user = null;
@@ -42,7 +43,7 @@ export const getAuthenticateStrategyMiddleware = <
         if (user) {
           ctx.request.user = user;
 
-          return await next();
+          return next();
         }
       }
     }
@@ -52,9 +53,10 @@ export const getAuthenticateStrategyMiddleware = <
 };
 
 export const getAuthenticateMiddleware = (): Koa.Middleware => {
-  return async (ctx: Koa.Context, next: Koa.Next): Promise<void> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return async (ctx: Koa.Context, next: Koa.Next): Promise<any> => {
     if (ctx.request.user !== null) {
-      return await next();
+      return next();
     }
 
     ctx.throw(403);

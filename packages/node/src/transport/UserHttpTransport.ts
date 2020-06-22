@@ -8,10 +8,10 @@ import {
   unsetCookieForAuthenticate,
 } from "../app/auth";
 import { Config } from "../app/Config";
+import { getRequestBodyJson } from "../app/getRequestBodyJson";
 import { UserModel } from "../model/UserModel";
 import { Channels } from "../webSocket/Channels";
 import { HttpTransport, HttpTransportACL } from "./HttpTransport";
-import { getRequestBodyJson } from "../app/getRequestBodyJson";
 
 export interface UserHttpTransportACL extends HttpTransportACL {
   readonly updateLogin: string[];
@@ -91,6 +91,9 @@ export class UserHttpTransport<
   ) {
     super(name, Entity, model, channels, ACL, switchers, Entity);
 
+    this.ACL = ACL;
+    this.switchers = switchers;
+
     this.current();
     this.signIn();
     this.signUp();
@@ -101,7 +104,7 @@ export class UserHttpTransport<
   }
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
-  protected update(): void {
+  protected update = (): void => {
     const URL = `${this.basePath}/update`;
 
     this.router.post(
@@ -115,7 +118,8 @@ export class UserHttpTransport<
           this.ACL.update,
           this.switchers.update,
           async (userId: string, wsid: string) => {
-            if (userId !== ctx.request.body.id) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (userId !== ctx?.request?.body?.id) {
               throw new Error("The model wasn't updated");
             }
 
@@ -132,10 +136,10 @@ export class UserHttpTransport<
         );
       },
     );
-  }
+  };
 
   // ! Returns the user object that was retrieved after authorization
-  protected current(): void {
+  protected current = (): void => {
     const URL = `${this.basePath}/current`;
 
     this.router.get(URL, getAuthenticateMiddleware(), (ctx: Koa.Context) => {
@@ -154,9 +158,9 @@ export class UserHttpTransport<
         ctx.throw(404, `Current user is not available (${this.constructor.name})(${URL})`);
       }
     });
-  }
+  };
 
-  protected signIn(): void {
+  protected signIn = (): void => {
     const URL = `${this.basePath}/signIn`;
 
     this.router.post(
@@ -181,9 +185,9 @@ export class UserHttpTransport<
         }
       },
     );
-  }
+  };
 
-  protected signUp(): void {
+  protected signUp = (): void => {
     const URL = `${this.basePath}/signUp`;
 
     this.router.post(URL, getRequestBodyJson(), async (ctx: Koa.Context) => {
@@ -204,10 +208,10 @@ export class UserHttpTransport<
         ctx.throw(404, message);
       }
     });
-  }
+  };
 
   // ! Этот метод необходим для системного администратора, которому нужно мочь создавать пользователй.
-  protected create(): void {
+  protected create = (): void => {
     const URL = `${this.basePath}/create`;
 
     this.router.put(
@@ -233,9 +237,9 @@ export class UserHttpTransport<
         });
       },
     );
-  }
+  };
 
-  protected signOut(): void {
+  protected signOut = (): void => {
     const URL = `${this.basePath}/signOut`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
@@ -250,9 +254,9 @@ export class UserHttpTransport<
         });
       });
     });
-  }
+  };
 
-  protected updateLogin(): void {
+  protected updateLogin = (): void => {
     const URL = `${this.basePath}/updateLogin`;
 
     this.router.post(
@@ -285,9 +289,9 @@ export class UserHttpTransport<
         );
       },
     );
-  }
+  };
 
-  protected updatePassword(): void {
+  protected updatePassword = (): void => {
     const URL = `${this.basePath}/updatePassword`;
 
     this.router.post(
@@ -320,9 +324,9 @@ export class UserHttpTransport<
         );
       },
     );
-  }
+  };
 
-  protected updateGroup(): void {
+  protected updateGroup = (): void => {
     const URL = `${this.basePath}/updateGroup`;
 
     this.router.post(
@@ -336,6 +340,7 @@ export class UserHttpTransport<
           this.ACL.updateGroup,
           this.switchers.updateGroup,
           async (userId: string, wsid: string): Promise<void> => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { ids, group } = ctx.request.body;
 
             const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
@@ -353,5 +358,5 @@ export class UserHttpTransport<
         );
       },
     );
-  }
+  };
 }

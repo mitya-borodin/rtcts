@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response, User, UserData, ValidateResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";
-// import koaCompress from "koa-compress";
 import koaLogger from "koa-logger";
 import Router from "koa-router";
 import { getAuthenticateMiddleware } from "../app/auth";
@@ -27,7 +25,8 @@ export abstract class BaseHttpTransport<
   };
   protected readonly router: Router;
 
-  protected readonly User: new (data?: any) => USER;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected readonly User: new (data?: { [key: string]: any }) => USER;
   protected readonly root: string;
   protected readonly webSocketIdHeaderKey: string;
 
@@ -40,7 +39,8 @@ export abstract class BaseHttpTransport<
     } = {
       channel: true,
     },
-    User: new (data?: any) => USER,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    User: new (data?: { [key: string]: any }) => USER,
     root = "/api",
     webSocketIdHeaderKey = "x-ws-id",
   ) {
@@ -53,9 +53,9 @@ export abstract class BaseHttpTransport<
     this.root = root;
     this.webSocketIdHeaderKey = webSocketIdHeaderKey;
 
-    // this.router.use(koaCompress());
     this.router.use(koaLogger());
     this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
       ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
 
       await next();
@@ -64,19 +64,19 @@ export abstract class BaseHttpTransport<
     this.channel();
   }
 
-  public getRouter(): Router {
+  public getRouter = (): Router => {
     return this.router;
-  }
+  };
 
-  public setMiddleware(middleware: Koa.Middleware): void {
+  public setMiddleware = (middleware: Koa.Middleware): void => {
     this.router.use(middleware);
-  }
+  };
 
   protected get basePath(): string {
     return `${this.root}/${this.name}`;
   }
 
-  protected channel(): void {
+  protected channel = (): void => {
     const URL = `${this.basePath}/channel`;
 
     this.router.post(
@@ -90,6 +90,7 @@ export abstract class BaseHttpTransport<
           this.ACL.channel,
           this.switchers.channel,
           (userId: string, wsid: string) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { action, channelName } = ctx.request.body;
 
             if (action === "on") {
@@ -119,19 +120,20 @@ export abstract class BaseHttpTransport<
         );
       },
     );
-  }
+  };
 
-  protected async executor(
+  protected executor = async (
     ctx: Koa.Context,
     URL: string,
     ACL: string[],
     switcher: boolean,
     worker: (userId: string, wsid: string) => Promise<void> | void,
-  ): Promise<void> {
+  ): Promise<void> => {
     if (switcher) {
       try {
         // ! ctx.request.user - provided by getAuthenticateStrategyMiddleware
         // ! components/node-lib/src/app/auth.ts
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const { wsid, user } = ctx.request;
 
         if (
@@ -143,16 +145,23 @@ export abstract class BaseHttpTransport<
           return await worker(user.id, wsid);
         }
 
-        ctx.throw(403, `Access denied (${this.constructor.name})(${URL}) for ${user.group}`);
+        ctx.throw(
+          403,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          `Access denied (${this.constructor.name})(${URL}) for ${String(user.group)}`,
+        );
       } catch (error) {
         ctx.throw(
           500,
-          `[ ${this.constructor.name} ][ URL: ${URL} ][ ACL: ${ACL} ]` +
+          `[ ${this.constructor.name} ][ URL: ${URL} ][ ACL: ${ACL.join(", ")} ]` +
             `[ switcher: ${switcher} ][ ${getErrorMessage(error)} ][ 500 ]`,
         );
       }
     } else {
-      ctx.throw(404, `[ executor ][ URL: ${URL} ][ ACL: ${ACL} ][ switcher: ${switcher} ][ 404 ]`);
+      ctx.throw(
+        404,
+        `[ executor ][ URL: ${URL} ][ ACL: ${ACL.join(", ")} ][ switcher: ${switcher} ][ 404 ]`,
+      );
     }
-  }
+  };
 }

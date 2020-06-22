@@ -1,16 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity, Send, ValidateResult, Response } from "@rtcts/isomorphic";
+import { Entity, Response, Send, ValidateResult } from "@rtcts/isomorphic";
 import { isObject } from "@rtcts/utils";
 import { Collection, FindOneAndReplaceOption } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
 export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = object> {
   protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected readonly Entity: new (data?: any) => ENTITY;
   protected readonly sendThroughWebSocket: Send;
 
   constructor(
     repository: MongoDBRepository<ENTITY, DATA, VA>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Entity: new (data?: any) => ENTITY,
     sendThroughWebSocket: Send,
   ) {
@@ -51,7 +52,8 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     try {
       return await this.repository.findOne({});
     } catch (error) {
-      const collection: Collection<ENTITY> = await this.repository.getCollection();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const collection: Collection<any> = await this.repository.getCollection();
 
       await collection.drop();
 
@@ -94,7 +96,9 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
         if (entity.isEntity()) {
           const { id: _id, ...$set } = entity.toObject();
 
-          const updatedEntity: ENTITY | null = await this.repository.findOneAndUpdate(
+          const updatedEntity: ENTITY | null = await this.repository.findOneAndUpdate<{
+            _id: string;
+          }>(
             { _id },
             { $set },
             {

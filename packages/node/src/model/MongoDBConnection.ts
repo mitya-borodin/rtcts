@@ -21,18 +21,18 @@ export class MongoDBConnection extends EventEmitter {
   constructor(config: Config) {
     super();
 
+    this.client = undefined;
+
     this.status = Status.CLOSED;
     this.config = config;
     this.pingTimer = setInterval(() => null, 1000 * 1000);
-
-    this.connect = this.connect.bind(this);
   }
 
   get name(): string {
     return this.constructor.name;
   }
 
-  public async connect(): Promise<void> {
+  public connect = async (): Promise<void> => {
     if (this.status === Status.CLOSED) {
       console.log("");
       console.log(
@@ -61,22 +61,24 @@ export class MongoDBConnection extends EventEmitter {
         console.log("");
 
         // Если ошибок не возникло, то подписывается на события закрытия процесса;
-        process.once("beforeExit", async (code) => {
+        process.once("beforeExit", (code): void => {
           console.log(
             chalk.red.bold(`[ ${this.name} ][ connect ][ BEFORE_EXIT ][ CODE: ${code} ]`),
           );
 
-          await this.disconnect();
+          this.disconnect();
         });
 
         // Запускаем таймер который будет проверять имеется ли соединение с БД или нет.
-        this.pingTimer = setInterval(async () => {
+        this.pingTimer = setInterval(() => {
           // console.log("PING ", new Date());
           if (this.client && !this.client.isConnected()) {
             clearInterval(this.pingTimer);
 
-            await this.disconnect();
-            await this.connect();
+            (async (): Promise<void> => {
+              await this.disconnect();
+              await this.connect();
+            })();
           }
         }, 1000);
       } catch (error) {
@@ -93,18 +95,18 @@ export class MongoDBConnection extends EventEmitter {
             ),
           );
 
-          setTimeout(async () => {
+          setTimeout(() => {
             this.status = Status.CLOSED;
-            await this.connect();
+            this.connect();
           }, 2500);
         }
 
         this.emit(this.status);
       }
     }
-  }
+  };
 
-  public async disconnect(): Promise<void> {
+  public disconnect = async (): Promise<void> => {
     try {
       console.log("");
       console.log(chalk.magenta.bold(`[ ${this.name} ][ disconnect ][ TRY ]`));
@@ -135,27 +137,27 @@ export class MongoDBConnection extends EventEmitter {
         this.emit(this.status);
       }
     }
-  }
+  };
 
-  public async getDB(): Promise<Db> {
-    return new Promise<Db>(async (resolve, reject) => {
+  public getDB = async (): Promise<Db> => {
+    return new Promise<Db>((resolve, reject): void => {
       try {
         if (this.db instanceof Db) {
           resolve(this.db);
         } else if (this.client instanceof MongoClient) {
           this.db = this.client.db(this.config.db.name);
-
-          await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" });
-
-          resolve(this.db);
+          this.db
+            .executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" })
+            .then(() => resolve(this.db))
+            .catch(reject);
         } else {
-          this.once(Status.OPEN, async () => {
+          this.once(Status.OPEN, () => {
             if (this.client instanceof MongoClient) {
               this.db = this.client.db(this.config.db.name);
-
-              await this.db.executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" });
-
-              resolve(this.db);
+              this.db
+                .executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" })
+                .then(() => resolve(this.db))
+                .catch(reject);
             } else {
               throw new Error(`Connection object is not instanceof MongoClient`);
             }
@@ -166,8 +168,8 @@ export class MongoDBConnection extends EventEmitter {
       } catch (error) {
         console.error(`[ ${this.name} ][ getDB ][ ERROR_MESSAGE: ${getErrorMessage(error)} ]`);
 
-        reject();
+        reject(error);
       }
     });
-  }
+  };
 }

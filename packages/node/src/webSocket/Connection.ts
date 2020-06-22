@@ -26,18 +26,9 @@ export class Connection {
     };
 
     this.ws.on("pong", this.heartbeat);
-
-    this.getConnectionID = this.getConnectionID.bind(this);
-    this.isOwner = this.isOwner.bind(this);
-    this.isItSelf = this.isItSelf.bind(this);
-    this.setUserID = this.setUserID.bind(this);
-    this.send = this.send.bind(this);
-    this.wasTerminate = this.wasTerminate.bind(this);
-    this.close = this.close.bind(this);
-    this.terminate = this.terminate.bind(this);
   }
 
-  public getConnectionID(): string {
+  public getConnectionID = (): string => {
     try {
       if (isString(this.uid) && this.uid.length > 0) {
         return Connection.getConnectionID(this.uid, this.wsid);
@@ -55,9 +46,9 @@ export class Connection {
 
       return "";
     }
-  }
+  };
 
-  public isOwner(uid: string): boolean {
+  public isOwner = (uid: string): boolean => {
     if (isString(this.uid) && this.uid.length > 0) {
       return this.uid === uid;
     }
@@ -65,9 +56,9 @@ export class Connection {
     console.error(chalk.red(`[ CONNECTION ][ ERROR ][ uid is not defined ]`));
 
     return false;
-  }
+  };
 
-  public isItSelf(uid: string, wsid: string): boolean {
+  public isItSelf = (uid: string, wsid: string): boolean => {
     if (isString(this.uid) && this.uid.length > 0) {
       return this.uid === uid && this.wsid === wsid;
     }
@@ -75,26 +66,26 @@ export class Connection {
     console.error(chalk.red(`[ CONNECTION ][ ERROR ][ uid is not defined ]`));
 
     return false;
-  }
+  };
 
-  public setUserID(uid: string): void {
+  public setUserID = (uid: string): void => {
     if (!isString(this.uid)) {
       this.uid = uid;
     } else {
       console.error(chalk.yellow(`[ CONNECTION ][ ERROR ][ uid is already defined ]`));
     }
-  }
+  };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public send(data: any): void {
+  public send = (data: any): void => {
     try {
       this.ws.send(data);
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  public wasTerminate(): boolean {
+  public wasTerminate = (): boolean => {
     try {
       if (this.isAlive) {
         this.isAlive = false;
@@ -122,9 +113,9 @@ export class Connection {
     }
 
     return false;
-  }
+  };
 
-  public close(message = ""): void {
+  public close = (message = ""): void => {
     try {
       this.ws.removeEventListener("pong", this.heartbeat);
       this.ws.removeAllListeners();
@@ -136,9 +127,9 @@ export class Connection {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  public terminate(message?: string): void {
+  public terminate = (message?: string): void => {
     try {
       this.isAlive = false;
       this.ws.removeEventListener("pong", this.heartbeat);
@@ -152,5 +143,5 @@ export class Connection {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 }

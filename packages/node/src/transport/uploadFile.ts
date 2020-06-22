@@ -46,7 +46,10 @@ export const uploadFile = async (
     config.mimeTypes.length > 0 &&
     !typeIs(ctx.req, config.mimeTypes)
   ) {
-    ctx.throw(422, `Mime type (${mimeType}) does not match valid values (${config.mimeTypes})`);
+    ctx.throw(
+      422,
+      `Mime type (${mimeType}) does not match valid values (${config.mimeTypes.join(", ")})`,
+    );
   }
 
   return new Promise((resolve, reject) => {

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Entity, ValueObject } from "@rtcts/isomorphic";
@@ -13,12 +17,12 @@ import {
   Db,
   FilterQuery,
   FindAndModifyWriteOpResultObject,
+  FindOneAndDeleteOption,
   FindOneAndReplaceOption,
   FindOneOptions,
   InsertOneWriteOpResult,
   InsertWriteOpResult,
   ReplaceOneOptions,
-  FindOneAndDeleteOption,
   UpdateQuery,
 } from "mongodb";
 import { MongoDBConnection } from "./MongoDBConnection";
@@ -91,13 +95,15 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      const insert: InsertWriteOpResult = await collection.insertMany(
+      const insert: InsertWriteOpResult<any> = await collection.insertMany(
         items
           .filter((item: ValueObject<DATA>) => item.canBeInsert())
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           .map((item) => this.removeID(item.toObject())),
         this.getOptions(options),
       );
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       return insert.ops.map(this.createEntity);
     } catch (error) {
       console.error(error);
@@ -114,7 +120,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
       if (item.canBeInsert()) {
         const collection: Collection<any> = await this.getCollection();
 
-        const insert: InsertOneWriteOpResult = await collection.insertOne(
+        const insert: InsertOneWriteOpResult<any> = await collection.insertOne(
           this.removeID(item.toObject()),
           this.getOptions(options),
         );
@@ -129,8 +135,8 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async find(
-    query: FilterQuery<DATA>,
+  public async find<T = DATA>(
+    query: FilterQuery<T & { _id: any }>,
     offset = 0,
     limit = 20,
     options?: FindOneOptions,
@@ -145,6 +151,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
 
       const items = await cursor.toArray();
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       return items.map(this.createEntity);
     } catch (error) {
       console.error(error);
@@ -154,7 +161,10 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async findOne(query: FilterQuery<DATA>, options?: FindOneOptions): Promise<ENTITY | null> {
+  public async findOne<T = DATA>(
+    query: FilterQuery<T>,
+    options?: FindOneOptions,
+  ): Promise<ENTITY | null> {
     try {
       const collection: Collection = await this.getCollection();
       const item: object | null = await collection.findOne(
@@ -174,7 +184,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
 
   public async findById(id: string, options?: FindOneOptions): Promise<ENTITY | null> {
     try {
-      const item: ENTITY | null = await this.findOne(
+      const item: ENTITY | null = await this.findOne<{ _id: ObjectId }>(
         { _id: new ObjectId(id) },
         this.getOptions(options),
       );
@@ -190,14 +200,14 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async findOneAndUpdate(
-    query: FilterQuery<DATA>,
-    update: UpdateQuery<DATA>,
+  public async findOneAndUpdate<T = DATA>(
+    query: FilterQuery<T & { _id: any }>,
+    update: UpdateQuery<T>,
     options?: FindOneAndReplaceOption,
   ): Promise<ENTITY | null> {
     try {
       const collection: Collection<any> = await this.getCollection();
-      const result: FindAndModifyWriteOpResultObject = await collection.findOneAndUpdate(
+      const result: FindAndModifyWriteOpResultObject<any> = await collection.findOneAndUpdate(
         this.normalizeObjectID(query),
         this.removeID(update),
         this.getOptions(options),
@@ -214,14 +224,14 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async findOneAndRemove(
-    query: FilterQuery<DATA>,
+  public async findOneAndRemove<T = DATA>(
+    query: FilterQuery<T>,
     options?: FindOneAndDeleteOption,
   ): Promise<ENTITY | null> {
     try {
       const collection: Collection<any> = await this.getCollection();
 
-      const result: FindAndModifyWriteOpResultObject = await collection.findOneAndDelete(
+      const result: FindAndModifyWriteOpResultObject<any> = await collection.findOneAndDelete(
         this.normalizeObjectID(query),
         this.getOptions(options),
       );
@@ -241,7 +251,10 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     options?: FindOneAndDeleteOption,
   ): Promise<ENTITY | null> {
     try {
-      return await this.findOneAndRemove({ _id: new ObjectId(id) }, this.getOptions(options));
+      return await this.findOneAndRemove<{ _id: ObjectId }>(
+        { _id: new ObjectId(id) },
+        this.getOptions(options),
+      );
     } catch (error) {
       console.error(error);
     }
@@ -264,9 +277,9 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async updateMany(
-    query: FilterQuery<DATA>,
-    update: UpdateQuery<DATA>,
+  public async updateMany<T = DATA>(
+    query: FilterQuery<T & { _id: any }>,
+    update: UpdateQuery<T>,
     options?: ReplaceOneOptions,
   ): Promise<void> {
     try {
@@ -279,7 +292,10 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async deleteOne(query: FilterQuery<DATA>, options?: CommonOptions): Promise<void> {
+  public async deleteOne<T = DATA>(
+    query: FilterQuery<T & { _id: any }>,
+    options?: CommonOptions,
+  ): Promise<void> {
     try {
       const collection: Collection<any> = await this.getCollection();
 
@@ -290,7 +306,10 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // https://docs.mongodb.com/manual/tutorial/query-documents/
-  public async deleteMany(query: FilterQuery<DATA>, options?: CommonOptions): Promise<void> {
+  public async deleteMany<T = DATA>(
+    query: FilterQuery<T & { _id: any }>,
+    options?: CommonOptions,
+  ): Promise<void> {
     try {
       const collection: Collection<any> = await this.getCollection();
 

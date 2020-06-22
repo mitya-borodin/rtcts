@@ -2,10 +2,10 @@
 import { Entity, User, UserData } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
+import { getRequestBodyJson } from "../app/getRequestBodyJson";
 import { Model } from "../model/Model";
 import { Channels } from "../webSocket/Channels";
 import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
-import { getRequestBodyJson } from "../app/getRequestBodyJson";
 
 export interface HttpTransportACL extends BaseHttpTransportACL {
   readonly getList: string[];
@@ -62,6 +62,9 @@ export class HttpTransport<
   ) {
     super(name, channels, ACL, switchers, User);
 
+    this.ACL = ACL;
+    this.switchers = switchers;
+
     this.Entity = Entity;
     this.model = model;
 
@@ -72,7 +75,7 @@ export class HttpTransport<
     this.remove();
   }
 
-  protected getList(): void {
+  protected getList = (): void => {
     const URL = `${this.basePath}/list`;
 
     this.router.get(
@@ -80,6 +83,7 @@ export class HttpTransport<
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(ctx, URL, this.ACL.getList, this.switchers.getList, async () => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           const listResponse = await this.model.getListResponse(ctx.query.offset, ctx.query.limit);
 
           ctx.status = 200;
@@ -88,9 +92,9 @@ export class HttpTransport<
         });
       },
     );
-  }
+  };
 
-  protected getItem(): void {
+  protected getItem = (): void => {
     const URL = `${this.basePath}/item/:id`;
 
     this.router.get(
@@ -98,6 +102,7 @@ export class HttpTransport<
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(ctx, URL, this.ACL.getItem, this.switchers.getItem, async () => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const { id } = ctx.params;
           const response = await this.model.getItemResponse(id);
 
@@ -113,7 +118,7 @@ export class HttpTransport<
         });
       },
     );
-  }
+  };
 
   protected create(): void {
     const URL = `${this.basePath}/create`;
@@ -187,6 +192,7 @@ export class HttpTransport<
           this.ACL.remove,
           this.switchers.remove,
           async (userId: string, wsid: string) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { id } = ctx.request.body;
             const response = await this.model.removeResponse(id, userId, wsid);
 
@@ -195,6 +201,7 @@ export class HttpTransport<
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
             } else {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${ctx.request.body.id} ]`;
 
               ctx.throw(404, message);

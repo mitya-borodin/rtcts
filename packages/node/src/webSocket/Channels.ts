@@ -1,27 +1,21 @@
 import { makeMessage } from "@rtcts/isomorphic";
+import { isString } from "@rtcts/utils";
 import chalk from "chalk";
 import { Connection } from "./Connection";
-import { isString } from "@rtcts/utils";
 
 export class Channels<CONNECTION extends Connection = Connection> {
-  // Map<connectionID: string, Connection>
+  // * Map<connectionID: string, Connection>
   private connections: Map<string, CONNECTION>;
 
-  // Map<channelName: string, Map<connectionID: string, Connection>>
+  // * Map<channelName: string, Map<connectionID: string, Connection>>
   private channels: Map<string, Map<string, CONNECTION>>;
 
   constructor() {
-    this.connections = new Map();
-    this.channels = new Map();
-
-    this.addConnection = this.addConnection.bind(this);
-    this.deleteConnection = this.deleteConnection.bind(this);
-    this.on = this.on.bind(this);
-    this.off = this.off.bind(this);
-    this.send = this.send.bind(this);
+    this.connections = new Map<string, CONNECTION>();
+    this.channels = new Map<string, Map<string, CONNECTION>>();
   }
 
-  public addConnection(connection: CONNECTION): void {
+  public addConnection = (connection: CONNECTION): void => {
     try {
       const connectionID = connection.getConnectionID();
 
@@ -42,9 +36,9 @@ export class Channels<CONNECTION extends Connection = Connection> {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  public deleteConnection(connection: CONNECTION): void {
+  public deleteConnection = (connection: CONNECTION): void => {
     try {
       const connectionID = connection.getConnectionID();
       const curConnection = this.connections.get(connectionID);
@@ -72,9 +66,9 @@ export class Channels<CONNECTION extends Connection = Connection> {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  public on(chName: string, uid: string, wsid: string): void {
+  public on = (chName: string, uid: string, wsid: string): void => {
     try {
       const connectionID = Connection.getConnectionID(uid, wsid);
       const connection = this.connections.get(connectionID);
@@ -110,9 +104,9 @@ export class Channels<CONNECTION extends Connection = Connection> {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  public off(chName: string, uid: string, wsid: string): void {
+  public off = (chName: string, uid: string, wsid: string): void => {
     try {
       const connectionID = Connection.getConnectionID(uid, wsid);
       const channel = this.channels.get(chName);
@@ -133,9 +127,9 @@ export class Channels<CONNECTION extends Connection = Connection> {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  public send(
+  public send = (
     chName: string,
     payload: {
       create?: object;
@@ -148,7 +142,7 @@ export class Channels<CONNECTION extends Connection = Connection> {
     uid: string,
     wsid: string,
     excludeCurrentDevice = true,
-  ): void {
+  ): void => {
     try {
       const message = makeMessage(chName, payload);
       const channel = this.channels.get(chName);
@@ -169,5 +163,5 @@ export class Channels<CONNECTION extends Connection = Connection> {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 }

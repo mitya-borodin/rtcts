@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BindUserToConnection,
-  UnbindUserFromConnection,
   makeErrorMessage,
   makeMessage,
   PingChannel,
   PongChannel,
   recognizeMessage,
+  UnbindUserFromConnection,
   User,
   UserData,
 } from "@rtcts/isomorphic";
 import { getErrorMessage, isArray, isString, isUndefined } from "@rtcts/utils";
 import chalk from "chalk";
 import WebSocket from "ws";
-import { Channels } from "./Channels";
-import { Connection } from "./Connection";
 import { Config } from "../app/Config";
 import { UserModel } from "../model/UserModel";
+import { Channels } from "./Channels";
+import { Connection } from "./Connection";
 
 export class WebSocketServer<
   USER_MODEL extends UserModel<USER, DATA, VA>,
@@ -55,12 +55,9 @@ export class WebSocketServer<
     this.interval = setInterval(() => null, 1000 * 1000);
 
     this.connections = new Set();
-
-    this.run = this.run.bind(this);
-    this.connectionHandler = this.connectionHandler.bind(this);
   }
 
-  public run(): void {
+  public run = (): void => {
     try {
       if (!this.wasRun) {
         console.log(
@@ -115,9 +112,9 @@ export class WebSocketServer<
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  private connectionHandler(ws: WebSocket): void {
+  private connectionHandler = (ws: WebSocket): void => {
     try {
       const connection = new this.Connection(ws);
       const messageHandler = this.messageHandler.bind(this, connection);
@@ -186,7 +183,7 @@ export class WebSocketServer<
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   private messageHandler(
     connection: Connection,
@@ -248,7 +245,7 @@ export class WebSocketServer<
                       );
                     }
                   })
-                  .catch((error: any) => {
+                  .catch((error: Error) => {
                     connection.send(
                       this.makeErrorMessage(
                         `BIND_USER_TO_CONNECTION [ FAIL ] [ ${getErrorMessage(error)} ]`,

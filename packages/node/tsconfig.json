@@ -1,49 +1,21 @@
 {
-  "compileOnSave": false,
+  "include": [
+    "src",
+    "test",
+    "types",
+  ],
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "lib": ["dom", "es2018", "esnext.asynciterable"],
-    "allowJs": true,
-    "checkJs": false,
-    "incremental": false,
-    "jsx": "react",
-    "removeComments": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictFunctionTypes": true,
-    "strictPropertyInitialization": false,
-    "suppressImplicitAnyIndexErrors": true,
-    "suppressExcessPropertyErrors": false,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "baseUrl": "src",
-    "typeRoots": ["./types", "./node_modules/@types"],
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "importHelpers": true,
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "inlineSourceMap": false,
-    "inlineSources": false,
-    "diagnostics": false,
-    "extendedDiagnostics": false,
-    "traceResolution": false,
-    "listEmittedFiles": false,
-    "listFiles": false,
-    "noErrorTruncation": true,
-    "pretty": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "lib", "src/**/*.test.ts", "src/**/*.spec.ts", "__tests__/**/*"]
+    "baseUrl": "./",
+    "paths": {
+      "*": [
+        "src/*",
+        "node_modules/*"
+      ]
+    },
+    "types": [
+      "@types/node",
+      "@types/jest",
+    ],
+  }
 }
