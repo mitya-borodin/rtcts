@@ -1,25 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity, Send, ListResponse, Response, ValidateResult } from "@rtcts/isomorphic";
-import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
+import { Entity, ListResponse, Response, Send, ValidateResult } from "@rtcts/isomorphic";
 import { MongoDBRepository } from "./MongoDBRepository";
 
 export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = object> {
-  protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
   protected readonly Entity: new (data?: any) => ENTITY;
+  protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
   protected readonly sendThroughWebSocket: Send;
 
   constructor(
-    repository: MongoDBRepository<ENTITY, DATA, VA>,
     Entity: new (data?: any) => ENTITY,
+    repository: MongoDBRepository<ENTITY, DATA, VA>,
     sendThroughWebSocket: Send,
   ) {
-    this.repository = repository;
     this.Entity = Entity;
+    this.repository = repository;
     this.sendThroughWebSocket = sendThroughWebSocket;
   }
 
   // ! Response API
-
   public async getListResponse(offset = 0, limit = 20): Promise<ListResponse> {
     const results: ENTITY[] = await this.repository.find({}, offset, limit);
 
@@ -30,8 +28,8 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
     });
   }
 
-  public async getItemResponse(id: string, options?: FindOneOptions): Promise<Response> {
-    const result: ENTITY | null = await this.repository.findById(id, options);
+  public async getItemResponse(id: string): Promise<Response> {
+    const result: ENTITY | null = await this.repository.findById(id);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -43,10 +41,9 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
     data: object,
     uid: string,
     wsid: string,
-    options?: CollectionInsertOneOptions,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await this.create(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.create(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -58,10 +55,9 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
     data: object,
     uid: string,
     wsid: string,
-    options?: CollectionInsertOneOptions,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.update(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -73,10 +69,9 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
     id: string,
     uid: string,
     wsid: string,
-    options?: { projection?: object; sort?: object },
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await this.remove(id, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.remove(id, uid, wsid, excludeRequestingDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -85,8 +80,7 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
   }
 
   // ! Model API
-
-  public async getMap(offset = 0, limit = 20): Promise<Map<string, ENTITY>> {
+  public async getMap(offset = 0, limit = 25): Promise<Map<string, ENTITY>> {
     const map: Map<string, ENTITY> = new Map<string, ENTITY>();
 
     try {
@@ -108,19 +102,23 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
     data: object,
     uid: string,
     wsid: string,
-    options?: CollectionInsertOneOptions,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<ENTITY | null> {
     try {
       const insert = new this.Entity(data);
 
       if (insert.canBeInsert()) {
-        const result: ENTITY | null = await this.repository.insertOne(insert, options);
+        const entity: ENTITY | null = await this.repository.insertOne(insert);
 
-        if (result) {
-          this.sendThroughWebSocket({ create: result.toObject() }, uid, wsid, excludeCurrentDevice);
+        if (entity) {
+          this.sendThroughWebSocket(
+            { create: entity.toObject() },
+            uid,
+            wsid,
+            excludeRequestingDevice,
+          );
 
-          return result;
+          return entity;
         }
       }
     } catch (error) {
@@ -134,25 +132,21 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
     data: object,
     uid: string,
     wsid: string,
-    options?: FindOneAndReplaceOption,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<ENTITY | null> {
     try {
       const entity = new this.Entity(data);
 
       if (entity.isEntity()) {
-        const { id: _id, ...$set } = entity.toObject();
-        const result: ENTITY | null = await this.repository.findOneAndUpdate<{ _id: string }>(
-          { _id },
-          { $set },
-          {
-            returnOriginal: false,
-            ...options,
-          },
-        );
+        const result: ENTITY | null = await this.repository.findOneAndUpdate(entity);
 
         if (result !== null) {
-          this.sendThroughWebSocket({ update: result.toObject() }, uid, wsid, excludeCurrentDevice);
+          this.sendThroughWebSocket(
+            { update: result.toObject() },
+            uid,
+            wsid,
+            excludeRequestingDevice,
+          );
 
           return result;
         }
@@ -168,14 +162,18 @@ export class Model<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = ob
     id: string,
     uid: string,
     wsid: string,
-    options?: { projection?: object; sort?: object },
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<ENTITY | null> {
     try {
-      const result: ENTITY | null = await this.repository.findByIdAndRemove(id, options);
+      const result: ENTITY | null = await this.repository.findByIdAndRemove(id);
 
       if (result !== null) {
-        this.sendThroughWebSocket({ remove: result.toObject() }, uid, wsid, excludeCurrentDevice);
+        this.sendThroughWebSocket(
+          { remove: result.toObject() },
+          uid,
+          wsid,
+          excludeRequestingDevice,
+        );
 
         return result;
       }

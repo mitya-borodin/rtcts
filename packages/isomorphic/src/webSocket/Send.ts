@@ -9,5 +9,5 @@ export type Send = (
   },
   uid: string,
   wsid: string,
-  excludeCurrentDevice: boolean,
+  excludeRequestingDevice: boolean,
 ) => void;

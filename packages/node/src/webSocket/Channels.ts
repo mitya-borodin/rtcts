@@ -141,7 +141,7 @@ export class Channels<CONNECTION extends Connection = Connection> {
     },
     uid: string,
     wsid: string,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): void => {
     try {
       const message = makeMessage(chName, payload);
@@ -149,7 +149,7 @@ export class Channels<CONNECTION extends Connection = Connection> {
 
       if (channel) {
         for (const connection of channel.values()) {
-          if (excludeCurrentDevice) {
+          if (excludeRequestingDevice) {
             if (!connection.isItSelf(uid, wsid)) {
               connection.send(message);
             }

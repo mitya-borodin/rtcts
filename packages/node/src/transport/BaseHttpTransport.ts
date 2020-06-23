@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response, User, UserData, ValidateResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";
@@ -25,7 +26,6 @@ export abstract class BaseHttpTransport<
   };
   protected readonly router: Router;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected readonly User: new (data?: { [key: string]: any }) => USER;
   protected readonly root: string;
   protected readonly webSocketIdHeaderKey: string;
@@ -39,7 +39,6 @@ export abstract class BaseHttpTransport<
     } = {
       channel: true,
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     User: new (data?: { [key: string]: any }) => USER,
     root = "/api",
     webSocketIdHeaderKey = "x-ws-id",

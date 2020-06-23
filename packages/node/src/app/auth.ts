@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { User, UserData } from "@rtcts/isomorphic";
+import { isObject, isString } from "@rtcts/utils";
 import jwt from "jsonwebtoken";
 import Koa from "koa";
 import ms from "ms";
 import { UserModel } from "../model/UserModel";
 import { Config } from "./Config";
-import { isObject, isString } from "@rtcts/utils";
 
 export const setCookieForAuthenticate = (ctx: Koa.Context, token: string): void => {
   ctx.cookies.set("jwt", token, { maxAge: ms("12h"), httpOnly: true });
@@ -28,7 +29,6 @@ export const getAuthenticateStrategyMiddleware = <
   config: CONFIG,
   userModel: MODEL,
 ): Koa.Middleware => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (ctx: Koa.Context, next: Koa.Next): Promise<any> => {
     const token = ctx.cookies.get("jwt");
 
@@ -53,7 +53,6 @@ export const getAuthenticateStrategyMiddleware = <
 };
 
 export const getAuthenticateMiddleware = (): Koa.Middleware => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async (ctx: Koa.Context, next: Koa.Next): Promise<any> => {
     if (ctx.request.user !== null) {
       return next();

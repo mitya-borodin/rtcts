@@ -12,7 +12,7 @@ import { checkPassword, isString } from "@rtcts/utils";
 import { ObjectId } from "bson";
 import jwt from "jsonwebtoken";
 import omit from "lodash.omit";
-import { CollectionInsertOneOptions, FindOneAndReplaceOption, FindOneOptions } from "mongodb";
+import { FindOneOptions } from "mongodb";
 import { Config } from "../app/Config";
 import { authenticate } from "../utils/authenticate";
 import { encryptPassword } from "../utils/encryptPassword";
@@ -29,12 +29,12 @@ export class UserModel<
   protected config: CONFIG;
 
   constructor(
-    repository: MongoDBRepository<ENTITY, DATA, VA>,
     Entity: new (data?: any) => ENTITY,
+    repository: MongoDBRepository<ENTITY, DATA, VA>,
     sendThroughWebSocket: Send,
     config: CONFIG,
   ) {
-    super(repository, Entity, sendThroughWebSocket);
+    super(Entity, repository, sendThroughWebSocket);
 
     this.config = config;
   }
@@ -63,16 +63,9 @@ export class UserModel<
     data: object,
     uid: string,
     wsid: string,
-    options?: CollectionInsertOneOptions,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await super.create(
-      data,
-      uid,
-      wsid,
-      options,
-      excludeCurrentDevice,
-    );
+    const result: ENTITY | null = await super.create(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -84,16 +77,9 @@ export class UserModel<
     data: object,
     uid: string,
     wsid: string,
-    options?: CollectionInsertOneOptions,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await super.update(
-      data,
-      uid,
-      wsid,
-      options,
-      excludeCurrentDevice,
-    );
+    const result: ENTITY | null = await super.update(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -105,10 +91,9 @@ export class UserModel<
     id: string,
     uid: string,
     wsid: string,
-    options?: { projection?: object; sort?: object },
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await super.remove(id, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await super.remove(id, uid, wsid, excludeRequestingDevice);
 
     return new Response({
       result: result !== null ? result.getUnSecureData() : result,
@@ -147,7 +132,7 @@ export class UserModel<
     group: string,
     uid: string,
     wsid: string,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
     offset = 0,
     limit = 1000,
   ): Promise<ListResponse> {
@@ -156,7 +141,7 @@ export class UserModel<
       group,
       uid,
       wsid,
-      excludeCurrentDevice,
+      excludeRequestingDevice,
       offset,
       limit,
     );
@@ -349,7 +334,7 @@ export class UserModel<
     group: string,
     uid: string,
     wsid: string,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
     offset = 0,
     limit = 1000,
   ): Promise<ENTITY[]> {
@@ -357,9 +342,9 @@ export class UserModel<
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
       const update = { $set: { group } };
 
-      await this.repository.updateMany<UserData>(query, update);
+      await this.repository.updateMany(query, update);
 
-      const users: ENTITY[] = await this.repository.find<UserData>(query, offset, limit);
+      const users: ENTITY[] = await this.repository.find(query, offset, limit);
 
       this.sendThroughWebSocket(
         {
@@ -373,7 +358,7 @@ export class UserModel<
         },
         uid,
         wsid,
-        excludeCurrentDevice,
+        excludeRequestingDevice,
       );
 
       return users;
@@ -385,12 +370,7 @@ export class UserModel<
   }
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
-  public async update(
-    data: object,
-    uid: string,
-    wsid: string,
-    options?: FindOneAndReplaceOption,
-  ): Promise<ENTITY | null> {
+  public async update(data: object, uid: string, wsid: string): Promise<ENTITY | null> {
     try {
       const insert: ENTITY = new this.Entity(data);
 
@@ -405,7 +385,6 @@ export class UserModel<
             },
             uid,
             wsid,
-            options,
           );
         }
       }

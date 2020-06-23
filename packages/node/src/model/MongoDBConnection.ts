@@ -12,8 +12,9 @@ enum Status {
 
 export class MongoDBConnection extends EventEmitter {
   protected status: Status.OPEN | Status.CONNECTING | Status.CLOSED;
-  protected config: Config;
   protected pingTimer: NodeJS.Timer;
+
+  protected config: Config;
 
   protected client: MongoClient | void;
   protected db: Db | undefined;
@@ -21,11 +22,13 @@ export class MongoDBConnection extends EventEmitter {
   constructor(config: Config) {
     super();
 
-    this.client = undefined;
-
     this.status = Status.CLOSED;
-    this.config = config;
     this.pingTimer = setInterval(() => null, 1000 * 1000);
+
+    this.config = config;
+
+    this.client = undefined;
+    this.db = undefined;
   }
 
   get name(): string {
@@ -44,12 +47,10 @@ export class MongoDBConnection extends EventEmitter {
       this.status = Status.CONNECTING;
 
       try {
-        // eslint-disable-next-line @typescript-eslint/await-thenable
         this.client = await MongoClient.connect(this.config.db.url, {
           useNewUrlParser: true,
           useUnifiedTopology: true,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any);
+        });
 
         this.status = Status.OPEN;
 

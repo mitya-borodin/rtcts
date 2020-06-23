@@ -1,22 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Entity, Response, Send, ValidateResult } from "@rtcts/isomorphic";
-import { isObject } from "@rtcts/utils";
-import { Collection, FindOneAndReplaceOption } from "mongodb";
+import { Collection } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
 export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = object> {
-  protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected readonly Entity: new (data?: any) => ENTITY;
+  protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
   protected readonly sendThroughWebSocket: Send;
 
   constructor(
-    repository: MongoDBRepository<ENTITY, DATA, VA>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Entity: new (data?: any) => ENTITY,
+    repository: MongoDBRepository<ENTITY, DATA, VA>,
     sendThroughWebSocket: Send,
   ) {
-    this.repository = repository;
     this.Entity = Entity;
+    this.repository = repository;
     this.sendThroughWebSocket = sendThroughWebSocket;
   }
 
@@ -35,10 +33,9 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     data: object,
     uid: string,
     wsid: string,
-    options?: FindOneAndReplaceOption,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await this.update(data, uid, wsid, options, excludeCurrentDevice);
+    const result: ENTITY | null = await this.update(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
       result: result !== null ? result.toJSON() : result,
@@ -52,7 +49,6 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     try {
       return await this.repository.findOne({});
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const collection: Collection<any> = await this.repository.getCollection();
 
       await collection.drop();
@@ -67,8 +63,7 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     data: object,
     uid: string,
     wsid: string,
-    options?: FindOneAndReplaceOption,
-    excludeCurrentDevice = true,
+    excludeRequestingDevice = true,
   ): Promise<ENTITY | null> {
     try {
       const currentEntity: ENTITY | null = await this.getItem();
@@ -77,14 +72,14 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
         const insert: ENTITY = new this.Entity(data);
 
         if (insert.canBeInsert()) {
-          const entity: ENTITY | null = await this.repository.insertOne(insert, options);
+          const entity: ENTITY | null = await this.repository.insertOne(insert);
 
           if (entity) {
             this.sendThroughWebSocket(
               { create: entity.toObject() },
               uid,
               wsid,
-              excludeCurrentDevice,
+              excludeRequestingDevice,
             );
 
             return entity;
@@ -94,25 +89,14 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
         const entity: ENTITY = new this.Entity(data);
 
         if (entity.isEntity()) {
-          const { id: _id, ...$set } = entity.toObject();
-
-          const updatedEntity: ENTITY | null = await this.repository.findOneAndUpdate<{
-            _id: string;
-          }>(
-            { _id },
-            { $set },
-            {
-              returnOriginal: false,
-              ...(isObject(options) ? options : {}),
-            },
-          );
+          const updatedEntity: ENTITY | null = await this.repository.findOneAndUpdate(entity);
 
           if (updatedEntity !== null) {
             this.sendThroughWebSocket(
               { update: updatedEntity.toObject() },
               uid,
               wsid,
-              excludeCurrentDevice,
+              excludeRequestingDevice,
             );
 
             return updatedEntity;

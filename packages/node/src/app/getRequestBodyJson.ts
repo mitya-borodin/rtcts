@@ -1,5 +1,5 @@
 import body from "co-body";
-import { Context, Next, Middleware } from "koa";
+import { Context, Middleware, Next } from "koa";
 
 export const getRequestBodyJson = (): Middleware => {
   return async (ctx: Context, next: Next): Promise<void> => {
