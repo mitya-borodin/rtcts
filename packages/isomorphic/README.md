@@ -1,58 +1,27 @@
-# @rtcts/isomorphic
+# TSDX Bootstrap
 
-Contains basic isomorphic abstractions and implementations of a framework that allows you to create a real-time client-server application.
+This project was bootstrapped with [TSDX](https://github.com/jaredpalmer/tsdx).
 
-## SimpleObject
+## Local Development
 
-- The basis of all created objects in the system.
-- Declares two key methods toObject, toJSON.
+Below is a list of commands you will probably find useful.
 
-## ValueObject
+### `npm start` or `yarn start`
 
-- Globally not unique and immutable.
-- Contains the canBeInsert method, which allows you to check the object and make sure that it is composed correctly and can be inserted into the database for example.
-- Contains the validate method, which allows you to get information about the fields that are correctly or incorrectly filled.
-- It can be part of an entity and stored in a database, or it can be intermediate data, such as user registration form data, that will be deleted after the query is executed.
+Runs the project in development/watch mode. Your project will be rebuilt upon changes. TSDX has a special logger for you convenience. Error messages are pretty printed and formatted for compatibility VS Code's Problems tab.
 
-## Entity
+<img src="https://user-images.githubusercontent.com/4060187/52168303-574d3a00-26f6-11e9-9f3b-71dbec9ebfcb.gif" width="600" />
 
-- Is a globally unique object.
-- Contains an isEntity method that checks for an identifier in the object, and also calls canBeInsert.
-- It can be stored in a database as a stand-alone entity or as part of a root aggregation entity.
+Your library will be rebuilt if you make edits.
 
-## User
+### `npm run build` or `yarn build`
 
-- The basic implementation of the user class. Not mandatory for use but recommended for use.
+Bundles the package to the `dist` folder.
+The package is optimized and bundled with Rollup into multiple formats (CommonJS, UMD, and ES Module).
 
-## Log
+<img src="https://user-images.githubusercontent.com/4060187/52168322-a98e5b00-26f6-11e9-8cf6-222d716b75ef.gif" width="600" />
 
-- Used to display different types of information in a list.
+### `npm test` or `yarn test`
 
-## Validate
-
-- Used to store information about the validation of any field in the object. The object can be transmitted over the network.
-- Often used to validate form data, but not limited to form data. You can use Validate inside algorithms and other complex operations, both on the client and on the server. Very useful for implementing asynchronous form data validation on the server.
-
-## ValidateResult
-
-- Is the store for Validate, in addition to the store role calculates derived data from Validate.
-
-## ws
-
-- wsChannels - Contains the official names of the channels.
-- wsEventEnum - Contains the official names of the events.
-- wsHelpers - Contains functions that structure messages before sending and parse the message when receiving, it is very convenient to use these functions simultaneously on the client and server. They provide a consistent message format.
-
-## Build
-
-To build a library, run the following commands:
-
-```sh
-npm i -g rearguard
-
-npm i
-
-npm run build
-
-npm link
-```
+Runs the test watcher (Jest) in an interactive mode.
+By default, runs tests related to files changed since the last commit.

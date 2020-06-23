@@ -10,10 +10,6 @@
   "engines": {
     "node": ">=10"
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
@@ -58,6 +54,10 @@
   "bugs": {
     "email": "dmitriy@borodin.site",
     "url": "https://github.com/mitya-borodin/rtcts/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "module": "dist/node.esm.js",
   "devDependencies": {

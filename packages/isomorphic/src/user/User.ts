@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { isString } from "@rtcts/utils";
-import { Entity, EntityID } from "../Entity";
-import { ValidateResult } from "../validate/ValidateResult";
-import { Validate } from "../validate/Validate";
-import { logTypeEnum } from "../log/logTypeEnum";
 import omit from "lodash.omit";
+import { Entity, EntityID } from "../Entity";
+import { logTypeEnum } from "../log/logTypeEnum";
+import { Validate } from "../validate/Validate";
+import { ValidateResult } from "../validate/ValidateResult";
 
 export interface UserData {
   readonly login?: string;

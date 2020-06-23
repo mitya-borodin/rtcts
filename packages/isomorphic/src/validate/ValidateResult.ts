@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isArray, isObject, isString } from "@rtcts/utils";
 import { SimpleObject } from "../Entity";
 import { Log, LogData } from "../log/Log";
@@ -19,7 +20,7 @@ export class ValidateResult extends SimpleObject<ValidateData[]> {
   public readonly messages: string[];
   public readonly log: Log<LogData>[];
 
-  private readonly cache: Map<string, any> = new Map();
+  private readonly cache: Map<string, Validate> = new Map<string, Validate>();
 
   constructor(
     data?:

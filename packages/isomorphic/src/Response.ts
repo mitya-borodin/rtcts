@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isArray, isNumber, isUndefined } from "@rtcts/utils";
 import { ValidateData } from "./validate/Validate";
 import { ValidateResult } from "./validate/ValidateResult";

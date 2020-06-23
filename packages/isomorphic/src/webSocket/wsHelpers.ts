@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getErrorMessage, isObject, isString } from "@rtcts/utils";
 import { ErrorChannel } from "./wsChannels";
 
@@ -40,6 +42,6 @@ export const recognizeMessage = (message: string): [string, { [key: string]: any
       );
     }
   } catch (error) {
-    return makeErrorMessage(getErrorMessage(error), { error, receive_message: message });
+    return makeErrorMessage(getErrorMessage(error), { error, receiveMessage: message });
   }
 };

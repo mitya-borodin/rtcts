@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { isString } from "@rtcts/utils";
 import { SimpleObject } from "../Entity";
 import { LogType } from "./LogType";
