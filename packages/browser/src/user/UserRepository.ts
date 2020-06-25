@@ -35,6 +35,8 @@ export class UserRepository<
   ) {
     super(httpTransport, Entity, wsClient, channelName, pubSub);
 
+    this.Entity = Entity;
+
     // ! BINDINGS
     this.init = this.init.bind(this);
     this.signIn = this.signIn.bind(this);

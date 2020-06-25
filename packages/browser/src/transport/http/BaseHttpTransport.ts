@@ -36,6 +36,8 @@ export class BaseHttpTransport<
     this.pubSub = pubSub;
     this.rootPath = rootPath;
 
+    this.currentUserGroup = "";
+
     this.pubSub.on(userEventEnum.SET_USER_GROUP, (currentUserGroup: string) => {
       if (isString(currentUserGroup)) {
         this.currentUserGroup = currentUserGroup;

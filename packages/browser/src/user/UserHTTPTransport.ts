@@ -31,6 +31,8 @@ export class UserHTTPTransport<
     root = "/api",
   ) {
     super(name, Entity, ws, channelName, ACL, pubSub, root);
+
+    this.ACL = ACL;
   }
 
   public async current(): Promise<Response<ENTITY> | void> {

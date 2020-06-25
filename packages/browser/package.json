@@ -1,142 +1,60 @@
 {
-  "name": "@rtcts/browser-lib",
-  "description": "Contains basic abstractions and implementations for creating a browser application",
+  "version": "1.1.18",
   "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint src test",
+    "prepare": "tsdx build"
+  },
+  "peerDependencies": {
+    "@rtcts/isomorphic": "^1.1.6",
+    "@rtcts/utils": "^1.1.6",
+    "eventemitter3": "^4.0.4",
+    "mobx": "^5.15.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "name": "@rtcts/browser",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
-  "homepage": "https://gitlab.com/mitya-borodin/base-code",
+  "homepage": "https://github.com/mitya-borodin/rtcts",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/mitya-borodin/base-code.git"
+    "url": "git+ssh://git@github.com:mitya-borodin/rtcts.git"
   },
   "bugs": {
     "email": "dmitriy@borodin.site",
-    "url": "https://gitlab.com/mitya-borodin/base-code"
-  },
-  "version": "1.1.17",
-  "main": "./lib/export.js",
-  "bin": "",
-  "files": [
-    "lib",
-    "lib_bundle"
-  ],
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "start": "rearguard start",
-    "build": "rearguard build",
-    "test": "rearguard test",
-    "lint": "rearguard lint",
-    "lint-fix": "rearguard lint --fix",
-    "typecheck": "tsc --noEmit",
-    "validate-prettiness": "prettier -c '**/*.{ts,tsx,json,md}'",
-    "validate": "npm run lint && npm run typecheck && npm run validate-prettiness",
-    "make-prettier": "prettier --write '**/*.{ts,tsx,json,md}'",
-    "postinstall": "npx typesync",
-    "sync": "rearguard sync",
-    "refresh": "rearguard refresh",
-    "watch": "rearguard watch"
-  },
-  "types": "./lib/export.d.ts",
-  "dependencies": {
-    "@rtcts/isomorphic": "1.1.6",
-    "@rtcts/utils": "1.1.6",
-    "@rtcts/vendor-mobx": "1.1.6",
-    "@rtcts/vendor-other": "1.1.6",
-    "@rtcts/vendor-react": "1.1.6",
-    "eventemitter3": "4.0.0",
-    "tslib": "2.0.0"
-  },
-  "devDependencies": {
-    "@types/chai": "4.1.7",
-    "@types/eslint": "6.1.7",
-    "@types/eventemitter3": "2.0.2",
-    "@types/history": "4.7.3",
-    "@types/mocha": "5.2.6",
-    "@types/node": "11.12.2",
-    "@types/numeral": "0.0.26",
-    "@types/prettier": "1.16.4",
-    "@types/react": "16.9.5",
-    "@types/react-dom": "16.9.1",
-    "@types/stylelint": "9.10.1",
-    "@typescript-eslint/eslint-plugin": "3.0.0",
-    "@typescript-eslint/parser": "3.0.0",
-    "chai": "4.2.0",
-    "eslint": "7.1.0",
-    "eslint-config-prettier": "6.11.0",
-    "eslint-plugin-import": "2.20.2",
-    "eslint-plugin-jest": "23.13.1",
-    "eslint-plugin-react": "7.20.0",
-    "eslint-plugin-react-hooks": "4.0.2",
-    "husky": "4.2.5",
-    "mocha": "6.1.4",
-    "normalize.css": "8.0.1",
-    "prettier": "2.0.5",
-    "pretty-quick": "2.0.1",
-    "stylelint": "13.5.0",
-    "stylelint-config-css-modules": "2.2.0",
-    "stylelint-config-prettier": "8.0.1",
-    "stylelint-config-standard": "20.0.0",
-    "ts-node": "8.1.0",
-    "ts-node-dev": "1.0.0-pre.32",
-    "tslint": "5.14.0",
-    "typescript": "3.9.3"
-  },
-  "keywords": [],
-  "engines": {
-    "node": ">=10 <11",
-    "npm": ">=6 <7"
+    "url": "https://github.com/mitya-borodin/rtcts/issues"
   },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "browserslist": [
-    "last 2 versions"
-  ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged",
-      "pre-push": "npm run validate"
-    }
-  },
-  "rearguard": {
-    "webpack": {
-      "context": "src",
-      "dll_entry": "rtcts_browser_lib_vendors.ts",
-      "entry": "index.tsx",
-      "lib_entry": "export.ts",
-      "modules": [
-        "src"
-      ],
-      "output": {
-        "path": "dist",
-        "publicPath": "/",
-        "libraryTarget": "var"
-      }
-    },
-    "html": {
-      "noInjectAssets": false
-    },
-    "css": {
-      "postcssPlugins": "postcss.config.js",
-      "useOnlyIsomorphicStyleLoader": false
-    },
-    "project": {
-      "runtime": "browser",
-      "type": "lib",
-      "thisModuleWillLoadOnDemand": false,
-      "buildListOfLoadOnDemandModulesForAll": false,
-      "unPublishedDependency": []
-    },
-    "configs": {
-      "noOverwriteTSConfig": false,
-      "noOverwriteTSTestConfig": false,
-      "noOverwriteLintConfig": false,
-      "noOverwriteGitIgnore": false
-    },
-    "distribution": {
-      "publish_to_git": false
-    }
+  "module": "dist/browser.esm.js",
+  "devDependencies": {
+    "@rtcts/isomorphic": "^1.1.7",
+    "@rtcts/utils": "^1.1.6",
+    "@types/eventemitter3": "^2.0.2",
+    "@types/jest": "^26.0.0",
+    "@types/node": "^14.0.13",
+    "eventemitter3": "^4.0.4",
+    "husky": "^4.2.5",
+    "mobx": "^5.15.4",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.5"
   }
 }

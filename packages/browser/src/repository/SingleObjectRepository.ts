@@ -6,8 +6,6 @@ import { repositoryPubSubEnum } from "../enums/repositoryPubSubEnum";
 import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTransport";
 import { WSClient } from "../transport/ws/WSClient";
 
-// tslint:disable: object-literal-sort-keys
-
 export class SingleObjectRepository<
   HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
   ENTITY extends Entity<DATA, VA>,
@@ -66,8 +64,8 @@ export class SingleObjectRepository<
     this.handleUserUnBindedToConnection = this.handleUserUnBindedToConnection.bind(this);
 
     // ! SUBSCRIPTIONS
-    this.ws.on(wsEventEnum.USER_BINDED_TO_CONNECTION, this.handleUserBindedToConnection);
-    this.ws.on(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, this.handleUserUnBindedToConnection);
+    this.ws.on(wsEventEnum.USER_BIND_TO_CONNECTION, this.handleUserBindedToConnection);
+    this.ws.on(wsEventEnum.USER_UNBIND_FROM_CONNECTION, this.handleUserUnBindedToConnection);
   }
 
   @action("SingleObjectRepository.init")

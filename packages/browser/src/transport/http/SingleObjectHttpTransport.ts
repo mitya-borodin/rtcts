@@ -1,7 +1,7 @@
-import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
+import { Entity, Response } from "@rtcts/isomorphic";
 import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";
-import { Entity, Response } from "@rtcts/isomorphic";
+import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
 
 export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
   getItem: string[];
@@ -30,6 +30,7 @@ export class SingleObjectHttpTransport<
   ) {
     super(name, ws, channelName, ACL, pubSub, root);
 
+    this.ACL = ACL;
     this.Entity = Entity;
 
     this.getItem = this.getItem.bind(this);

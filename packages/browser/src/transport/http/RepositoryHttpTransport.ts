@@ -33,6 +33,7 @@ export class RepositoryHttpTransport<
   ) {
     super(name, ws, channelName, ACL, pubSub, root);
 
+    this.ACL = ACL;
     this.Entity = Entity;
 
     this.getList = this.getList.bind(this);

@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Entity, ValidateResult } from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
@@ -172,7 +170,9 @@ export class FormStore<
 
   // eslint-disable-next-line @typescript-eslint/require-await
   protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
-    console.log(`External handler for open action (${this.constructor.name})`, { id });
+    console.log(`External handler for open action (${this.constructor.name})`, {
+      id,
+    });
 
     return new this.Entity({ id });
   }

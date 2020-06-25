@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 import {
   BindUserToConnection,
   ErrorChannel,
@@ -38,6 +36,9 @@ export class WSClient extends EventEmitter {
     reconnectionDelay = 5000,
   ) {
     super();
+
+    this.wsid = "";
+    this.connection = null;
 
     // PROPS
     this.isAlive = true;
@@ -125,7 +126,10 @@ export class WSClient extends EventEmitter {
           }
 
           if (chName === BindUserToConnection) {
-            this.bindUserToConnectionHandler({ uid: data.uid, wsid: data.wsid });
+            this.bindUserToConnectionHandler({
+              uid: data.uid,
+              wsid: data.wsid,
+            });
           } else if (chName === UnbindUserFromConnection) {
             this.unbindUserToConnectionHandler();
           } else if (chName === PongChannel) {
@@ -190,7 +194,7 @@ export class WSClient extends EventEmitter {
       // метод disconnect;
       await new Promise<void>(async (resolve, reject) => {
         try {
-          this.once(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, () => {
+          this.once(wsEventEnum.USER_UNBIND_FROM_CONNECTION, () => {
             if (this.connection instanceof WebSocket) {
               this.connection.close(1000, reason);
             } else {
@@ -277,7 +281,7 @@ export class WSClient extends EventEmitter {
 
         this.connection.send(makeMessage(BindUserToConnection, { uid: this.uid }));
 
-        this.once(wsEventEnum.USER_BINDED_TO_CONNECTION, resolve);
+        this.once(wsEventEnum.USER_BIND_TO_CONNECTION, resolve);
       });
     } catch (error) {
       console.error(error);
@@ -307,7 +311,7 @@ export class WSClient extends EventEmitter {
 
         this.send(UnbindUserFromConnection, { uid: this.uid });
 
-        this.once(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, resolve);
+        this.once(wsEventEnum.USER_UNBIND_FROM_CONNECTION, resolve);
       });
     } catch (error) {
       console.error(error);
@@ -353,7 +357,7 @@ export class WSClient extends EventEmitter {
       this.wsid = wsid;
       this.uid = uid;
 
-      this.emit(wsEventEnum.USER_BINDED_TO_CONNECTION, {});
+      this.emit(wsEventEnum.USER_BIND_TO_CONNECTION, {});
     } catch (error) {
       console.error(error);
     }
@@ -365,7 +369,7 @@ export class WSClient extends EventEmitter {
       this.isUserBindToConnection = false;
       this.wsid = "";
 
-      this.emit(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, {});
+      this.emit(wsEventEnum.USER_UNBIND_FROM_CONNECTION, {});
     } catch (error) {
       console.error(error);
     }

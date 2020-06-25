@@ -1,14 +1,10 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Entity, wsEventEnum, ListResponse, Response } from "@rtcts/isomorphic";
+import { Entity, ListResponse, Response, wsEventEnum } from "@rtcts/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
+import { repositoryPubSubEnum } from "../enums/repositoryPubSubEnum";
 import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTransport";
 import { WSClient } from "../transport/ws/WSClient";
-import { repositoryPubSubEnum } from "../enums/repositoryPubSubEnum";
-
-// tslint:disable: object-literal-sort-keys
 
 export class Repository<
   HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
@@ -61,7 +57,7 @@ export class Repository<
 
     // ! OBSERVABLE
     this.pending = false;
-    this.collection = observable.map();
+    this.collection = observable.map<string, ENTITY>();
 
     // * BINDINGS
     this.init = this.init.bind(this);
@@ -75,8 +71,8 @@ export class Repository<
     this.filter = this.filter.bind(this);
 
     // ! SUBSCRIPTIONS
-    this.ws.on(wsEventEnum.USER_BINDED_TO_CONNECTION, this.handleUserBindedToConnection);
-    this.ws.on(wsEventEnum.USER_UNBINDED_FROM_CONNECTION, this.handleUserUnBindedToConnection);
+    this.ws.on(wsEventEnum.USER_BIND_TO_CONNECTION, this.handleUserBindedToConnection);
+    this.ws.on(wsEventEnum.USER_UNBIND_FROM_CONNECTION, this.handleUserUnBindedToConnection);
   }
 
   @computed({ name: "Repository.map" })

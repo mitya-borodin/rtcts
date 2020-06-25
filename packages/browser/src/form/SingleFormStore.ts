@@ -1,17 +1,30 @@
-import { Entity } from "@rtcts/isomorphic";
-import { isString, getErrorMessage } from "@rtcts/utils";
-import { FormStore } from "./FormStore";
-import { SingleRepositoryPubSubEnum } from "../enums/SingleRepositoryPubSubEnum";
-import { SingleObjectRepository } from "../repository/SingleObjectRepository";
-import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTransport";
-import { WSClient } from "../transport/ws/WSClient";
-import EventEmitter from "eventemitter3";
+import { Entity } from '@rtcts/isomorphic';
+import { getErrorMessage, isString } from '@rtcts/utils';
+import EventEmitter from 'eventemitter3';
+import { SingleRepositoryPubSubEnum } from '../enums/SingleRepositoryPubSubEnum';
+import { SingleObjectRepository } from '../repository/SingleObjectRepository';
+import { SingleObjectHttpTransport } from '../transport/http/SingleObjectHttpTransport';
+import { WSClient } from '../transport/ws/WSClient';
+import { FormStore } from './FormStore';
 
 export class SingleFormStore<
-  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
+  HTTP_TRANSPORT extends SingleObjectHttpTransport<
+    ENTITY,
+    DATA,
+    VA,
+    WS,
+    PUB_SUB
+  >,
   ENTITY extends Entity<DATA, VA>,
   DATA,
-  REP extends SingleObjectRepository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB>,
+  REP extends SingleObjectRepository<
+    HTTP_TRANSPORT,
+    ENTITY,
+    DATA,
+    VA,
+    WS,
+    PUB_SUB
+  >,
   VA extends object = object,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
@@ -22,6 +35,7 @@ export class SingleFormStore<
   constructor(Entity: new (data?: any) => ENTITY, repository: REP) {
     super(Entity);
 
+    this.Entity = Entity;
     this.repository = repository;
 
     this.openForm = this.openForm.bind(this);
@@ -35,7 +49,9 @@ export class SingleFormStore<
       return new this.Entity(this.repository.entity.toObject());
     }
 
-    console.warn(`Initialize the repository before you begin using ${this.constructor.name}`);
+    console.warn(
+      `Initialize the repository before you begin using ${this.constructor.name}`
+    );
 
     return new this.Entity();
   }
@@ -60,7 +76,11 @@ export class SingleFormStore<
 
       this.emit(SingleRepositoryPubSubEnum.submit, result);
     } catch (error) {
-      console.error(`Submit (${this.constructor.name}) has been filed: ${getErrorMessage(error)}`);
+      console.error(
+        `Submit (${this.constructor.name}) has been filed: ${getErrorMessage(
+          error
+        )}`
+      );
     }
   }
 }
