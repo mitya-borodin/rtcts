@@ -1,7 +1,19 @@
 {
   "version": "1.0.0",
   "name": "rtcts",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "lint": "lerna run lint",
+    "test": "lerna run test",
+    "build": "lerna run build"
+  },
   "devDependencies": {
+    "husky": "^4.2.5",
     "lerna": "^3.18.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
   }
 }
