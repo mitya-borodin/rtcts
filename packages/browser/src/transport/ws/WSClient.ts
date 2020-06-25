@@ -192,7 +192,7 @@ export class WSClient extends EventEmitter {
       // Не используется если CLOSE или ERROR, так как но может быть закрыто или упасть с ошибкой по разным
       // причинам. И при CLOSE или ERROR необходимо выполнять reconnect если явно небыл вызван этот
       // метод disconnect;
-      await new Promise<void>(async (resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         try {
           this.once(wsEventEnum.USER_UNBIND_FROM_CONNECTION, () => {
             if (this.connection instanceof WebSocket) {
@@ -209,13 +209,14 @@ export class WSClient extends EventEmitter {
             resolve();
           });
 
-          await this.unbindUserFromConnection();
-
-          console.log(`Connection disconnected`);
+          this.unbindUserFromConnection()
+            .then(() => console.log(`Connection disconnected`))
+            .catch(reject);
         } catch (error) {
           reject(`Connection disconnected with an error: ${getErrorMessage(error)}`);
         } finally {
           console.log(`Reason for disconnecting the connection: ${reason}`);
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           console.log(`Number of remaining subscribers: ${this.listenerCount} `);
         }
       });
