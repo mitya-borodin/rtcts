@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable no-underscore-dangle */
@@ -27,18 +28,19 @@ import { MongoDBConnection } from "./MongoDBConnection";
 
 type QueryData = { _id: string | ObjectId } & { [key: string]: any };
 
-export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = object> {
+// new MongoDBRepository<User, UserData>("name", db, User, {})
+export class MongoDBRepository<ENTITY extends Entity> {
   private readonly name: string;
   private readonly db: MongoDBConnection;
   private readonly options?: CollectionCreateOptions;
   private collection?: Collection;
 
-  protected readonly Entity: new (data?: any) => ENTITY;
+  protected readonly Entity: new (data: any) => ENTITY;
 
   constructor(
     name: string,
     db: MongoDBConnection,
-    Entity: new (data?: any) => ENTITY,
+    Entity: new (data: any) => ENTITY,
     options?: CollectionCreateOptions,
   ) {
     this.name = name;
@@ -89,7 +91,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   public async insertMany(
-    items: ValueObject<any>[],
+    items: ValueObject[],
     options?: CollectionInsertManyOptions,
   ): Promise<ENTITY[]> {
     try {
@@ -97,8 +99,7 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
 
       const insert: InsertWriteOpResult<any> = await collection.insertMany(
         items
-          .filter((item: ValueObject<any>) => item.canBeInsert())
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          .filter((item: ValueObject) => item.isInsert())
           .map((item) => this.removeID(item.toObject())),
         this.getOptions(options),
       );
@@ -113,11 +114,11 @@ export class MongoDBRepository<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   public async insertOne(
-    item: ValueObject<DATA>,
+    item: ValueObject,
     options?: CollectionInsertOneOptions,
   ): Promise<ENTITY | null> {
     try {
-      if (item.canBeInsert()) {
+      if (item.isInsert()) {
         const collection: Collection<any> = await this.getCollection();
 
         const insert: InsertOneWriteOpResult<any> = await collection.insertOne(

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Response, User, UserData, ValidateResult } from "@rtcts/isomorphic";
+import { Response, User, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";
 import koaLogger from "koa-logger";
@@ -12,12 +12,7 @@ export interface BaseHttpTransportACL {
   readonly channel: string[];
 }
 
-export abstract class BaseHttpTransport<
-  USER extends User<USER_DATA, USER_VA>,
-  USER_DATA extends UserData = UserData,
-  USER_VA extends object = object,
-  CHANNELS extends Channels = Channels
-> {
+export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Channels = Channels> {
   protected readonly name: string;
   protected readonly channels: CHANNELS;
   protected readonly ACL: BaseHttpTransportACL;
@@ -98,8 +93,8 @@ export abstract class BaseHttpTransport<
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = new Response({
-                result: {},
-                validates: new ValidateResult(),
+                payload: {},
+                validationResult: new ValidationResult([]),
               });
             } else if (action === "off") {
               this.channels.off(channelName, userId, wsid);
@@ -107,8 +102,8 @@ export abstract class BaseHttpTransport<
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = new Response({
-                result: {},
-                validates: new ValidateResult(),
+                payload: {},
+                validationResult: new ValidationResult([]),
               });
             } else {
               const message = `[ ${this.constructor.name} ][ ${URL} ][ UNEXPECTED ACTION: ${action} ]`;
@@ -138,7 +133,7 @@ export abstract class BaseHttpTransport<
         if (
           user instanceof this.User &&
           // ! I should set UserData because I need to use concrete type
-          user.isEntity<UserData>() &&
+          user.isEntity() &&
           (ACL.length === 0 || ACL.includes(user.group))
         ) {
           return await worker(user.id, wsid);

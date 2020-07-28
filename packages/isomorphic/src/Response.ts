@@ -1,79 +1,83 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isArray, isNumber, isUndefined } from "@rtcts/utils";
-import { ValidateData } from "./validate/Validate";
-import { ValidateResult } from "./validate/ValidateResult";
+import { ValidationData } from "./validation/Validation";
+import { ValidationResult } from "./validation/ValidationResult";
 
 export class ListResponse<T = any> {
   readonly count: number;
-  readonly results: T[];
-  readonly validates: ValidateResult;
+  readonly payload: T[];
+  readonly validationResult: ValidationResult;
 
   constructor(data?: Omit<ListResponse<T>, "toJSON">) {
     if (data) {
       if (isNumber(data.count)) {
         this.count = data.count;
       } else {
-        throw new Error("ListResponse.count isn't valid");
+        throw new Error("ListResponse.count should be number");
       }
 
-      if (isArray<T>(data.results)) {
-        this.results = data.results;
+      if (isArray<T>(data.payload)) {
+        this.payload = data.payload;
       } else {
-        throw new Error("ListResponse.results isn't valid");
+        throw new Error("ListResponse.payload is undefined");
       }
 
-      if (isArray<ValidateData>(data.validates) || data.validates instanceof ValidateResult) {
-        this.validates = new ValidateResult(data.validates);
+      if (isArray<ValidationData>(data.validationResult)) {
+        this.validationResult = new ValidationResult(data.validationResult);
       } else {
-        throw new Error("ListResponse.validates isn't valid");
+        throw new Error("ListResponse.validationResult should be array of ValidationData");
       }
     } else {
-      throw new Error("ListResponse isn't valid");
+      throw new Error("ListResponse data is undefined");
     }
   }
 
   public toJSON(): {
     count: number;
-    results: T[];
-    validates: ValidateData[];
+    payload: T[];
+    validationResult: ValidationData[];
   } {
     return {
       count: this.count,
-      results: this.results,
-      validates: this.validates.toJSON(),
+      payload: this.payload,
+      validationResult: this.validationResult
+        .toValidation()
+        .map((validation) => validation.toJSON()),
     };
   }
 }
 
 export class Response<T = any> {
-  readonly result: T;
-  readonly validates: ValidateResult;
+  readonly payload: T;
+  readonly validationResult: ValidationResult;
 
   constructor(data?: Omit<Response<T>, "toJSON">) {
+    this.payload = {} as T;
+    this.validationResult = new ValidationResult([]);
+
     if (data) {
-      if (!isUndefined(data.result)) {
-        this.result = data.result;
+      if (!isUndefined(data.payload)) {
+        this.payload = data.payload;
       } else {
-        throw new Error("Response.result isn't valid");
+        throw new TypeError("Response.payload is undefined");
       }
 
-      if (isArray(data.validates) || data.validates instanceof ValidateResult) {
-        this.validates = new ValidateResult(data.validates);
+      if (isArray(data.validationResult)) {
+        this.validationResult = new ValidationResult(data.validationResult);
       } else {
-        throw new Error("Response.validates isn't valid");
+        throw new Error("Response.validationResult should be array of ValidationData");
       }
     } else {
-      throw new Error("Response isn't valid");
+      throw new Error("Response data is undefined");
     }
   }
 
-  public toJSON(): {
-    result: T;
-    validates: ValidateData[];
-  } {
+  public toJSON(): { payload: T; validationResult: ValidationData[] } {
     return {
-      result: this.result,
-      validates: this.validates.toJSON(),
+      payload: this.payload,
+      validationResult: this.validationResult
+        .toValidation()
+        .map((validation) => validation.toJSON()),
     };
   }
 }

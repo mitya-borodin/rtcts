@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ListResponse,
   Response,
   Send,
   User,
-  UserData,
   userGroupEnum,
-  ValidateResult,
+  ValidationResult,
 } from "@rtcts/isomorphic";
 import { checkPassword, isString } from "@rtcts/utils";
 import { ObjectId } from "bson";
@@ -20,17 +22,12 @@ import { getSalt } from "../utils/getSalt";
 import { Model } from "./Model";
 import { MongoDBRepository } from "./MongoDBRepository";
 
-export class UserModel<
-  ENTITY extends User<DATA, VA>,
-  DATA extends UserData = UserData,
-  VA extends object = object,
-  CONFIG extends Config = Config
-> extends Model<ENTITY, DATA, VA> {
+export class UserModel<ENTITY extends User, CONFIG extends Config = Config> extends Model<ENTITY> {
   protected config: CONFIG;
 
   constructor(
-    Entity: new (data?: any) => ENTITY,
-    repository: MongoDBRepository<ENTITY, DATA, VA>,
+    Entity: new (data: any) => ENTITY,
+    repository: MongoDBRepository<ENTITY>,
     sendThroughWebSocket: Send,
     config: CONFIG,
   ) {
@@ -41,21 +38,21 @@ export class UserModel<
 
   // ! Response API
   public async getListResponse(offset = 0, limit = 20): Promise<ListResponse> {
-    const results: ENTITY[] = await this.repository.find({}, offset, limit);
+    const payload: ENTITY[] = await this.repository.find({}, offset, limit);
 
     return new ListResponse({
-      count: results.length,
-      results: results.map((item) => item.getUnSecureData()),
-      validates: new ValidateResult(),
+      count: payload.length,
+      payload: payload.map((item) => item.getUnSecureData()),
+      validationResult: new ValidationResult([]),
     });
   }
 
   public async getItemResponse(id: string, options?: FindOneOptions): Promise<Response> {
-    const result: ENTITY | null = await this.repository.findById(id, options);
+    const payload: ENTITY | null = await this.repository.findById(id, options);
 
     return new Response({
-      result: result !== null ? result.getUnSecureData() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.getUnSecureData() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
@@ -65,11 +62,11 @@ export class UserModel<
     wsid: string,
     excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await super.create(data, uid, wsid, excludeRequestingDevice);
+    const payload: ENTITY | null = await super.create(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
-      result: result !== null ? result.getUnSecureData() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.getUnSecureData() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
@@ -79,11 +76,11 @@ export class UserModel<
     wsid: string,
     excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await super.update(data, uid, wsid, excludeRequestingDevice);
+    const payload: ENTITY | null = await super.update(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
-      result: result !== null ? result.getUnSecureData() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.getUnSecureData() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
@@ -93,11 +90,11 @@ export class UserModel<
     wsid: string,
     excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await super.remove(id, uid, wsid, excludeRequestingDevice);
+    const payload: ENTITY | null = await super.remove(id, uid, wsid, excludeRequestingDevice);
 
     return new Response({
-      result: result !== null ? result.getUnSecureData() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.getUnSecureData() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
@@ -106,11 +103,11 @@ export class UserModel<
     uid: string,
     wsid: string,
   ): Promise<Response> {
-    const result: ENTITY | null = await this.updateLogin(data, uid, wsid);
+    const payload: ENTITY | null = await this.updateLogin(data, uid, wsid);
 
     return new Response({
-      result: result !== null ? result.getUnSecureData() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.getUnSecureData() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
@@ -119,11 +116,11 @@ export class UserModel<
     uid: string,
     wsid: string,
   ): Promise<Response> {
-    const result: ENTITY | null = await this.updatePassword(data, uid, wsid);
+    const payload: ENTITY | null = await this.updatePassword(data, uid, wsid);
 
     return new Response({
-      result: result !== null ? result.getUnSecureData() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.getUnSecureData() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
@@ -136,7 +133,7 @@ export class UserModel<
     offset = 0,
     limit = 1000,
   ): Promise<ListResponse> {
-    const results: ENTITY[] | null = await this.updateGroup(
+    const payload: ENTITY[] | null = await this.updateGroup(
       ids,
       group,
       uid,
@@ -147,14 +144,13 @@ export class UserModel<
     );
 
     return new ListResponse({
-      count: results.length,
-      results: results.map((result) => result.getUnSecureData()),
-      validates: new ValidateResult(),
+      count: payload.length,
+      payload: payload.map((payload) => payload.getUnSecureData()),
+      validationResult: new ValidationResult([]),
     });
   }
 
   // ! Model API
-
   public async getUsers(offset = 0, limit = 20): Promise<ENTITY[]> {
     return await this.repository.find({}, offset, limit);
   }
@@ -165,9 +161,9 @@ export class UserModel<
 
   public async init(): Promise<void> {
     try {
-      const result: ENTITY | null = await this.repository.findOne({});
+      const payload: ENTITY | null = await this.repository.findOne({});
 
-      if (result === null) {
+      if (payload === null) {
         await this.signUp({
           group: userGroupEnum.admin,
           login: "admin@admin.com",
@@ -212,14 +208,14 @@ export class UserModel<
       const hashedPassword = encryptPassword(password, salt);
       const insert = new this.Entity({ login, group, salt, hashedPassword, ...other });
 
-      if (insert.canBeInsertWithSecureFields()) {
+      if (insert.isInsert()) {
         const user: ENTITY | null = await this.repository.insertOne(insert);
 
-        if (user && user.isEntityWithSecureFields()) {
+        if (user && user.isEntity()) {
           if (onlyCreate) {
             return new Response({
-              result: user.getUnSecureData(),
-              validates: new ValidateResult(),
+              payload: user.getUnSecureData(),
+              validationResult: new ValidationResult([]),
             });
           } else {
             return jwt.sign({ id: user.id }, this.config.jwt.secretKey, { expiresIn: "12h" });
@@ -245,7 +241,7 @@ export class UserModel<
         throw new Error(`User with login: ${data.login} not found`);
       }
 
-      if (user.isEntityWithSecureFields<UserData>()) {
+      if (user.isEntity()) {
         if (!authenticate(data.password, user.salt, user.hashedPassword)) {
           throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
         }
@@ -269,16 +265,16 @@ export class UserModel<
         throw new Error(`Incorrect updateLogin data: ${JSON.stringify(data)}`);
       }
 
-      const result: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+      const payload: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
-      if (result === null) {
+      if (payload === null) {
         throw new Error(`User with id: ${data.id} and login: ${data.login} not found`);
       }
 
-      if (result.isEntityWithSecureFields()) {
-        const updatedEntity = new this.Entity({ ...result.toObject(), login: data.login });
+      if (payload.isEntity()) {
+        const updatedEntity = new this.Entity({ ...payload.toObject(), login: data.login });
 
-        if (!updatedEntity.isEntityWithSecureFields()) {
+        if (!updatedEntity.isEntity()) {
           throw new Error(`Updated entity wrong`);
         }
 
@@ -307,18 +303,16 @@ export class UserModel<
         throw new Error(`Incorrect password: ${JSON.stringify(data)}`);
       }
 
-      const result: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+      const payload: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
-      if (result === null) {
+      if (payload === null) {
         throw new Error(`User with id: ${data.id} not found`);
       }
 
-      console.log(result, result.isEntityWithSecureFields());
-
-      if (result.isEntityWithSecureFields()) {
+      if (payload.isEntity()) {
         const salt = getSalt();
         const hashedPassword = encryptPassword(data.password, salt);
-        const query = { ...result.toObject(), salt, hashedPassword };
+        const query = { ...payload.toObject(), salt, hashedPassword };
 
         return await super.update(query, uid, wsid);
       }
@@ -349,7 +343,7 @@ export class UserModel<
       this.sendThroughWebSocket(
         {
           bulkUpdate: users.map((user) => {
-            if (user.isEntityWithSecureFields()) {
+            if (user.isEntity()) {
               return user.getUnSecureData();
             }
 

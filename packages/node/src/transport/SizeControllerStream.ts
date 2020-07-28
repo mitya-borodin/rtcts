@@ -1,4 +1,4 @@
-import { TransformCallback, Transform } from "stream";
+import { Transform, TransformCallback } from "stream";
 
 export class SizeControllerStream extends Transform {
   public bytes = 0;

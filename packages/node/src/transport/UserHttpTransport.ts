@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Response, User, UserData, userGroupEnum, ValidateResult } from "@rtcts/isomorphic";
+import { Response, User, userGroupEnum, ValidationResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import Koa from "koa";
 import {
   getAuthenticateMiddleware,
   setCookieForAuthenticate,
-  unsetCookieForAuthenticate,
+  unsetCookieForAuthenticate
 } from "../app/auth";
 import { Config } from "../app/Config";
 import { getRequestBodyJson } from "../app/getRequestBodyJson";
@@ -22,13 +22,11 @@ export interface UserHttpTransportACL extends HttpTransportACL {
 }
 
 export class UserHttpTransport<
-  MODEL extends UserModel<ENTITY, DATA, VA, CONFIG>,
-  ENTITY extends User<DATA, VA>,
-  DATA extends UserData = UserData,
-  VA extends object = object,
+  MODEL extends UserModel<ENTITY, CONFIG>,
+  ENTITY extends User,
   CONFIG extends Config = Config,
   CHANNELS extends Channels = Channels
-> extends HttpTransport<MODEL, ENTITY, DATA, VA, ENTITY, DATA, VA, CHANNELS> {
+> extends HttpTransport<MODEL, ENTITY, ENTITY, CHANNELS> {
   protected readonly ACL: UserHttpTransportACL;
 
   protected readonly switchers: {
@@ -125,7 +123,7 @@ export class UserHttpTransport<
 
             const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
 
-            if (response.result) {
+            if (response.payload) {
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
@@ -147,8 +145,8 @@ export class UserHttpTransport<
 
       if (user.isEntity()) {
         const response = new Response({
-          result: user.getUnSecureData(),
-          validates: new ValidateResult(),
+          payload: user.getUnSecureData(),
+          validationResult: new ValidationResult([]),
         });
 
         ctx.status = 200;
@@ -175,8 +173,8 @@ export class UserHttpTransport<
           ctx.status = 200;
           ctx.type = "application/json";
           ctx.body = new Response({
-            result: {},
-            validates: new ValidateResult(),
+            payload: {},
+            validationResult: new ValidationResult([]),
           });
         } else {
           const message = `SingIn (${this.constructor.name})(${URL}) has been failed`;
@@ -199,8 +197,8 @@ export class UserHttpTransport<
         ctx.status = 200;
         ctx.type = "application/json";
         ctx.body = new Response({
-          result: {},
-          validates: new ValidateResult(),
+          payload: {},
+          validationResult: new ValidationResult([]),
         });
       } else {
         const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
@@ -225,7 +223,7 @@ export class UserHttpTransport<
             true,
           );
 
-          if (response instanceof Response && response.result) {
+          if (response instanceof Response && response.payload) {
             ctx.status = 200;
             ctx.type = "application/json";
             ctx.body = JSON.stringify(response);
@@ -249,8 +247,8 @@ export class UserHttpTransport<
         ctx.status = 200;
         ctx.type = "application/json";
         ctx.body = new Response({
-          result: {},
-          validates: new ValidateResult(),
+          payload: {},
+          validationResult: new ValidationResult([]),
         });
       });
     });
@@ -276,7 +274,7 @@ export class UserHttpTransport<
               wsid,
             );
 
-            if (response.result) {
+            if (response.payload) {
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
@@ -311,7 +309,7 @@ export class UserHttpTransport<
               wsid,
             );
 
-            if (response.result) {
+            if (response.payload) {
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
@@ -345,7 +343,7 @@ export class UserHttpTransport<
 
             const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
 
-            if (listResponse.results.length === 0) {
+            if (listResponse.payload.length === 0) {
               const message = `UpdateGroup (${this.constructor.name})(${URL}) has been failed`;
 
               ctx.throw(404, message);

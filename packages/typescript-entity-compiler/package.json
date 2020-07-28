@@ -1,0 +1,67 @@
+{
+  "version": "1.2.1",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "test:watch": "tsdx test --watch",
+    "test:coverage": "tsdx test --coverage",
+    "lint": "tsdx lint src test",
+    "lint:fix": "tsdx lint src test --fix",
+    "lint:report": "tsdx lint src test --report-file report.json",
+    "prepare": "tsdx build"
+  },
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint src test"
+    }
+  },
+  "name": "@rtcts/typescript-entity-compiler",
+  "description": "Typescript compiler for entities",
+  "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
+  "homepage": "https://github.com/mitya-borodin/rtcts",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:mitya-borodin/rtcts.git"
+  },
+  "keywords": [
+    "typescript",
+    "entity",
+    "compiler",
+    "validation",
+    "type-safety",
+    "run-time type checking",
+    "database schema as code"
+  ],
+  "bugs": {
+    "email": "dmitriy@borodin.site",
+    "url": "https://github.com/mitya-borodin/rtcts/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "module": "dist/utils.esm.js",
+  "devDependencies": {
+    "@types/jest": "^26.0.7",
+    "@types/node": "^14.0.25",
+    "husky": "^4.2.5",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@rtcts/isomorphic": "^1.2.1"
+  }
+}

@@ -24,11 +24,12 @@
   "typescript.updateImportsOnFileMove.enabled": "never",
   "eslint.alwaysShowStatus": true,
   "eslint.enable": true,
-  "eslint.packageManager": "npm",
+  "eslint.packageManager": "yarn",
   "eslint.workingDirectories": [
     "./packages/browser",
     "./packages/isomorphic",
     "./packages/node",
+    "./packages/typescript-entity-compiler",
     "./packages/utils",
   ],
   "css.validate": false,

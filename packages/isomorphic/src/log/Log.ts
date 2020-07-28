@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { isString } from "@rtcts/utils";
-import { SimpleObject } from "../Entity";
+import { EssentialObject } from "../Entity";
 import { LogType } from "./LogType";
 import { logTypeEnum } from "./logTypeEnum";
 
@@ -9,35 +9,43 @@ export interface LogData {
   readonly message: string;
 }
 
-const fields: string[] = ["type", "message"];
+export class Log implements EssentialObject {
+  readonly type: LogType;
+  readonly message: string;
 
-export class Log<DATA extends LogData = LogData> extends SimpleObject<DATA> {
-  public readonly type: LogType;
-  public readonly message: string;
-
-  constructor(data: Partial<DATA>) {
-    super();
-
+  constructor(data: Partial<LogData>) {
     this.type = logTypeEnum.log;
     this.message = "";
 
-    if (data) {
-      for (const field of fields) {
-        if (isString(data[field])) {
-          this[field] = data[field];
-        } else {
-          throw new Error(`Log.${field} should be String`);
-        }
-      }
-    } else {
+    if(!data) {
       throw new Error(`Log(data) data should be defined`);
+    }
+
+    if (isString(data.type)) {
+      this.type = data.type;
+    } else {
+      throw new Error(`Log.type should be string`);
+    }
+
+    if (isString(data.message)) {
+      this.message = data.message;
+    } else {
+      throw new Error(`Log.message should be string`);
     }
   }
 
-  public toObject(): DATA {
+  toObject(): LogData {
     return {
       type: this.type,
       message: this.message,
-    } as DATA;
+    };
+  }
+
+  toJSON(): LogData {
+    return this.toObject();
+  }
+
+  toJS(): LogData {
+    return this.toObject();
   }
 }

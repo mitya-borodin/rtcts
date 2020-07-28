@@ -7,8 +7,7 @@ import {
   PongChannel,
   recognizeMessage,
   UnbindUserFromConnection,
-  User,
-  UserData,
+  User
 } from "@rtcts/isomorphic";
 import { getErrorMessage, isArray, isString, isUndefined } from "@rtcts/utils";
 import chalk from "chalk";
@@ -19,10 +18,8 @@ import { Channels } from "./Channels";
 import { Connection } from "./Connection";
 
 export class WebSocketServer<
-  USER_MODEL extends UserModel<USER, DATA, VA>,
-  USER extends User<DATA, VA>,
-  DATA extends UserData = UserData,
-  VA extends object = object,
+  USER_MODEL extends UserModel<USER>,
+  USER extends User,
   CONFIG extends Config = Config
 > {
   private wasRun: boolean;

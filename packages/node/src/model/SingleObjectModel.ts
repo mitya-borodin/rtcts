@@ -1,16 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity, Response, Send, ValidateResult } from "@rtcts/isomorphic";
+import { Entity, Response, Send, ValidationResult } from "@rtcts/isomorphic";
 import { Collection } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";
 
-export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends object = object> {
-  protected readonly Entity: new (data?: any) => ENTITY;
-  protected readonly repository: MongoDBRepository<ENTITY, DATA, VA>;
+export class SingleObjectModel<ENTITY extends Entity> {
+  protected readonly Entity: new (data: any) => ENTITY;
+  protected readonly repository: MongoDBRepository<ENTITY>;
   protected readonly sendThroughWebSocket: Send;
 
   constructor(
-    Entity: new (data?: any) => ENTITY,
-    repository: MongoDBRepository<ENTITY, DATA, VA>,
+    Entity: new (data: any) => ENTITY,
+    repository: MongoDBRepository<ENTITY>,
     sendThroughWebSocket: Send,
   ) {
     this.Entity = Entity;
@@ -19,13 +22,12 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
   }
 
   // ! Response API
-
   public async getItemResponse(): Promise<Response> {
-    const result: ENTITY | null = await this.getItem();
+    const payload: ENTITY | null = await this.getItem();
 
     return new Response({
-      result: result !== null ? result.toJSON() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.toJSON() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
@@ -35,16 +37,15 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
     wsid: string,
     excludeRequestingDevice = true,
   ): Promise<Response> {
-    const result: ENTITY | null = await this.update(data, uid, wsid, excludeRequestingDevice);
+    const payload: ENTITY | null = await this.update(data, uid, wsid, excludeRequestingDevice);
 
     return new Response({
-      result: result !== null ? result.toJSON() : result,
-      validates: new ValidateResult(),
+      payload: payload !== null ? payload.toJSON() : payload,
+      validationResult: new ValidationResult([]),
     });
   }
 
   // ! Model API
-
   public async getItem(): Promise<ENTITY | null> {
     try {
       return await this.repository.findOne({});
@@ -71,7 +72,7 @@ export class SingleObjectModel<ENTITY extends Entity<DATA, VA>, DATA, VA extends
       if (currentEntity === null) {
         const insert: ENTITY = new this.Entity(data);
 
-        if (insert.canBeInsert()) {
+        if (insert.isInsert()) {
           const entity: ENTITY | null = await this.repository.insertOne(insert);
 
           if (entity) {

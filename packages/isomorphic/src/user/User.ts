@@ -4,12 +4,13 @@
 /* eslint-disable no-unused-vars */
 import { isString } from "@rtcts/utils";
 import omit from "lodash.omit";
-import { Entity, EntityID } from "../Entity";
+import { Entity } from "../Entity";
 import { logTypeEnum } from "../log/logTypeEnum";
-import { Validate } from "../validate/Validate";
-import { ValidateResult } from "../validate/ValidateResult";
+import { Validation } from "../validation/Validation";
+import { ValidationResult } from "../validation/ValidationResult";
 
 export interface UserData {
+  readonly id?: string;
   readonly login?: string;
   readonly group?: string;
   readonly salt?: string;
@@ -19,31 +20,27 @@ export interface UserData {
 const noSecureFields: string[] = ["login", "group"];
 const secureFields: string[] = ["salt", "hashedPassword"];
 
-export class User<DATA extends UserData = UserData, VA extends object = object> extends Entity<
-  DATA,
-  VA
-> {
-  public readonly login?: string;
-  public readonly group?: string;
-  public readonly salt?: string;
-  public readonly hashedPassword?: string;
+export class User implements Entity {
+  readonly id?: string;
+  readonly login?: string;
+  readonly group?: string;
+  readonly salt?: string;
+  readonly hashedPassword?: string;
 
   // The check in the constructor ensures that the correct noSecureFields will be written into the object
-  constructor(data: Partial<EntityID> & Partial<DATA>) {
-    super(data);
-
-    if (data) {
-      for (const field of [...noSecureFields, ...secureFields]) {
-        if (isString(data[field])) {
-          this[field] = data[field];
-        }
-      }
-    } else {
+  constructor(data: Partial<UserData>) {
+    if (!data) {
       throw new Error(`User(data) data should be defined`);
+    }
+
+    for (const field of [...noSecureFields, ...secureFields]) {
+      if (isString(data[field])) {
+        this[field] = data[field];
+      }
     }
   }
 
-  public isEntityWithSecureFields<T = DATA>(): this is Required<EntityID> & Required<T> {
+  isEntity(): this is Required<UserData> {
     if (!isString(this.id)) {
       throw new Error(`${this.constructor.name}.id should be String`);
     }
@@ -54,21 +51,15 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
     return true;
   }
 
-  public canBeInsertWithSecureFields<T = DATA>(): this is Required<T> {
+  // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
+  isInsert(): this is Required<Omit<UserData, "id">> {
     this.checkNoSecureFields();
     this.checkSecureFields();
 
     return true;
   }
 
-  // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
-  public canBeInsert<T = DATA>(): this is Required<T> {
-    this.checkNoSecureFields();
-
-    return true;
-  }
-
-  public checkNoSecureFields(): this is Pick<Required<UserData>, "login" | "group"> {
+  checkNoSecureFields(): this is Pick<Required<UserData>, "login" | "group"> {
     for (const field of noSecureFields) {
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);
@@ -78,7 +69,7 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
     return true;
   }
 
-  public checkSecureFields(): this is Pick<Required<UserData>, "salt" | "hashedPassword"> {
+  checkSecureFields(): this is Pick<Required<UserData>, "salt" | "hashedPassword"> {
     for (const field of secureFields) {
       if (!isString(this[field])) {
         throw new Error(`User.${field} should be String`);
@@ -88,13 +79,13 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
     return true;
   }
 
-  // The validate method allows you to implement the logic of checking the entered values in the object and to minimize the object describing the result of the check
-  public validate(...args: any[]): ValidateResult {
-    const validates: Validate[] = [];
+  // The Validation method allows you to implement the logic of checking the entered values in the object and to minimize the object describing the result of the check
+  validation(): ValidationResult {
+    const validations: Validation[] = [];
 
     if (!isString(this.login)) {
-      validates.push(
-        new Validate({
+      validations.push(
+        new Validation({
           field: "login",
           message: `Login should be typed`,
           type: logTypeEnum.error,
@@ -103,8 +94,8 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
     }
 
     if (!isString(this.group)) {
-      validates.push(
-        new Validate({
+      validations.push(
+        new Validation({
           field: "group",
           message: `Group should be selected`,
           type: logTypeEnum.error,
@@ -112,20 +103,28 @@ export class User<DATA extends UserData = UserData, VA extends object = object> 
       );
     }
 
-    return new ValidateResult(validates);
+    return new ValidationResult(validations);
   }
 
-  public getUnSecureData(): Omit<DATA, "salt" | "hashedPassword"> {
+  getUnSecureData(): Omit<UserData, "salt" | "hashedPassword"> {
     return omit(this.toObject(), ["salt", "hashedPassword"]);
   }
 
-  // ! The eject method returns an object as DATA with allFields that are the current object's content
-  protected eject(): DATA {
+  toObject(): UserData {
     return {
+      ...(isString(this.id) ? { id: this.id } : {}),
       login: this.login,
       group: this.group,
       ...(this.salt ? { salt: this.salt } : {}),
       ...(this.hashedPassword ? { hashedPassword: this.hashedPassword } : {}),
-    } as DATA;
+    };
+  }
+
+  toJSON(): UserData {
+    return this.toObject();
+  }
+
+  toJS(): UserData {
+    return this.toObject();
   }
 }

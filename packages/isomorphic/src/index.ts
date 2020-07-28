@@ -1,4 +1,4 @@
-export { SimpleObject, ValueObject, Entity, EntityID } from "./Entity";
+export { EssentialObject, ValueObject, Entity } from "./Entity";
 
 export { userEventEnum } from "./user/userEventEnum";
 export { userGroupEnum } from "./user/userGroupEnum";
@@ -9,8 +9,8 @@ export { LogType } from "./log/LogType";
 export { logEnum } from "./log/logEnum";
 export { logTypeEnum } from "./log/logTypeEnum";
 
-export { Validate, ValidateData } from "./validate/Validate";
-export { ValidateResult } from "./validate/ValidateResult";
+export { Validation, ValidationData } from "./validation/Validation";
+export { ValidationResult } from "./validation/ValidationResult";
 
 export {
   ErrorChannel,

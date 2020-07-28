@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { User, UserData } from "@rtcts/isomorphic";
+import { User } from "@rtcts/isomorphic";
 import { isObject, isString } from "@rtcts/utils";
 import jwt from "jsonwebtoken";
 import Koa from "koa";
@@ -20,10 +20,8 @@ export const unsetCookieForAuthenticate = (ctx: Koa.Context): void => {
 };
 
 export const getAuthenticateStrategyMiddleware = <
-  MODEL extends UserModel<USER, USER_DATA>,
-  USER extends User<USER_DATA, VA>,
-  USER_DATA extends UserData = UserData,
-  VA extends object = object,
+  MODEL extends UserModel<USER>,
+  USER extends User,
   CONFIG extends Config = Config
 >(
   config: CONFIG,

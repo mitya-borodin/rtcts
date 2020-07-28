@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity, User, UserData } from "@rtcts/isomorphic";
+import { Entity, User } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { getRequestBodyJson } from "../app/getRequestBodyJson";
@@ -16,16 +16,12 @@ export interface HttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class HttpTransport<
-  MODEL extends Model<ENTITY, DATA, VA>,
-  ENTITY extends Entity<DATA, VA>,
-  DATA,
-  VA extends object,
-  USER extends User<USER_DATA, USER_VA>,
-  USER_DATA extends UserData = UserData,
-  USER_VA extends object = object,
+  MODEL extends Model<ENTITY>,
+  ENTITY extends Entity,
+  USER extends User,
   CHANNELS extends Channels = Channels
-> extends BaseHttpTransport<USER, USER_DATA, USER_VA, CHANNELS> {
-  protected readonly Entity: new (data: Partial<DATA>) => ENTITY;
+> extends BaseHttpTransport<USER, CHANNELS> {
+  protected readonly Entity: new (data: any) => ENTITY;
   protected readonly model: MODEL;
   protected readonly ACL: HttpTransportACL;
   protected readonly switchers: {
@@ -106,7 +102,7 @@ export class HttpTransport<
           const { id } = ctx.params;
           const response = await this.model.getItemResponse(id);
 
-          if (response.result) {
+          if (response.payload) {
             ctx.status = 200;
             ctx.type = "application/json";
             ctx.body = JSON.stringify(response);
@@ -136,7 +132,7 @@ export class HttpTransport<
           async (userId: string, wsid: string) => {
             const response = await this.model.createResponse(ctx.request.body, userId, wsid);
 
-            if (response.result) {
+            if (response.payload) {
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
@@ -165,7 +161,7 @@ export class HttpTransport<
           async (userId: string, wsid: string) => {
             const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
 
-            if (response.result) {
+            if (response.payload) {
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
@@ -196,7 +192,7 @@ export class HttpTransport<
             const { id } = ctx.request.body;
             const response = await this.model.removeResponse(id, userId, wsid);
 
-            if (response.result) {
+            if (response.payload) {
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);

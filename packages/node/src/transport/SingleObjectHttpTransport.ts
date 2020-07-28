@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entity, User, UserData } from "@rtcts/isomorphic";
+import { Entity, User } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
+import { getRequestBodyJson } from "../app/getRequestBodyJson";
 import { SingleObjectModel } from "../model/SingleObjectModel";
 import { Channels } from "../webSocket/Channels";
 import { BaseHttpTransport, BaseHttpTransportACL } from "./BaseHttpTransport";
-import { getRequestBodyJson } from "../app/getRequestBodyJson";
 
 export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
   readonly getItem: string[];
@@ -13,15 +13,13 @@ export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class SingleObjectHttpTransport<
-  MODEL extends SingleObjectModel<ENTITY, DATA, VA>,
-  ENTITY extends Entity<DATA, VA>,
+  MODEL extends SingleObjectModel<ENTITY>,
+  ENTITY extends Entity,
   DATA,
   VA extends any[],
-  USER extends User<USER_DATA, USER_VA>,
-  USER_DATA extends UserData = UserData,
-  USER_VA extends object = object,
+  USER extends User,
   CH extends Channels = Channels
-> extends BaseHttpTransport<USER, USER_DATA, USER_VA, CH> {
+> extends BaseHttpTransport<USER, CH> {
   protected readonly Entity: new (data?: any) => ENTITY;
   protected readonly model: MODEL;
   protected readonly ACL: SingleObjectHttpTransportACL;
@@ -70,7 +68,7 @@ export class SingleObjectHttpTransport<
         await this.executor(ctx, URL, this.ACL.getItem, this.switchers.getItem, async () => {
           const response = await this.model.getItemResponse();
 
-          if (response.result) {
+          if (response.payload) {
             ctx.status = 200;
             ctx.type = "application/json";
             ctx.body = JSON.stringify(response);
@@ -100,7 +98,7 @@ export class SingleObjectHttpTransport<
           async (userId: string, wsid: string) => {
             const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
 
-            if (response.result) {
+            if (response.payload) {
               ctx.status = 200;
               ctx.type = "application/json";
               ctx.body = JSON.stringify(response);
