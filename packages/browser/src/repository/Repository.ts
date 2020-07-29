@@ -7,10 +7,8 @@ import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTranspo
 import { WSClient } from "../transport/ws/WSClient";
 
 export class Repository<
-  HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
-  ENTITY extends Entity<DATA, VA>,
-  DATA,
-  VA extends object = object,
+  HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, WS, PUB_SUB>,
+  ENTITY extends Entity,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends EventEmitter {
@@ -22,13 +20,14 @@ export class Repository<
     removeSubmit: `Repository.removeSubmit`,
     destroy: `Repository.destroy`,
   };
+
   @observable
   public pending: boolean;
 
   @observable
   protected collection: ObservableMap<string, ENTITY>;
 
-  protected Entity: new (data?: any) => ENTITY;
+  protected Entity: new (data: any) => ENTITY;
   protected httpTransport: HTTP_TRANSPORT;
   protected pubSub: PUB_SUB;
   protected ws: WS;
@@ -38,7 +37,7 @@ export class Repository<
 
   constructor(
     httpTransport: HTTP_TRANSPORT,
-    Entity: new (data?: any) => ENTITY,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
     pubSub: PUB_SUB,
@@ -104,7 +103,7 @@ export class Repository<
 
       this.start();
 
-      const listResponse: ListResponse | void = await this.httpTransport.getList();
+      const listResponse: ListResponse<ENTITY> | void = await this.httpTransport.getList();
 
       if (!listResponse) {
         throw new Error(`response is empty`);
@@ -113,7 +112,7 @@ export class Repository<
       runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
         const collection: ENTITY[] = [];
 
-        for (const item of listResponse.results) {
+        for (const item of listResponse.payload) {
           if (item.isEntity()) {
             this.collection.set(item.id, item);
 
@@ -157,7 +156,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      const entity = response.result;
+      const entity = response.payload;
 
       if (!entity.isEntity()) {
         return;
@@ -198,7 +197,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      const entity = response.result;
+      const entity = response.payload;
 
       if (!entity.isEntity()) {
         return;
@@ -240,7 +239,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      const entity = response.result;
+      const entity = response.payload;
 
       if (!entity.isEntity()) {
         return;

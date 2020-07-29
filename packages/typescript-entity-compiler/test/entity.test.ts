@@ -1,4 +1,3 @@
-import fs from "fs";
 import { compiler } from "../src";
 
 describe("Compilation for ", () => {

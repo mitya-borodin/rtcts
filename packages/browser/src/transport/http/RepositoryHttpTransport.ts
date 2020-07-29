@@ -12,19 +12,17 @@ export interface RepositoryHttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class RepositoryHttpTransport<
-  ENTITY extends Entity<DATA, VA>,
-  DATA,
-  VA extends object = object,
+  ENTITY extends Entity,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends BaseHttpTransport<WS, PUB_SUB> {
-  protected Entity: new (data?: any) => ENTITY;
+  protected Entity: new (data: any) => ENTITY;
 
   public readonly ACL: RepositoryHttpTransportACL;
 
   constructor(
     name: string,
-    Entity: new (data?: any) => ENTITY,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
     ACL: RepositoryHttpTransportACL,
@@ -49,24 +47,20 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.getHttpRequest(`/${this.name}/list`);
+      const payload: any | void = await this.getHttpRequest(`/${this.name}/list`);
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const listResponse = new ListResponse(result);
+      const listResponse = new ListResponse(payload);
 
       return new ListResponse<ENTITY>({
         count: listResponse.count,
-        results: listResponse.results.map((result: any) => {
-          const entity = new this.Entity(result);
-
-          entity.isEntity();
-
-          return entity;
-        }),
-        validates: listResponse.validates,
+        payload: listResponse.payload
+          .map((payload) => new this.Entity(payload))
+          .filter((entity) => entity.isEntity()),
+        validationResult: listResponse.validationResult,
       });
     } catch (error) {
       console.error(error);
@@ -79,17 +73,17 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.getHttpRequest(`/${this.name}/item/${id}`);
+      const payload: any | void = await this.getHttpRequest(`/${this.name}/item/${id}`);
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const response = new Response(result);
+      const response = new Response<ENTITY>(payload);
 
       return new Response<ENTITY>({
-        result: new this.Entity(response.result),
-        validates: response.validates,
+        payload: new this.Entity(response.payload),
+        validationResult: response.validationResult,
       });
     } catch (error) {
       console.error(error);
@@ -102,17 +96,17 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.putHttpRequest(`/${this.name}/create`, input);
+      const payload: any | void = await this.putHttpRequest(`/${this.name}/create`, input);
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const response = new Response(result);
+      const response = new Response<ENTITY>(payload);
 
       return new Response<ENTITY>({
-        result: new this.Entity(response.result),
-        validates: response.validates,
+        payload: new this.Entity(response.payload),
+        validationResult: response.validationResult,
       });
     } catch (error) {
       console.error(error);
@@ -125,17 +119,17 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.postHttpRequest(`/${this.name}/update`, input);
+      const payload: any | void = await this.postHttpRequest(`/${this.name}/update`, input);
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const response = new Response(result);
+      const response = new Response<ENTITY>(payload);
 
       return new Response<ENTITY>({
-        result: new this.Entity(response.result),
-        validates: response.validates,
+        payload: new this.Entity(response.payload),
+        validationResult: response.validationResult,
       });
     } catch (error) {
       console.error(error);
@@ -148,17 +142,17 @@ export class RepositoryHttpTransport<
         return;
       }
 
-      const result: any | void = await this.deleteHttpRequest(`/${this.name}/remove`, { id });
+      const payload: any | void = await this.deleteHttpRequest(`/${this.name}/remove`, { id });
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const response = new Response(result);
+      const response = new Response<ENTITY>(payload);
 
       return new Response<ENTITY>({
-        result: new this.Entity(response.result),
-        validates: response.validates,
+        payload: new this.Entity(response.payload),
+        validationResult: response.validationResult,
       });
     } catch (error) {
       console.error(error);

@@ -59,6 +59,10 @@ export class User implements Entity {
     return true;
   }
 
+  hasId(): this is { id: string } {
+    return isString(this.id);
+  }
+
   checkNoSecureFields(): this is Pick<Required<UserData>, "login" | "group"> {
     for (const field of noSecureFields) {
       if (!isString(this[field])) {

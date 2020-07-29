@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ValidationResult } from "./validation/ValidationResult";
 
 export interface EssentialObject {
@@ -13,4 +14,5 @@ export interface ValueObject extends EssentialObject {
 
 export interface Entity extends ValueObject {
   isEntity(): this is { id: string };
+  hasId(): this is { id: string };
 }

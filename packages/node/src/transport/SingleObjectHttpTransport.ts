@@ -15,8 +15,6 @@ export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
 export class SingleObjectHttpTransport<
   MODEL extends SingleObjectModel<ENTITY>,
   ENTITY extends Entity,
-  DATA,
-  VA extends any[],
   USER extends User,
   CH extends Channels = Channels
 > extends BaseHttpTransport<USER, CH> {

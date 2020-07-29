@@ -25,13 +25,6 @@
   "eslint.alwaysShowStatus": true,
   "eslint.enable": true,
   "eslint.packageManager": "yarn",
-  "eslint.workingDirectories": [
-    "./packages/browser",
-    "./packages/isomorphic",
-    "./packages/node",
-    "./packages/typescript-entity-compiler",
-    "./packages/utils",
-  ],
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
@@ -39,7 +32,6 @@
   "workbench.colorTheme": "One Dark Pro",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.editor.revealIfOpen": true,
-  "vsicons.dontShowNewVersionMessage": true,
   "cSpell.words": [
     "rtcts"
   ],

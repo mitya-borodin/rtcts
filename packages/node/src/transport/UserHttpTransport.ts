@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response, User, userGroupEnum, ValidationResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
@@ -5,7 +8,7 @@ import Koa from "koa";
 import {
   getAuthenticateMiddleware,
   setCookieForAuthenticate,
-  unsetCookieForAuthenticate
+  unsetCookieForAuthenticate,
 } from "../app/auth";
 import { Config } from "../app/Config";
 import { getRequestBodyJson } from "../app/getRequestBodyJson";

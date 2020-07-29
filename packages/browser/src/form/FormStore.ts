@@ -1,15 +1,12 @@
-import { Entity, ValidateResult } from "@rtcts/isomorphic";
+import { Entity, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
 
-export class FormStore<
-  ENTITY extends Entity<DATA, VA>,
-  DATA,
-  VA extends object = object
-> extends EventEmitter {
+export class FormStore<ENTITY extends Entity, DATA> extends EventEmitter {
   @observable
   public pending: boolean;
+
   @observable
   public showValidateResult: boolean;
 
@@ -19,9 +16,9 @@ export class FormStore<
   @observable
   public inputFiles: File[] = [];
 
-  protected readonly Entity: new (data?: any) => ENTITY;
+  protected readonly Entity: new (data: any) => ENTITY;
 
-  constructor(Entity: new (data?: any) => ENTITY) {
+  constructor(Entity: new (data: any) => ENTITY) {
     super();
 
     this.Entity = Entity;
@@ -35,18 +32,18 @@ export class FormStore<
     this.submit = this.submit.bind(this);
   }
 
-  @computed({ name: "FormStore.validateResult" })
-  get validateResult(): ValidateResult {
+  @computed({ name: "FormStore.validationResult" })
+  get validationResult(): ValidationResult {
     if (this.form instanceof this.Entity) {
-      return this.form.validate();
+      return this.form.validation();
     }
 
-    return new ValidateResult([]);
+    return new ValidationResult([]);
   }
 
   @computed({ name: "FormStore.isValid" })
   get isValid(): boolean {
-    return this.validateResult.isValid;
+    return this.validationResult.isValid;
   }
 
   @computed({ name: "FormStore.isOpen" })
@@ -56,7 +53,7 @@ export class FormStore<
 
   @computed({ name: "FormStore.isEdit" })
   get isEdit(): boolean {
-    return this.form instanceof this.Entity && isString(this.form.id) && this.form.id.length > 0;
+    return this.form instanceof this.Entity && this.form.hasId() && this.form.id.length > 0;
   }
 
   public async open(id?: string): Promise<void> {

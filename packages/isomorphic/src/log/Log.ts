@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { isString } from "@rtcts/utils";
 import { EssentialObject } from "../Entity";
@@ -17,7 +19,7 @@ export class Log implements EssentialObject {
     this.type = logTypeEnum.log;
     this.message = "";
 
-    if(!data) {
+    if (!data) {
       throw new Error(`Log(data) data should be defined`);
     }
 

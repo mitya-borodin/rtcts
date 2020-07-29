@@ -1,11 +1,4 @@
-import {
-  Response,
-  User,
-  UserData,
-  userEventEnum,
-  userGroupEnum,
-  ListResponse,
-} from "@rtcts/isomorphic";
+import { ListResponse, Response, User, userEventEnum, userGroupEnum } from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
@@ -14,13 +7,11 @@ import { WSClient } from "../transport/ws/WSClient";
 import { UserHTTPTransport } from "./UserHTTPTransport";
 
 export class UserRepository<
-  HTTP_TRANSPORT extends UserHTTPTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
-  ENTITY extends User<DATA, VA>,
-  DATA extends UserData = UserData,
-  VA extends object = object,
+  HTTP_TRANSPORT extends UserHTTPTransport<ENTITY, WS, PUB_SUB>,
+  ENTITY extends User,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends Repository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB> {
+> extends Repository<HTTP_TRANSPORT, ENTITY, WS, PUB_SUB> {
   protected Entity: new (data?: any) => ENTITY;
 
   @observable
@@ -28,7 +19,7 @@ export class UserRepository<
 
   constructor(
     httpTransport: HTTP_TRANSPORT,
-    Entity: new (data?: any) => ENTITY,
+    Entity: new (data: any) => ENTITY,
     wsClient: WS,
     channelName: string,
     pubSub: PUB_SUB,
@@ -201,11 +192,12 @@ export class UserRepository<
 
       if (onlyCreate) {
         const response: Response<ENTITY> | void = await this.httpTransport.create(data);
+
         if (!response) {
           throw new Error(`response is empty`);
         }
 
-        const entity = response.result;
+        const entity = response.payload;
 
         if (!entity.isEntity()) {
           return;
@@ -253,7 +245,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      const entity = response.result;
+      const entity = response.payload;
 
       if (!entity.isEntity()) {
         return;
@@ -288,7 +280,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      const entity = response.result;
+      const entity = response.payload;
 
       if (!entity.isEntity()) {
         return;
@@ -321,12 +313,10 @@ export class UserRepository<
       }
 
       runInAction(`UpdateGroup (${this.constructor.name}) has been succeed`, () => {
-        for (const user of listResponse.results) {
-          if (!user.isEntity()) {
-            continue;
+        for (const user of listResponse.payload) {
+          if (user.isEntity()) {
+            this.collection.set(user.id, user);
           }
-
-          this.collection.set(user.id, user);
         }
       });
     } catch (error) {
@@ -349,7 +339,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      const entity = response.result;
+      const entity = response.payload;
 
       if (!entity.isEntity()) {
         return;
@@ -395,7 +385,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      const entity = response.result;
+      const entity = response.payload;
 
       if (!entity.isEntity()) {
         return;

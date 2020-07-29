@@ -1,4 +1,4 @@
-import { ListResponse, Response, User, UserData } from "@rtcts/isomorphic";
+import { ListResponse, Response, User } from "@rtcts/isomorphic";
 import EventEmitter from "eventemitter3";
 import {
   RepositoryHttpTransport,
@@ -13,17 +13,15 @@ interface UserHTTPTransportACL extends RepositoryHttpTransportACL {
 }
 
 export class UserHTTPTransport<
-  ENTITY extends User<DATA, VA>,
-  DATA extends UserData = UserData,
-  VA extends object = object,
+  ENTITY extends User,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB> {
+> extends RepositoryHttpTransport<ENTITY, WS, PUB_SUB> {
   public ACL: UserHTTPTransportACL;
 
   constructor(
     name: string,
-    Entity: new (data?: any) => ENTITY,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
     ACL: UserHTTPTransportACL,
@@ -37,17 +35,17 @@ export class UserHTTPTransport<
 
   public async current(): Promise<Response<ENTITY> | void> {
     try {
-      const result: any | void = await this.getHttpRequest(`/${this.name}/current`);
+      const payload: any | void = await this.getHttpRequest(`/${this.name}/current`);
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const response = new Response(result);
+      const response = new Response<ENTITY>(payload);
 
       return new Response<ENTITY>({
-        result: new this.Entity(response.result),
-        validates: response.validates,
+        payload: new this.Entity(response.payload),
+        validationResult: response.validationResult,
       });
     } catch (error) {
       console.error(error);
@@ -81,17 +79,17 @@ export class UserHTTPTransport<
   public async updateLogin(data: object): Promise<Response<ENTITY> | void> {
     try {
       if (this.ACL.updateLogin.includes(this.currentUserGroup)) {
-        const result: any | void = await this.postHttpRequest(`/${this.name}/updateLogin`, data);
+        const payload: any | void = await this.postHttpRequest(`/${this.name}/updateLogin`, data);
 
-        if (!result) {
+        if (!payload) {
           return;
         }
 
-        const response = new Response(result);
+        const response = new Response<ENTITY>(payload);
 
         return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
+          payload: new this.Entity(response.payload),
+          validationResult: response.validationResult,
         });
       }
     } catch (error) {
@@ -102,17 +100,20 @@ export class UserHTTPTransport<
   public async updatePassword(data: object): Promise<Response<ENTITY> | void> {
     try {
       if (this.ACL.updatePassword.includes(this.currentUserGroup)) {
-        const result: any | void = await this.postHttpRequest(`/${this.name}/updatePassword`, data);
+        const payload: any | void = await this.postHttpRequest(
+          `/${this.name}/updatePassword`,
+          data,
+        );
 
-        if (!result) {
+        if (!payload) {
           return;
         }
 
-        const response = new Response(result);
+        const response = new Response<ENTITY>(payload);
 
         return new Response<ENTITY>({
-          result: new this.Entity(response.result),
-          validates: response.validates,
+          payload: new this.Entity(response.payload),
+          validationResult: response.validationResult,
         });
       }
     } catch (error) {
@@ -123,27 +124,23 @@ export class UserHTTPTransport<
   public async updateGroup(ids: string[], group: string): Promise<ListResponse<ENTITY> | void> {
     try {
       if (this.ACL.updateGroup.includes(this.currentUserGroup)) {
-        const result: any | void = await this.postHttpRequest(`/${this.name}/updateGroup`, {
+        const payload: any | void = await this.postHttpRequest(`/${this.name}/updateGroup`, {
           ids,
           group,
         });
 
-        if (!result) {
+        if (!payload) {
           return;
         }
 
-        const listResponse = new ListResponse(result);
+        const listResponse = new ListResponse<ENTITY>(payload);
 
         return new ListResponse<ENTITY>({
           count: listResponse.count,
-          results: listResponse.results.map((result: any) => {
-            const entity = new this.Entity(result);
-
-            entity.isEntity();
-
-            return entity;
-          }),
-          validates: listResponse.validates,
+          payload: listResponse.payload
+            .map((payload) => new this.Entity(payload))
+            .filter((entity) => entity.isEntity()),
+          validationResult: listResponse.validationResult,
         });
       }
     } catch (error) {

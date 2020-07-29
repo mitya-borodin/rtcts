@@ -9,19 +9,17 @@ export interface SingleObjectHttpTransportACL extends BaseHttpTransportACL {
 }
 
 export class SingleObjectHttpTransport<
-  ENTITY extends Entity<DATA, VA>,
-  DATA,
-  VA extends object = object,
+  ENTITY extends Entity,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends BaseHttpTransport<WS, PUB_SUB> {
-  protected Entity: new (data?: any) => ENTITY;
+  protected Entity: new (data: any) => ENTITY;
 
   public readonly ACL: SingleObjectHttpTransportACL;
 
   constructor(
     name: string,
-    Entity: new (data?: any) => ENTITY,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
     ACL: SingleObjectHttpTransportACL,
@@ -43,17 +41,17 @@ export class SingleObjectHttpTransport<
         return;
       }
 
-      const result: any | void = await this.getHttpRequest(`/${this.name}/item`);
+      const payload: any | void = await this.getHttpRequest(`/${this.name}/item`);
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const response = new Response(result);
+      const response = new Response<ENTITY>(payload);
 
       return new Response<ENTITY>({
-        result: new this.Entity(response.result),
-        validates: response.validates,
+        payload: new this.Entity(response.payload),
+        validationResult: response.validationResult,
       });
     } catch (error) {
       console.error(error);
@@ -66,17 +64,17 @@ export class SingleObjectHttpTransport<
         return;
       }
 
-      const result: any | void = await this.postHttpRequest(`/${this.name}/update`, data);
+      const payload: any | void = await this.postHttpRequest(`/${this.name}/update`, data);
 
-      if (!result) {
+      if (!payload) {
         return;
       }
 
-      const response = new Response(result);
+      const response = new Response<ENTITY>(payload);
 
       return new Response<ENTITY>({
-        result: new this.Entity(response.result),
-        validates: response.validates,
+        payload: new this.Entity(response.payload),
+        validationResult: response.validationResult,
       });
     } catch (error) {
       console.error(error);

@@ -7,10 +7,8 @@ import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTra
 import { WSClient } from "../transport/ws/WSClient";
 
 export class SingleObjectRepository<
-  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
-  ENTITY extends Entity<DATA, VA>,
-  DATA,
-  VA extends object = object,
+  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, WS, PUB_SUB>,
+  ENTITY extends Entity,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > extends EventEmitter {
@@ -22,10 +20,11 @@ export class SingleObjectRepository<
 
   @observable
   public pending: boolean;
+
   @observable
   public entity: ENTITY | undefined;
 
-  protected Entity: new (data?: any) => ENTITY;
+  protected Entity: new (data: any) => ENTITY;
   protected httpTransport: HTTP_TRANSPORT;
   protected ws: WS;
   protected channelName: string;
@@ -34,7 +33,7 @@ export class SingleObjectRepository<
   protected isInit: boolean;
 
   constructor(
-    Entity: new (data?: any) => ENTITY,
+    Entity: new (data: any) => ENTITY,
     httpTransport: HTTP_TRANSPORT,
     ws: WS,
     channelName: string,
@@ -88,7 +87,7 @@ export class SingleObjectRepository<
       }
 
       runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
-        this.entity = response.result;
+        this.entity = response.payload;
         this.isInit = true;
 
         this.entityDidInit();
@@ -127,7 +126,7 @@ export class SingleObjectRepository<
 
       runInAction(
         `Update (${this.constructor.name}) has been succeed`,
-        () => (this.entity = response.result),
+        () => (this.entity = response.payload),
       );
 
       this.entityDidUpdate();

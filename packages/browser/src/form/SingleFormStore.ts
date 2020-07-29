@@ -1,5 +1,5 @@
 import { Entity } from "@rtcts/isomorphic";
-import { getErrorMessage, isString } from "@rtcts/utils";
+import { getErrorMessage } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { SingleRepositoryPubSubEnum } from "../enums/SingleRepositoryPubSubEnum";
 import { SingleObjectRepository } from "../repository/SingleObjectRepository";
@@ -8,14 +8,13 @@ import { WSClient } from "../transport/ws/WSClient";
 import { FormStore } from "./FormStore";
 
 export class SingleFormStore<
-  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
-  ENTITY extends Entity<DATA, VA>,
+  HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, WS, PUB_SUB>,
+  ENTITY extends Entity,
   DATA,
-  REP extends SingleObjectRepository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB>,
-  VA extends object = object,
+  REP extends SingleObjectRepository<HTTP_TRANSPORT, ENTITY, WS, PUB_SUB>,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends FormStore<ENTITY, DATA, VA> {
+> extends FormStore<ENTITY, DATA> {
   protected readonly Entity: new (data?: any) => ENTITY;
   protected readonly repository: REP;
 
@@ -45,7 +44,7 @@ export class SingleFormStore<
     try {
       let result: ENTITY | void;
 
-      if (isString(submit.id)) {
+      if (submit.hasId()) {
         const entity: ENTITY = new this.Entity(submit.toObject());
 
         if (entity.isEntity()) {
@@ -54,7 +53,7 @@ export class SingleFormStore<
       } else {
         const insert: ENTITY = new this.Entity(submit.toObject());
 
-        if (insert.canBeInsert()) {
+        if (insert.isInsert()) {
           result = await this.repository.update(insert);
         }
       }

@@ -3,11 +3,7 @@ import { getErrorMessage } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, ObservableMap } from "mobx";
 
-export class CacheRepository<
-  ENTITY extends Entity<DATA, VA>,
-  DATA,
-  VA extends object = object
-> extends EventEmitter {
+export class CacheRepository<ENTITY extends Entity> extends EventEmitter {
   public static events = {
     set: `CacheRepository.event.set`,
     delete: `CacheRepository.event.delete`,

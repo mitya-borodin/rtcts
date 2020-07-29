@@ -1,20 +1,17 @@
 {
   "include": [
     "src",
-    "test"
+    "types"
   ],
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "rootDir": "./src",
     "baseUrl": "./",
     "paths": {
       "*": [
-        "*",
+        "src/*",
         "node_modules/*"
       ]
     },
-    "types": [
-      "@types/node",
-      "@types/jest",
-    ],
-  }
+  },
 }

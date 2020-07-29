@@ -7,14 +7,13 @@ import { WSClient } from "../transport/ws/WSClient";
 import { FormStore } from "./FormStore";
 
 export class RepositoryFormStore<
-  HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, DATA, VA, WS, PUB_SUB>,
-  ENTITY extends Entity<DATA, VA>,
+  HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, WS, PUB_SUB>,
+  ENTITY extends Entity,
   DATA,
-  REP extends Repository<HTTP_TRANSPORT, ENTITY, DATA, VA, WS, PUB_SUB>,
-  VA extends object = object,
+  REP extends Repository<HTTP_TRANSPORT, ENTITY, WS, PUB_SUB>,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends FormStore<ENTITY, DATA, VA> {
+> extends FormStore<ENTITY, DATA> {
   public static events = {
     submit: `[ RepositoryFormStore ][ SUBMIT ]`,
   };
@@ -60,16 +59,16 @@ export class RepositoryFormStore<
   }
 
   protected async submitToRepository(submit: ENTITY): Promise<ENTITY | void> {
-    if (isString(submit.id)) {
+    if (submit.hasId()) {
       const entity: ENTITY = new this.Entity(submit.toObject());
 
       if (entity.isEntity()) {
         return await this.repository.update(entity.toObject());
       }
     } else {
-      const entity: ENTITY = new this.Entity(submit.toJS());
+      const entity: ENTITY = new this.Entity(submit.toObject());
 
-      if (entity.canBeInsert()) {
+      if (entity.isInsert()) {
         return await this.repository.create(entity.toObject());
       }
     }
