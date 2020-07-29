@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import crypto from "crypto";
 import { fromStream } from "file-type";
 import fs from "fs";

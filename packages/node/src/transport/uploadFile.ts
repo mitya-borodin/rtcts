@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isNumber } from "@rtcts/utils";
 import fs from "fs";
 import Koa from "koa";

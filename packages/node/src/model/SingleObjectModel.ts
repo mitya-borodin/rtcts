@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Entity, Response, Send, ValidationResult } from "@rtcts/isomorphic";
 import { Collection } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from "@rtcts/isomorphic";
 import { isObject, isString } from "@rtcts/utils";
 import jwt from "jsonwebtoken";

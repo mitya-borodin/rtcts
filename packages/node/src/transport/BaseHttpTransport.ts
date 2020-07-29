@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response, User, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";

@@ -6,7 +6,6 @@ export const getRequestBodyJson = (): Middleware => {
     ctx.request.body = {};
 
     if (ctx.is("application/json")) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       ctx.request.body = await body.json(ctx);
     }
 
