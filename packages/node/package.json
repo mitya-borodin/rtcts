@@ -22,8 +22,8 @@
     "prepare": "tsdx build"
   },
   "peerDependencies": {
-    "@rtcts/isomorphic": "^1.1.7",
-    "@rtcts/utils": "^1.1.7",
+    "@rtcts/isomorphic": "^1.2.1",
+    "@rtcts/utils": "^1.2.1",
     "bson": "^4.0.3",
     "chalk": "^3.0.0",
     "co-body": "^6.0.0",

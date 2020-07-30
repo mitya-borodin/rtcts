@@ -22,8 +22,8 @@
     "prepare": "tsdx build"
   },
   "peerDependencies": {
-    "@rtcts/isomorphic": "^1.1.6",
-    "@rtcts/utils": "^1.1.6",
+    "@rtcts/isomorphic": "^1.2.1",
+    "@rtcts/utils": "^1.2.1",
     "eventemitter3": "^4.0.4",
     "mobx": "^5.15.4"
   },

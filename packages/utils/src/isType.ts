@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 export function isString<T = string>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object String]";
 }
@@ -25,7 +20,6 @@ export function isObject<T = { [key: string]: any }>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Object]";
 }
 
-// tslint:disable-next-line:ban-types
 export function isFunction<T = Function>(test: any): test is T {
   return Object.prototype.toString.call(test) === "[object Function]";
 }

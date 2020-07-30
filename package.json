@@ -15,9 +15,5 @@
     "hooks": {
       "pre-commit": "yarn lint"
     }
-  },
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ]
+  }
 }
