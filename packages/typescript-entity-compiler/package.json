@@ -23,7 +23,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint src test"
+      "pre-commit": "tsdx lint src"
     }
   },
   "name": "@rtcts/typescript-entity-compiler",
