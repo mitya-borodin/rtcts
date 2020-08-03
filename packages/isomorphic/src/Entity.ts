@@ -16,3 +16,7 @@ export interface Entity extends ValueObject {
   isEntity(): this is { id: string };
   hasId(): this is { id: string };
 }
+
+export interface EntityId {
+  id?: string;
+}
