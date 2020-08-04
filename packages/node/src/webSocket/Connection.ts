@@ -1,6 +1,6 @@
 import { isString } from "@rtcts/utils";
 import chalk from "chalk";
-import uuid from "uuid/v1";
+import uuid from "uuid";
 import WebSocket from "ws";
 
 export class Connection {
@@ -16,7 +16,7 @@ export class Connection {
 
   constructor(ws: WebSocket) {
     this.ws = ws;
-    this.wsid = uuid();
+    this.wsid = uuid.v1();
     this.uid = undefined;
     this.isAlive = true;
     this.heartbeat = (): void => {
