@@ -50,7 +50,7 @@ export class MongoDBRepository<ENTITY extends Entity> {
     const db: Db = await this.db.getDB();
 
     if (!this.collection) {
-      this.collection = await db.createCollection<any>(this.name, this.options);
+      this.collection = await db.collection<any>(this.name);
     }
 
     await this.onValidation();

@@ -33,6 +33,10 @@ export class User implements Entity {
       throw new Error(`User(data) data should be defined`);
     }
 
+    if (isString(data.id)) {
+      this.id = data.id;
+    }
+
     for (const field of [...noSecureFields, ...secureFields]) {
       if (isString(data[field])) {
         this[field] = data[field];
