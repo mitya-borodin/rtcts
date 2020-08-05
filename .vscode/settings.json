@@ -54,6 +54,7 @@
   "cSpell.language": "en,ru",
   "conventionalCommits.scopes": [
     "entity/backend",
-    "backend"
+    "backend",
+    "form"
   ]
 }

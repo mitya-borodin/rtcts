@@ -1,9 +1,9 @@
-import { Entity, ValidationResult } from "@rtcts/isomorphic";
+import { ValidationResult, ValueObject } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
 
-export class ValueObjectFormStore<VALUE_OBJECT extends Entity, DATA> extends EventEmitter {
+export class ValueObjectFormStore<VALUE_OBJECT extends ValueObject, DATA> extends EventEmitter {
   @observable
   public pending: boolean;
 
