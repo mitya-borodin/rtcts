@@ -21,6 +21,7 @@
     "@typescript-eslint/ban-types": "warn",
     "@typescript-eslint/unbound-method": "warn",
     "@typescript-eslint/no-misused-promises": "warn",
+    "@typescript-eslint/require-await": "warn",
     "@typescript-eslint/restrict-template-expressions": [
       "warn",
       {

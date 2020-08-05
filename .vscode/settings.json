@@ -35,11 +35,13 @@
     "javascript",
     "typescript"
   ],
-  "eslint.packageManager": "yarn",
+  "eslint.packageManager": "npm",
   "eslint.workingDirectories": [
-    "./frontend",
-    "./backend",
-    "./shared",
+    "./packages/browser",
+    "./packages/isomorphic",
+    "./packages/node",
+    "./packages/typescript-entity-compiler",
+    "./packages/utils",
   ],
   "css.validate": false,
   "less.validate": false,
@@ -49,12 +51,14 @@
   "workbench.iconTheme": "material-icon-theme",
   "workbench.editor.revealIfOpen": true,
   "cSpell.words": [
+    "mobx",
     "rtcts"
   ],
   "cSpell.language": "en,ru",
   "conventionalCommits.scopes": [
     "entity/backend",
     "backend",
-    "form"
+    "form",
+    "settings"
   ]
 }

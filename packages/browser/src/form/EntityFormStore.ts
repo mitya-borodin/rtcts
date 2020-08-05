@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { Entity } from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";
 import { computed, runInAction } from "mobx";
-import { ValueObjectFormStore } from './ValueObjectFormStore';
+import { ValueObjectFormStore } from "./ValueObjectFormStore";
 
-export class EntityFormStore<ENTITY extends Entity, DATA> extends ValueObjectFormStore<ENTITY, DATA> {
+export class EntityFormStore<ENTITY extends Entity, DATA> extends ValueObjectFormStore<
+  ENTITY,
+  DATA
+> {
   @computed({ name: "FormStore.isEdit" })
   get isEdit(): boolean {
     return this.form instanceof this.Entity && this.form.hasId() && this.form.id.length > 0;
