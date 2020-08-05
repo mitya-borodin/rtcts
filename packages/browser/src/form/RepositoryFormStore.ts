@@ -4,7 +4,7 @@ import EventEmitter from "eventemitter3";
 import { Repository } from "../repository/Repository";
 import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTransport";
 import { WSClient } from "../transport/ws/WSClient";
-import { FormStore } from "./FormStore";
+import { EntityFormStore } from "./EntityFormStore";
 
 export class RepositoryFormStore<
   HTTP_TRANSPORT extends RepositoryHttpTransport<ENTITY, WS, PUB_SUB>,
@@ -13,7 +13,7 @@ export class RepositoryFormStore<
   REP extends Repository<HTTP_TRANSPORT, ENTITY, WS, PUB_SUB>,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends FormStore<ENTITY, DATA> {
+> extends EntityFormStore<ENTITY, DATA> {
   public static events = {
     submit: `[ RepositoryFormStore ][ SUBMIT ]`,
   };

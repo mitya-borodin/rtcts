@@ -5,7 +5,7 @@ import { SingleRepositoryPubSubEnum } from "../enums/SingleRepositoryPubSubEnum"
 import { SingleObjectRepository } from "../repository/SingleObjectRepository";
 import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTransport";
 import { WSClient } from "../transport/ws/WSClient";
-import { FormStore } from "./FormStore";
+import { EntityFormStore } from "./EntityFormStore";
 
 export class SingleFormStore<
   HTTP_TRANSPORT extends SingleObjectHttpTransport<ENTITY, WS, PUB_SUB>,
@@ -14,7 +14,7 @@ export class SingleFormStore<
   REP extends SingleObjectRepository<HTTP_TRANSPORT, ENTITY, WS, PUB_SUB>,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends FormStore<ENTITY, DATA> {
+> extends EntityFormStore<ENTITY, DATA> {
   protected readonly Entity: new (data?: any) => ENTITY;
   protected readonly repository: REP;
 
