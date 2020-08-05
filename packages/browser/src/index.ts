@@ -4,7 +4,8 @@ export { SingleRepositoryPubSubEnum } from "./enums/SingleRepositoryPubSubEnum";
 // FILTER
 export { FilterStore } from "./filter/FilterStore";
 // FORM
-export { FormStore } from "./form/FormStore";
+export { EntityFormStore } from "./form/EntityFormStore";
+export { ValueObjectFormStore } from "./form/ValueObjectFormStore";
 export { RepositoryFormStore } from "./form/RepositoryFormStore";
 export { SingleFormStore } from "./form/SingleFormStore";
 export { CacheRepository } from "./repository/CacheRepository";

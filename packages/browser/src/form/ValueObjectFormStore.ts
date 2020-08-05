@@ -1,9 +1,9 @@
 import { Entity, ValidationResult } from "@rtcts/isomorphic";
-import { getErrorMessage, isString } from "@rtcts/utils";
+import { getErrorMessage } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
 
-export class FormStore<ENTITY extends Entity, DATA> extends EventEmitter {
+export class ValueObjectFormStore<VALUE_OBJECT extends Entity, DATA> extends EventEmitter {
   @observable
   public pending: boolean;
 
@@ -11,14 +11,14 @@ export class FormStore<ENTITY extends Entity, DATA> extends EventEmitter {
   public showValidateResult: boolean;
 
   @observable
-  public form: ENTITY | undefined;
+  public form: VALUE_OBJECT | undefined;
 
   @observable
   public inputFiles: File[] = [];
 
-  protected readonly Entity: new (data: any) => ENTITY;
+  protected readonly Entity: new (data: any) => VALUE_OBJECT;
 
-  constructor(Entity: new (data: any) => ENTITY) {
+  constructor(Entity: new (data: any) => VALUE_OBJECT) {
     super();
 
     this.Entity = Entity;
@@ -32,7 +32,7 @@ export class FormStore<ENTITY extends Entity, DATA> extends EventEmitter {
     this.submit = this.submit.bind(this);
   }
 
-  @computed({ name: "FormStore.validationResult" })
+  @computed({ name: "ValueObjectFormStore.validationResult" })
   get validationResult(): ValidationResult {
     if (this.form instanceof this.Entity) {
       return this.form.validation();
@@ -41,37 +41,21 @@ export class FormStore<ENTITY extends Entity, DATA> extends EventEmitter {
     return new ValidationResult([]);
   }
 
-  @computed({ name: "FormStore.isValid" })
+  @computed({ name: "ValueObjectFormStore.isValid" })
   get isValid(): boolean {
     return this.validationResult.isValid;
   }
 
-  @computed({ name: "FormStore.isOpen" })
+  @computed({ name: "ValueObjectFormStore.isOpen" })
   get isOpen(): boolean {
     return this.form instanceof this.Entity;
   }
 
-  @computed({ name: "FormStore.isEdit" })
-  get isEdit(): boolean {
-    return this.form instanceof this.Entity && this.form.hasId() && this.form.id.length > 0;
-  }
-
-  public async open(id?: string): Promise<void> {
-    const hasID = isString(id) && id.length > 0;
-    const title = `Open (${this.constructor.name}) has been open for ${
-      hasID ? "update" : "create"
-    } `;
-
-    try {
-      this.start();
-      const form = await this.openForm(id);
-
-      runInAction(`${title} succeed`, () => (this.form = form));
-    } catch (error) {
-      console.error(`${title} failed: ${getErrorMessage(error)}`);
-    } finally {
-      this.stop();
-    }
+  public async open(): Promise<void> {
+    runInAction(
+      `Open (${this.constructor.name}) has been open succeed`,
+      () => (this.form = new this.Entity({})),
+    );
   }
 
   public async change(change: DATA & { inputFiles?: File[] }): Promise<void> {
@@ -104,7 +88,7 @@ export class FormStore<ENTITY extends Entity, DATA> extends EventEmitter {
     }
   }
 
-  @action("FormStore.submit")
+  @action("ValueObjectFormStore.submit")
   public async submit(): Promise<void> {
     try {
       this.start();
@@ -165,28 +149,17 @@ export class FormStore<ENTITY extends Entity, DATA> extends EventEmitter {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  protected async openForm(id?: string, ...args: any[]): Promise<ENTITY> {
-    console.log(`External handler for open action (${this.constructor.name})`, {
-      id,
-    });
-
-    return new this.Entity({ id });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await
   protected async changeForm(
-    form: ENTITY,
+    form: VALUE_OBJECT,
     change: DATA & { inputFiles?: File[] },
     ...args: any[]
-  ): Promise<ENTITY> {
+  ): Promise<VALUE_OBJECT> {
     console.log(`External handler for change action (${this.constructor.name})`, { change, form });
 
     return new this.Entity({ ...form.toObject(), ...change });
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  protected async submitForm(submit: ENTITY, ...args: any[]): Promise<ENTITY | void> {
+  protected async submitForm(submit: VALUE_OBJECT, ...args: any[]): Promise<VALUE_OBJECT | void> {
     console.log(`External handler for submit action (${this.constructor.name})`, { submit });
   }
 }
