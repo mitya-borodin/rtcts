@@ -44,7 +44,6 @@
   },
   "module": "dist/utils.esm.js",
   "devDependencies": {
-    "@types/moment": "^2.13.0",
     "husky": "^4.2.5",
     "tsdx": "^0.13.2",
     "tslib": "^2.0.0",
