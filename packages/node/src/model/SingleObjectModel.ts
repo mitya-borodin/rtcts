@@ -46,9 +46,11 @@ export class SingleObjectModel<ENTITY extends Entity> {
     try {
       return await this.repository.findOne({});
     } catch (error) {
-      const collection: Collection<any> = await this.repository.getCollection();
+      const collection: Collection<any> | null = await this.repository.getCollection();
 
-      await collection.drop();
+      if (collection) {
+        await collection.drop();
+      }
 
       console.error(error);
     }

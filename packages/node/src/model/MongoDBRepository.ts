@@ -46,16 +46,30 @@ export class MongoDBRepository<ENTITY extends Entity> {
     this.createEntity = this.createEntity.bind(this);
   }
 
-  public async getCollection(): Promise<Collection<any>> {
-    const db: Db = await this.db.getDB();
+  public async getCollection(): Promise<Collection<any> | null> {
+    try {
+      const db: Db = await this.db.getDB();
 
-    if (!this.collection) {
-      this.collection = db.collection<any>(this.name);
+      if (!this.collection) {
+        try {
+          this.collection = await db.createCollection<any>(this.name);
+        } catch (error) {
+          if (error.codeName === "NamespaceExists") {
+            this.collection = db.collection<any>(this.name);
+          } else {
+            throw error;
+          }
+        }
+      }
+
+      await this.onValidation();
+
+      return this.collection;
+    } catch (error) {
+      console.log(error);
     }
 
-    await this.onValidation();
-
-    return this.collection;
+    return null;
   }
 
   public async onValidation(): Promise<void> {
@@ -90,7 +104,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
     options?: CollectionInsertManyOptions,
   ): Promise<ENTITY[]> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return [];
+      }
 
       const insert: InsertWriteOpResult<any> = await collection.insertMany(
         items
@@ -114,7 +132,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
   ): Promise<ENTITY | null> {
     try {
       if (item.isInsert()) {
-        const collection: Collection<any> = await this.getCollection();
+        const collection: Collection<any> | null = await this.getCollection();
+
+        if (collection === null) {
+          return null;
+        }
 
         const insert: InsertOneWriteOpResult<any> = await collection.insertOne(
           this.removeID(item.toObject()),
@@ -138,7 +160,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
     options?: FindOneOptions,
   ): Promise<ENTITY[]> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return [];
+      }
 
       const cursor = collection
         .find(this.normalizeObjectID(query), this.getOptions(options))
@@ -162,7 +188,12 @@ export class MongoDBRepository<ENTITY extends Entity> {
     options?: FindOneOptions,
   ): Promise<ENTITY | null> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return null;
+      }
+
       const item: object | null = await collection.findOne(
         this.normalizeObjectID(query),
         this.getOptions(options),
@@ -198,7 +229,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
   // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async findOneAndUpdate(entity: ENTITY): Promise<ENTITY | null> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return null;
+      }
 
       const { id: _id, ...$set } = entity.toObject();
       const result: FindAndModifyWriteOpResultObject<any> = await collection.findOneAndUpdate(
@@ -223,7 +258,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
     options?: FindOneAndDeleteOption,
   ): Promise<ENTITY | null> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return null;
+      }
 
       const result: FindAndModifyWriteOpResultObject<any> = await collection.findOneAndDelete(
         this.normalizeObjectID(query),
@@ -259,7 +298,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
     options?: ReplaceOneOptions,
   ): Promise<void> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return undefined;
+      }
 
       await collection.updateOne(this.normalizeObjectID(query), this.removeID(update), options);
     } catch (error) {
@@ -274,7 +317,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
     options?: ReplaceOneOptions,
   ): Promise<void> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return undefined;
+      }
 
       await collection.updateMany(query, update, options);
     } catch (error) {
@@ -285,7 +332,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
   // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async deleteOne(query: FilterQuery<QueryData>, options?: CommonOptions): Promise<void> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return undefined;
+      }
 
       await collection.deleteOne(this.normalizeObjectID(query), options);
     } catch (error) {
@@ -296,7 +347,11 @@ export class MongoDBRepository<ENTITY extends Entity> {
   // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async deleteMany(query: FilterQuery<QueryData>, options?: CommonOptions): Promise<void> {
     try {
-      const collection: Collection<any> = await this.getCollection();
+      const collection: Collection<any> | null = await this.getCollection();
+
+      if (collection === null) {
+        return undefined;
+      }
 
       await collection.deleteMany(query, options);
     } catch (error) {
