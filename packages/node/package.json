@@ -1,5 +1,5 @@
 {
-  "version": "1.4.1",
+  "version": "1.4.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -65,7 +65,7 @@
   },
   "module": "dist/node.esm.js",
   "devDependencies": {
-    "@rtcts/isomorphic": "^1.4.1",
+    "@rtcts/isomorphic": "^1.4.2",
     "@rtcts/utils": "^1.4.1",
     "@types/bson": "^4.0.2",
     "@types/chai": "^4.2.12",
