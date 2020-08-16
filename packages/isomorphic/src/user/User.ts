@@ -49,14 +49,29 @@ export class User implements Entity {
       throw new Error(`${this.constructor.name}.id should be String`);
     }
 
-    this.checkNoSecureFields();
-    this.checkSecureFields();
+    this.isInsert();
 
     return true;
   }
 
   // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
   isInsert(): this is Required<Omit<UserData, "id">> {
+    this.checkNoSecureFields();
+
+    return true;
+  }
+
+  isSecureEntity(): this is Required<UserData> {
+    if (!isString(this.id)) {
+      throw new Error(`${this.constructor.name}.id should be String`);
+    }
+
+    this.isSecureInsert();
+
+    return true;
+  }
+
+  isSecureInsert(): this is Required<Omit<UserData, "id">> {
     this.checkNoSecureFields();
     this.checkSecureFields();
 
