@@ -21,10 +21,14 @@ export class ListResponse<T = any> {
         throw new Error("ListResponse.payload is undefined");
       }
 
-      if (isArray<ValidationData>(data.validationResult)) {
+      if (data.validationResult instanceof ValidationResult) {
+        this.validationResult = new ValidationResult(data.validationResult);
+      } else if (isArray(data.validationResult)) {
         this.validationResult = new ValidationResult(data.validationResult);
       } else {
-        throw new Error("ListResponse.validationResult should be array of ValidationData");
+        throw new Error(
+          "ListResponse.validationResult should be instance of ValidationResult or array of ValidationData",
+        );
       }
     } else {
       throw new Error("ListResponse data is undefined");
@@ -61,10 +65,14 @@ export class Response<T = any> {
         throw new TypeError("Response.payload is undefined");
       }
 
-      if (isArray(data.validationResult)) {
+      if (data.validationResult instanceof ValidationResult) {
+        this.validationResult = new ValidationResult(data.validationResult);
+      } else if (isArray(data.validationResult)) {
         this.validationResult = new ValidationResult(data.validationResult);
       } else {
-        throw new Error("Response.validationResult should be array of ValidationData");
+        throw new Error(
+          "Response.validationResult should be instance of ValidationResult or array of ValidationData",
+        );
       }
     } else {
       throw new Error("Response data is undefined");

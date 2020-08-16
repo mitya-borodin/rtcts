@@ -60,6 +60,7 @@
     "settings",
     "utils",
     "All",
-    "dependencies"
+    "dependencies",
+    "isomorphic"
   ]
 }
