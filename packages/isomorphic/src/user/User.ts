@@ -44,7 +44,7 @@ export class User implements Entity {
     }
   }
 
-  isEntity(): this is Required<UserData> {
+  isEntity(): this is Required<Omit<UserData, "salt" | "hashedPassword">> {
     if (!isString(this.id)) {
       throw new Error(`${this.constructor.name}.id should be String`);
     }
@@ -55,7 +55,7 @@ export class User implements Entity {
   }
 
   // The canBeInsert method ensures that all mandatory noSecureFields are filled in and have the correct data type.
-  isInsert(): this is Required<Omit<UserData, "id">> {
+  isInsert(): this is Required<Omit<UserData, "id" | "salt" | "hashedPassword">> {
     this.checkNoSecureFields();
 
     return true;

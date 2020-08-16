@@ -199,7 +199,7 @@ export class UserRepository<
 
         const entity = response.payload;
 
-        if (!entity.hasId() || !entity.checkNoSecureFields()) {
+        if (!entity.isEntity()) {
           return;
         }
 
@@ -247,7 +247,7 @@ export class UserRepository<
 
       const entity = response.payload;
 
-      if (!entity.hasId() || !entity.checkNoSecureFields()) {
+      if (!entity.isEntity()) {
         return;
       }
 
@@ -282,7 +282,7 @@ export class UserRepository<
 
       const entity = response.payload;
 
-      if (!entity.hasId() || !entity.checkNoSecureFields()) {
+      if (!entity.isEntity()) {
         return;
       }
 
@@ -314,7 +314,7 @@ export class UserRepository<
 
       runInAction(`UpdateGroup (${this.constructor.name}) has been succeed`, () => {
         for (const user of listResponse.payload) {
-          if (user.hasId() && user.checkNoSecureFields()) {
+          if (user.isEntity()) {
             this.collection.set(user.id, user);
           }
         }
@@ -341,7 +341,7 @@ export class UserRepository<
 
       const entity = response.payload;
 
-      if (!entity.hasId() || !entity.checkNoSecureFields()) {
+      if (!entity.isEntity()) {
         return;
       }
 
@@ -387,7 +387,7 @@ export class UserRepository<
 
       const entity = response.payload;
 
-      if (!entity.hasId() || !entity.checkNoSecureFields()) {
+      if (!entity.isEntity()) {
         return;
       }
 

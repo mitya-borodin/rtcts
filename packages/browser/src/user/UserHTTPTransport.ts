@@ -52,32 +52,6 @@ export class UserHTTPTransport<
     }
   }
 
-  public async getList(): Promise<ListResponse<ENTITY> | void> {
-    try {
-      if (!this.ACL.collection.includes(this.currentUserGroup)) {
-        return;
-      }
-
-      const payload: any | void = await this.getHttpRequest(`/${this.name}/list`);
-
-      if (!payload) {
-        return;
-      }
-
-      const listResponse = new ListResponse(payload);
-
-      return new ListResponse<ENTITY>({
-        count: listResponse.count,
-        payload: listResponse.payload
-          .map((payload) => new this.Entity(payload))
-          .filter((entity) => entity.hasId() && entity.checkNoSecureFields()),
-        validationResult: listResponse.validationResult,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   public async signIn(data: object): Promise<void> {
     try {
       await this.postHttpRequest(`/${this.name}/signIn`, data);
@@ -165,7 +139,7 @@ export class UserHTTPTransport<
           count: listResponse.count,
           payload: listResponse.payload
             .map((payload) => new this.Entity(payload))
-            .filter((entity) => entity.hasId() && entity.checkNoSecureFields()),
+            .filter((entity) => entity.isEntity()),
           validationResult: listResponse.validationResult,
         });
       }

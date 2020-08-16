@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   ListResponse,
   Response,
@@ -204,10 +205,10 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
       const hashedPassword = encryptPassword(password, salt);
       const insert = new this.Entity({ login, group, salt, hashedPassword, ...other });
 
-      if (insert.isInsert()) {
+      if (insert.isSecureInsert()) {
         const user: ENTITY | null = await this.repository.insertOne(insert);
 
-        if (user && user.isEntity()) {
+        if (user && user.isSecureEntity()) {
           if (onlyCreate) {
             return new Response({
               payload: user.getUnSecureData(),
@@ -237,7 +238,7 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
         throw new Error(`User with login: ${data.login} not found`);
       }
 
-      if (user.isEntity()) {
+      if (user.isSecureEntity()) {
         if (!authenticate(data.password, user.salt, user.hashedPassword)) {
           throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
         }
@@ -267,10 +268,10 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
         throw new Error(`User with id: ${data.id} and login: ${data.login} not found`);
       }
 
-      if (payload.isEntity()) {
+      if (payload.isSecureEntity()) {
         const updatedEntity = new this.Entity({ ...payload.toObject(), login: data.login });
 
-        if (!updatedEntity.isEntity()) {
+        if (!updatedEntity.isSecureEntity()) {
           throw new Error(`Updated entity wrong`);
         }
 
@@ -305,7 +306,7 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
         throw new Error(`User with id: ${data.id} not found`);
       }
 
-      if (payload.isEntity()) {
+      if (payload.isSecureEntity()) {
         const salt = getSalt();
         const hashedPassword = encryptPassword(data.password, salt);
         const query = { ...payload.toObject(), salt, hashedPassword };
@@ -339,7 +340,7 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
       this.sendThroughWebSocket(
         {
           bulkUpdate: users.map((user) => {
-            if (user.isEntity()) {
+            if (user.isSecureEntity()) {
               return user.getUnSecureData();
             }
 
