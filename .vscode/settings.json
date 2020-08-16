@@ -59,6 +59,7 @@
     "form",
     "settings",
     "utils",
-    "All"
+    "All",
+    "dependencies"
   ]
 }
