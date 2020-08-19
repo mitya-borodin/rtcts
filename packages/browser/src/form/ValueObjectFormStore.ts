@@ -107,8 +107,6 @@ export class ValueObjectFormStore<VALUE_OBJECT extends ValueObject, DATA> extend
       }
 
       await this.submitForm(this.form);
-
-      this.cancel();
     } catch (error) {
       console.error(`Submit (${this.constructor.name}) has been filed: ${getErrorMessage(error)}`);
     } finally {
