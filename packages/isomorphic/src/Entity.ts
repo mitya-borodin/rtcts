@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ValidationResult } from "./validation/ValidationResult";
 
-export interface EssentialObject {
+export interface DataTransferObject {
   toObject(): any;
   toJSON(): any;
   toJS(): any;
 }
 
-export interface ValueObject extends EssentialObject {
+export interface ValueObject extends DataTransferObject {
   isInsert(): boolean;
   validation(): ValidationResult;
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isArray, isObject, isString } from "@rtcts/utils";
-import { EssentialObject } from "../Entity";
+import { DataTransferObject } from "../Entity";
 import { Log } from "../log/Log";
 import { logTypeEnum } from "../log/logTypeEnum";
 import { Validation, ValidationData } from "./Validation";
@@ -11,7 +11,7 @@ type ValidationResultData =
   | Validation
   | Partial<ValidationData>;
 
-export class ValidationResult implements EssentialObject {
+export class ValidationResult implements DataTransferObject {
   readonly results: Validation[];
 
   readonly isValid: boolean;

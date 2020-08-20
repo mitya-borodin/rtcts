@@ -1,5 +1,5 @@
 import { isArray, isString, isUndefined } from "@rtcts/utils";
-import { EssentialObject } from "../Entity";
+import { DataTransferObject } from "../Entity";
 import { Log, LogData } from "../log/Log";
 
 export interface ValidationData extends LogData {
@@ -7,7 +7,7 @@ export interface ValidationData extends LogData {
   readonly title?: string;
 }
 
-export class Validation extends Log implements EssentialObject {
+export class Validation extends Log implements DataTransferObject {
   readonly field: string | string[];
   readonly title?: string;
 

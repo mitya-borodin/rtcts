@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { isString } from "@rtcts/utils";
-import { EssentialObject } from "../Entity";
+import { DataTransferObject } from "../Entity";
 import { LogType } from "./LogType";
 import { logTypeEnum } from "./logTypeEnum";
 
@@ -11,7 +11,7 @@ export interface LogData {
   readonly message: string;
 }
 
-export class Log implements EssentialObject {
+export class Log implements DataTransferObject {
   readonly type: LogType;
   readonly message: string;
 
