@@ -1,6 +1,7 @@
-import { Entity } from "@rtcts/isomorphic";
+import { Entity, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
+import { computed } from "mobx";
 import { SingleRepositoryPubSubEnum } from "../enums/SingleRepositoryPubSubEnum";
 import { SingleObjectRepository } from "../repository/SingleObjectRepository";
 import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTransport";
@@ -27,6 +28,11 @@ export class SingleFormStore<
     this.openForm = this.openForm.bind(this);
     this.changeForm = this.changeForm.bind(this);
     this.submitForm = this.submitForm.bind(this);
+  }
+
+  @computed({ name: "SingleFormStore.externalValidationResult" })
+  get externalValidationResult(): ValidationResult {
+    return this.repository.validationResult;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
