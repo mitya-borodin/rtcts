@@ -1,4 +1,4 @@
-import { isArray, isNumber, isUndefined } from "@rtcts/utils";
+import { isArray } from "@rtcts/utils";
 import { ValidationData } from "./validation/Validation";
 import { ValidationResult } from "./validation/ValidationResult";
 
@@ -9,7 +9,11 @@ export class ListResponse<T = any> {
 
   constructor(data?: Omit<ListResponse<T>, "toJSON">) {
     if (data) {
-      if (isNumber(data.count)) {
+      this.count = 0;
+      this.payload = [];
+      this.validationResult = new ValidationResult([]);
+
+      if (typeof data.count === "number") {
         this.count = data.count;
       } else {
         throw new Error("ListResponse.count should be number");
@@ -51,18 +55,19 @@ export class ListResponse<T = any> {
 }
 
 export class Response<T = any> {
-  readonly payload: T;
+  readonly payload: T | null;
   readonly validationResult: ValidationResult;
 
   constructor(data?: Omit<Response<T>, "toJSON">) {
-    this.payload = {} as T;
+    this.payload = null;
     this.validationResult = new ValidationResult([]);
 
     if (data) {
-      if (!isUndefined(data.payload)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      if (typeof data.payload !== "undefined") {
         this.payload = data.payload;
       } else {
-        throw new TypeError("Response.payload is undefined");
+        throw new TypeError("Response.payload should not be undefined");
       }
 
       if (data.validationResult instanceof ValidationResult) {
@@ -79,7 +84,7 @@ export class Response<T = any> {
     }
   }
 
-  public toJSON(): { payload: T; validationResult: ValidationData[] } {
+  public toJSON(): { payload: T | null; validationResult: ValidationData[] } {
     return {
       payload: this.payload,
       validationResult: this.validationResult

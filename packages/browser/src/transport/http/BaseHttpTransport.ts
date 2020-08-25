@@ -267,14 +267,34 @@ export class BaseHttpTransport<
         }
 
         return await res.text();
-      } else if (res.status === 404) {
-        console.info(`[ ${this.constructor.name} ][ path: ${this.rootPath + path} ][ NOT_FOUND ]`);
-      } else {
-        console.error({
-          status: res.status,
-          statusText: res.statusText,
-        });
       }
+
+      if (res.status === 500) {
+        try {
+          const result = await res.json();
+
+          console.error(result);
+
+          return result;
+        } catch (error) {
+          console.error({
+            status: res.status,
+            statusText: res.statusText,
+            res,
+            error,
+          });
+        }
+      }
+
+      if (res.status === 404) {
+        console.info(`[ ${this.constructor.name} ][ path: ${this.rootPath + path} ][ NOT_FOUND ]`);
+        return;
+      }
+
+      console.error({
+        status: res.status,
+        statusText: res.statusText,
+      });
     } catch (error) {
       console.error(error);
     }

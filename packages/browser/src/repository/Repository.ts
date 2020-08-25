@@ -1,4 +1,4 @@
-import { Entity, ListResponse, Response, wsEventEnum } from "@rtcts/isomorphic";
+import { Entity, ListResponse, Response, wsEventEnum, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";
@@ -26,6 +26,9 @@ export class Repository<
 
   @observable
   protected collection: ObservableMap<string, ENTITY>;
+
+  @observable
+  public validationResult: ValidationResult;
 
   protected Entity: new (data: any) => ENTITY;
   protected httpTransport: HTTP_TRANSPORT;
@@ -57,6 +60,7 @@ export class Repository<
     // ! OBSERVABLE
     this.pending = false;
     this.collection = observable.map<string, ENTITY>();
+    this.validationResult = new ValidationResult([]);
 
     // * BINDINGS
     this.init = this.init.bind(this);
@@ -109,6 +113,8 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(listResponse.validationResult);
+
       runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
         const collection: ENTITY[] = [];
 
@@ -156,7 +162,13 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       const entity = response.payload;
+
+      if (!entity) {
+        return;
+      }
 
       if (!entity.isEntity()) {
         return;
@@ -197,7 +209,13 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       const entity = response.payload;
+
+      if (!entity) {
+        return;
+      }
 
       if (!entity.isEntity()) {
         return;
@@ -239,7 +257,13 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       const entity = response.payload;
+
+      if (!entity) {
+        return;
+      }
 
       if (!entity.isEntity()) {
         return;

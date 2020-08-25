@@ -6,6 +6,8 @@ import {
   User,
   userGroupEnum,
   ValidationResult,
+  Validation,
+  logTypeEnum,
 } from "@rtcts/isomorphic";
 import { checkPassword, isString } from "@rtcts/utils";
 import { ObjectId } from "bson";
@@ -100,7 +102,11 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
     uid: string,
     wsid: string,
   ): Promise<Response> {
-    const payload: ENTITY | null = await this.updateLogin(data, uid, wsid);
+    const payload: ENTITY | Response | null = await this.updateLogin(data, uid, wsid);
+
+    if (payload instanceof Response) {
+      return payload;
+    }
 
     return new Response({
       payload: payload !== null ? payload.getUnSecureData() : payload,
@@ -113,8 +119,11 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
     uid: string,
     wsid: string,
   ): Promise<Response> {
-    const payload: ENTITY | null = await this.updatePassword(data, uid, wsid);
+    const payload: ENTITY | Response | null = await this.updatePassword(data, uid, wsid);
 
+    if (payload instanceof Response) {
+      return payload;
+    }
     return new Response({
       payload: payload !== null ? payload.getUnSecureData() : payload,
       validationResult: new ValidationResult([]),
@@ -186,19 +195,53 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
         !isString(passwordConfirm) ||
         !isString(group)
       ) {
-        throw new Error(`Incorrect signUp data: ${JSON.stringify(data)}`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Incorrect signUp data: ${JSON.stringify(data)}`,
+            }),
+          ]),
+        });
       }
 
       const existingUser: ENTITY | null = await this.repository.findOne({ login });
 
       if (existingUser !== null) {
-        throw new Error(`User with login: ${data.login} already exist`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `User with login: ${data.login} already exist`,
+              field: "login",
+              title: `User ${data.login} already exist`,
+            }),
+          ]),
+        });
       }
 
       const isValidPassword = checkPassword(password, passwordConfirm);
 
       if (!isValidPassword) {
-        throw new Error(`Password incorrect, ${JSON.stringify({ password, passwordConfirm })} }`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Password incorrect, ${JSON.stringify({ password, passwordConfirm })} }`,
+              field: "password",
+              title: "Password incorrect",
+            }),
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Password incorrect, ${JSON.stringify({ password, passwordConfirm })} }`,
+              field: "passwordConfirm",
+              title: "Password incorrect",
+            }),
+          ]),
+        });
       }
 
       const salt = getSalt();
@@ -226,21 +269,47 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
     return null;
   }
 
-  public async signIn(data: { [key: string]: any }): Promise<string | null> {
+  public async signIn(data: { [key: string]: any }): Promise<string | Response | null> {
     try {
       if (!isString(data.login) || !isString(data.password)) {
-        throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Incorrect signIn data: ${JSON.stringify(data)}`,
+            }),
+          ]),
+        });
       }
 
       const user: ENTITY | null = await this.repository.findOne({ login: data.login });
 
       if (user === null) {
-        throw new Error(`User with login: ${data.login} not found`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `User with login: ${data.login} not found`,
+              field: "login",
+              title: `User ${data.login} already exist`,
+            }),
+          ]),
+        });
       }
 
       if (user.isSecureEntity()) {
         if (!authenticate(data.password, user.salt, user.hashedPassword)) {
-          throw new Error(`Incorrect signIn data: ${JSON.stringify(data)}`);
+          return new Response({
+            payload: null,
+            validationResult: new ValidationResult([
+              new Validation({
+                type: logTypeEnum.error,
+                message: `Incorrect signIn data: ${JSON.stringify(data)}`,
+              }),
+            ]),
+          });
         }
 
         return jwt.sign({ id: user.id }, this.config.jwt.secretKey, { expiresIn: "12h" });
@@ -256,20 +325,40 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<ENTITY | null> {
+  ): Promise<ENTITY | Response | null> {
     try {
       if (!isString(data.id) || !isString(data.login)) {
-        throw new Error(`Incorrect updateLogin data: ${JSON.stringify(data)}`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Incorrect updateLogin data: ${JSON.stringify(data)}`,
+              field: "login",
+              title: `Incorrect data`,
+            }),
+          ]),
+        });
       }
 
-      const payload: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
+      const entity: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
-      if (payload === null) {
-        throw new Error(`User with id: ${data.id} and login: ${data.login} not found`);
+      if (entity === null) {
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `User with id: ${data.id} and login: ${data.login} not found`,
+              field: "login",
+              title: `User ${data.login} not found`,
+            }),
+          ]),
+        });
       }
 
-      if (payload.isSecureEntity()) {
-        const updatedEntity = new this.Entity({ ...payload.toObject(), login: data.login });
+      if (entity.isSecureEntity()) {
+        const updatedEntity = new this.Entity({ ...entity.toObject(), login: data.login });
 
         if (!updatedEntity.isSecureEntity()) {
           throw new Error(`Updated entity wrong`);
@@ -288,22 +377,64 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
     data: { [key: string]: any },
     uid: string,
     wsid: string,
-  ): Promise<ENTITY | null> {
+  ): Promise<ENTITY | Response | null> {
     try {
       if (!isString(data.id) || !isString(data.password) || !isString(data.passwordConfirm)) {
-        throw new Error(`Incorrect updatePassword data: ${JSON.stringify(data)}`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Incorrect updatePassword data: ${JSON.stringify(data)}`,
+              field: "password",
+              title: `Incorrect data`,
+            }),
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Incorrect updatePassword data: ${JSON.stringify(data)}`,
+              field: "passwordConfirm",
+              title: `Incorrect data`,
+            }),
+          ]),
+        });
       }
 
       const isValidPassword = checkPassword(data.password, data.passwordConfirm);
 
       if (!isValidPassword) {
-        throw new Error(`Incorrect password: ${JSON.stringify(data)}`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Incorrect updatePassword data: ${JSON.stringify(data)}`,
+              field: "password",
+              title: `Incorrect data`,
+            }),
+            new Validation({
+              type: logTypeEnum.error,
+              message: `Incorrect updatePassword data: ${JSON.stringify(data)}`,
+              field: "passwordConfirm",
+              title: `Incorrect data`,
+            }),
+          ]),
+        });
       }
 
       const payload: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
       if (payload === null) {
-        throw new Error(`User with id: ${data.id} not found`);
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `User with id: ${data.id} and login: ${data.login} not found`,
+              field: "login",
+              title: `User ${data.login} not found`,
+            }),
+          ]),
+        });
       }
 
       if (payload.isSecureEntity()) {

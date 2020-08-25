@@ -52,17 +52,29 @@ export class UserHTTPTransport<
     }
   }
 
-  public async signIn(data: object): Promise<void> {
+  public async signIn(data: object): Promise<Response | void> {
     try {
-      await this.postHttpRequest(`/${this.name}/signIn`, data);
+      const payload: any | void = await this.postHttpRequest(`/${this.name}/signIn`, data);
+
+      if (!payload) {
+        return;
+      }
+
+      return new Response(payload);
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async signUp(data: object): Promise<void> {
+  public async signUp(data: object): Promise<Response | void> {
     try {
-      await this.postHttpRequest(`/${this.name}/signUp`, data);
+      const payload: any | void = await this.postHttpRequest(`/${this.name}/signUp`, data);
+
+      if (!payload) {
+        return;
+      }
+
+      return new Response(payload);
     } catch (error) {
       console.error(error);
     }
@@ -87,6 +99,10 @@ export class UserHTTPTransport<
 
         const response = new Response<ENTITY>(payload);
 
+        if (response.validationResult.hasError) {
+          return response;
+        }
+
         return new Response<ENTITY>({
           payload: new this.Entity(response.payload),
           validationResult: response.validationResult,
@@ -110,6 +126,10 @@ export class UserHTTPTransport<
         }
 
         const response = new Response<ENTITY>(payload);
+
+        if (response.validationResult.hasError) {
+          return response;
+        }
 
         return new Response<ENTITY>({
           payload: new this.Entity(response.payload),

@@ -101,7 +101,7 @@ export class UserHttpTransport<
   }
 
   // ! The update method is used to change user data that does not affect access control, such as avatar, name, and other data
-  protected update = (): void => {
+  protected update(): void {
     const URL = `${this.basePath}/update`;
 
     this.router.post(
@@ -120,23 +120,24 @@ export class UserHttpTransport<
               throw new Error("The model wasn't updated");
             }
 
-            const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
+            const response: Response = await this.model.updateResponse(
+              ctx.request.body,
+              userId,
+              wsid,
+            );
+            const hasNotPayload = this.send(ctx, response);
 
-            if (response.payload) {
-              ctx.status = 200;
-              ctx.type = "application/json";
-              ctx.body = JSON.stringify(response);
-            } else {
+            if (hasNotPayload) {
               throw new Error("The model wasn't updated");
             }
           },
         );
       },
     );
-  };
+  }
 
   // ! Returns the user object that was retrieved after authorization
-  protected current = (): void => {
+  protected current(): void {
     const URL = `${this.basePath}/current`;
 
     this.router.get(URL, getAuthenticateMiddleware(), (ctx: Koa.Context) => {
@@ -155,60 +156,78 @@ export class UserHttpTransport<
         ctx.throw(404, `Current user is not available (${this.constructor.name})(${URL})`);
       }
     });
-  };
+  }
 
-  protected signIn = (): void => {
+  protected signIn(): void {
     const URL = `${this.basePath}/signIn`;
 
     this.router.post(
       URL,
       getRequestBodyJson(),
       async (ctx: Koa.Context): Promise<void> => {
-        const token: string | null = await this.model.signIn(ctx.request.body);
+        const result: string | Response | null = await this.model.signIn(ctx.request.body);
+        const errorMessage = `SingIn (${this.constructor.name})(${URL}) has been failed`;
 
-        if (isString(token)) {
-          setCookieForAuthenticate(ctx, token);
+        if (isString(result)) {
+          setCookieForAuthenticate(ctx, result);
 
           ctx.status = 200;
           ctx.type = "application/json";
           ctx.body = new Response({
-            payload: {},
+            payload: null,
             validationResult: new ValidationResult([]),
           });
-        } else {
-          const message = `SingIn (${this.constructor.name})(${URL}) has been failed`;
+        }
 
-          ctx.throw(404, message);
+        if (result instanceof Response) {
+          const hasNotPayload = this.send(ctx, result);
+
+          if (hasNotPayload) {
+            ctx.throw(404, errorMessage);
+          }
+        }
+
+        if (result === null) {
+          ctx.throw(404, errorMessage);
         }
       },
     );
-  };
+  }
 
-  protected signUp = (): void => {
+  protected signUp(): void {
     const URL = `${this.basePath}/signUp`;
 
     this.router.post(URL, getRequestBodyJson(), async (ctx: Koa.Context) => {
-      const token: string | Response | null = await this.model.signUp(ctx.request.body);
+      const result: string | Response | null = await this.model.signUp(ctx.request.body);
+      const errorMessage = `SingUp (${this.constructor.name})(${URL}) has been failed`;
 
-      if (isString(token)) {
-        setCookieForAuthenticate(ctx, token);
+      if (isString(result)) {
+        setCookieForAuthenticate(ctx, result);
 
         ctx.status = 200;
         ctx.type = "application/json";
         ctx.body = new Response({
-          payload: {},
+          payload: null,
           validationResult: new ValidationResult([]),
         });
-      } else {
-        const message = `SingUp (${this.constructor.name})(${URL}) has been failed`;
+      }
 
-        ctx.throw(404, message);
+      if (result instanceof Response) {
+        const hasNotPayload = this.send(ctx, result);
+
+        if (hasNotPayload) {
+          ctx.throw(404, errorMessage);
+        }
+      }
+
+      if (result === null) {
+        ctx.throw(404, errorMessage);
       }
     });
-  };
+  }
 
   // ! Этот метод необходим для системного администратора, которому нужно мочь создавать пользователй.
-  protected create = (): void => {
+  protected create(): void {
     const URL = `${this.basePath}/create`;
 
     this.router.put(
@@ -217,26 +236,35 @@ export class UserHttpTransport<
       getRequestBodyJson(),
       async (ctx: Koa.Context) => {
         await this.executor(ctx, URL, this.ACL.create, this.switchers.create, async () => {
-          const response: string | Response | null = await this.model.signUp(
-            ctx.request.body,
-            true,
-          );
+          const result: string | Response | null = await this.model.signUp(ctx.request.body, true);
+          const errorMessage = `Create (${this.constructor.name})(${URL}) has been failed`;
 
-          if (response instanceof Response && response.payload) {
+          if (isString(result)) {
             ctx.status = 200;
             ctx.type = "application/json";
-            ctx.body = JSON.stringify(response);
-          } else {
-            const message = `Create (${this.constructor.name})(${URL}) has been failed`;
+            ctx.body = new Response({
+              payload: null,
+              validationResult: new ValidationResult([]),
+            });
+          }
 
-            ctx.throw(404, message);
+          if (result instanceof Response) {
+            const hasNotPayload = this.send(ctx, result);
+
+            if (hasNotPayload) {
+              ctx.throw(404, errorMessage);
+            }
+          }
+
+          if (result === null) {
+            ctx.throw(404, errorMessage);
           }
         });
       },
     );
-  };
+  }
 
-  protected signOut = (): void => {
+  protected signOut(): void {
     const URL = `${this.basePath}/signOut`;
 
     this.router.post(URL, getAuthenticateMiddleware(), async (ctx: Koa.Context) => {
@@ -246,14 +274,14 @@ export class UserHttpTransport<
         ctx.status = 200;
         ctx.type = "application/json";
         ctx.body = new Response({
-          payload: {},
+          payload: null,
           validationResult: new ValidationResult([]),
         });
       });
     });
-  };
+  }
 
-  protected updateLogin = (): void => {
+  protected updateLogin(): void {
     const URL = `${this.basePath}/updateLogin`;
 
     this.router.post(
@@ -272,12 +300,9 @@ export class UserHttpTransport<
               userId,
               wsid,
             );
+            const hasNotPayload = this.send(ctx, response);
 
-            if (response.payload) {
-              ctx.status = 200;
-              ctx.type = "application/json";
-              ctx.body = JSON.stringify(response);
-            } else {
+            if (hasNotPayload) {
               const message = `UpdateLogin (${this.constructor.name})(${URL}) has been failed`;
 
               ctx.throw(404, message);
@@ -286,9 +311,9 @@ export class UserHttpTransport<
         );
       },
     );
-  };
+  }
 
-  protected updatePassword = (): void => {
+  protected updatePassword(): void {
     const URL = `${this.basePath}/updatePassword`;
 
     this.router.post(
@@ -307,12 +332,9 @@ export class UserHttpTransport<
               userId,
               wsid,
             );
+            const hasNotPayload = this.send(ctx, response);
 
-            if (response.payload) {
-              ctx.status = 200;
-              ctx.type = "application/json";
-              ctx.body = JSON.stringify(response);
-            } else {
+            if (hasNotPayload) {
               const message = `UpdatePassword (${this.constructor.name})(${URL}) has been failed`;
 
               ctx.throw(404, message);
@@ -321,9 +343,9 @@ export class UserHttpTransport<
         );
       },
     );
-  };
+  }
 
-  protected updateGroup = (): void => {
+  protected updateGroup(): void {
     const URL = `${this.basePath}/updateGroup`;
 
     this.router.post(
@@ -339,7 +361,6 @@ export class UserHttpTransport<
           async (userId: string, wsid: string): Promise<void> => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { ids, group } = ctx.request.body;
-
             const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
 
             if (listResponse.payload.length === 0) {
@@ -355,5 +376,5 @@ export class UserHttpTransport<
         );
       },
     );
-  };
+  }
 }

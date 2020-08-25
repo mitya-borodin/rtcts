@@ -1,4 +1,4 @@
-import { Response, User, ValidationResult } from "@rtcts/isomorphic";
+import { Response, User, ValidationResult, Validation, logTypeEnum } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";
 import koaLogger from "koa-logger";
@@ -69,7 +69,7 @@ export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Chan
     return `${this.root}/${this.name}`;
   }
 
-  protected channel = (): void => {
+  protected channel(): void {
     const URL = `${this.basePath}/channel`;
 
     this.router.post(
@@ -113,15 +113,15 @@ export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Chan
         );
       },
     );
-  };
+  }
 
-  protected executor = async (
+  protected async executor(
     ctx: Koa.Context,
     URL: string,
     ACL: string[],
     switcher: boolean,
     worker: (userId: string, wsid: string) => Promise<void> | void,
-  ): Promise<void> => {
+  ): Promise<void> {
     if (switcher) {
       try {
         // ! ctx.request.user - provided by getAuthenticateStrategyMiddleware
@@ -144,10 +144,18 @@ export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Chan
           `Access denied (${this.constructor.name})(${URL}) for ${String(user.group)}`,
         );
       } catch (error) {
-        ctx.throw(
-          500,
-          `[ ${this.constructor.name} ][ URL: ${URL} ][ ACL: ${ACL.join(", ")} ]` +
-            `[ switcher: ${switcher} ][ ${getErrorMessage(error)} ][ 500 ]`,
+        ctx.status = 500;
+        ctx.type = "application/json";
+        ctx.body = JSON.stringify(
+          new Response({
+            payload: { error },
+            validationResult: new ValidationResult([
+              new Validation({
+                type: logTypeEnum.error,
+                message: getErrorMessage(error),
+              }),
+            ]),
+          }),
         );
       }
     } else {
@@ -156,5 +164,25 @@ export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Chan
         `[ executor ][ URL: ${URL} ][ ACL: ${ACL.join(", ")} ][ switcher: ${switcher} ][ 404 ]`,
       );
     }
-  };
+  }
+
+  protected send(ctx: Koa.Context, response: Response): boolean {
+    if (response.validationResult.hasError) {
+      ctx.status = 500;
+      ctx.type = "application/json";
+      ctx.body = JSON.stringify(response);
+
+      return false;
+    }
+
+    if (response.payload) {
+      ctx.status = 200;
+      ctx.type = "application/json";
+      ctx.body = JSON.stringify(response);
+
+      return false;
+    }
+
+    return true;
+  }
 }

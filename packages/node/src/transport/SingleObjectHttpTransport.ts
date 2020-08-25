@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Entity, User } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
@@ -55,7 +56,7 @@ export class SingleObjectHttpTransport<
     this.update();
   }
 
-  protected getItem = (): void => {
+  protected getItem(): void {
     const URL = `${this.basePath}/item`;
 
     this.router.get(
@@ -64,12 +65,9 @@ export class SingleObjectHttpTransport<
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(ctx, URL, this.ACL.getItem, this.switchers.getItem, async () => {
           const response = await this.model.getItemResponse();
+          const hasNotPayload = this.send(ctx, response);
 
-          if (response.payload) {
-            ctx.status = 200;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(response);
-          } else {
+          if (hasNotPayload) {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ MODELS_NOT_FOUND ]`;
 
             ctx.throw(404, message);
@@ -77,9 +75,9 @@ export class SingleObjectHttpTransport<
         });
       },
     );
-  };
+  }
 
-  protected update = (): void => {
+  protected update(): void {
     const URL = `${this.basePath}/update`;
 
     this.router.post(
@@ -94,17 +92,14 @@ export class SingleObjectHttpTransport<
           this.switchers.update,
           async (userId: string, wsid: string) => {
             const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
+            const hasNotPayload = this.send(ctx, response);
 
-            if (response.payload) {
-              ctx.status = 200;
-              ctx.type = "application/json";
-              ctx.body = JSON.stringify(response);
-            } else {
+            if (hasNotPayload) {
               throw new Error("The model wasn't updated");
             }
           },
         );
       },
     );
-  };
+  }
 }

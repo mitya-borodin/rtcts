@@ -1,4 +1,4 @@
-import { Entity, Response, wsEventEnum } from "@rtcts/isomorphic";
+import { Entity, Response, wsEventEnum, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage, isObject } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, observable, runInAction } from "mobx";
@@ -23,6 +23,9 @@ export class SingleObjectRepository<
 
   @observable
   public entity: ENTITY | undefined;
+
+  @observable
+  public validationResult: ValidationResult;
 
   protected Entity: new (data: any) => ENTITY;
   protected httpTransport: HTTP_TRANSPORT;
@@ -53,6 +56,7 @@ export class SingleObjectRepository<
 
     // ! OBSERVABLE
     this.pending = false;
+    this.validationResult = new ValidationResult([]);
 
     // * BINDINGS
     this.init = this.init.bind(this);
@@ -86,7 +90,13 @@ export class SingleObjectRepository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
+        if (!response.payload) {
+          throw new Error(`response.payload is empty`);
+        }
+
         this.entity = response.payload;
         this.isInit = true;
 
@@ -124,10 +134,15 @@ export class SingleObjectRepository<
         throw new Error(`response is empty`);
       }
 
-      runInAction(
-        `Update (${this.constructor.name}) has been succeed`,
-        () => (this.entity = response.payload),
-      );
+      this.validationResult = new ValidationResult(response.validationResult);
+
+      runInAction(`Update (${this.constructor.name}) has been succeed`, () => {
+        if (!response.payload) {
+          throw new Error(`response.payload is empty`);
+        }
+
+        this.entity = response.payload;
+      });
 
       this.entityDidUpdate();
 
@@ -172,9 +187,10 @@ export class SingleObjectRepository<
         }
       } catch (error) {
         console.error(
-          `Received a message on the channel (${channelName}) (${
-            this.constructor.name
-          }) failed: ${getErrorMessage(error)}`,
+          `Received a message on the channel ` +
+            `(${channelName}) ` +
+            `(${this.constructor.name}) ` +
+            `failed: ${getErrorMessage(error)}`,
         );
       }
     }

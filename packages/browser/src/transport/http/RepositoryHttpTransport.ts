@@ -81,6 +81,10 @@ export class RepositoryHttpTransport<
 
       const response = new Response<ENTITY>(payload);
 
+      if (response.validationResult.hasError) {
+        return response;
+      }
+
       return new Response<ENTITY>({
         payload: new this.Entity(response.payload),
         validationResult: response.validationResult,
@@ -103,6 +107,10 @@ export class RepositoryHttpTransport<
       }
 
       const response = new Response<ENTITY>(payload);
+
+      if (response.validationResult.hasError) {
+        return response;
+      }
 
       return new Response<ENTITY>({
         payload: new this.Entity(response.payload),
@@ -127,6 +135,10 @@ export class RepositoryHttpTransport<
 
       const response = new Response<ENTITY>(payload);
 
+      if (response.validationResult.hasError) {
+        return response;
+      }
+
       return new Response<ENTITY>({
         payload: new this.Entity(response.payload),
         validationResult: response.validationResult,
@@ -149,6 +161,10 @@ export class RepositoryHttpTransport<
       }
 
       const response = new Response<ENTITY>(payload);
+
+      if (response.validationResult.hasError) {
+        return response;
+      }
 
       return new Response<ENTITY>({
         payload: new this.Entity(response.payload),

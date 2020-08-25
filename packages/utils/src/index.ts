@@ -10,6 +10,7 @@ export {
   isObject,
   isString,
   isUndefined,
+  isNull,
 } from "./isType";
 export { uploadCSV } from "./uploadCSV";
 export { uploadHTML } from "./uploadHTML";

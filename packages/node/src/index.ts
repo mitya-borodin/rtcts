@@ -32,5 +32,3 @@ export { getSalt } from "./utils/getSalt";
 export { Channels } from "./webSocket/Channels";
 export { Connection } from "./webSocket/Connection";
 export { WebSocketServer } from "./webSocket/WebSocketServer";
-
-// HACK for forcing invalidation of the ts-node-dev compiler, timestamp: 1589488666972

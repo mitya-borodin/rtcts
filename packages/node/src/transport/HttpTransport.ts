@@ -70,7 +70,7 @@ export class HttpTransport<
     this.remove();
   }
 
-  protected getList = (): void => {
+  protected getList(): void {
     const URL = `${this.basePath}/list`;
 
     this.router.get(
@@ -87,9 +87,9 @@ export class HttpTransport<
         });
       },
     );
-  };
+  }
 
-  protected getItem = (): void => {
+  protected getItem(): void {
     const URL = `${this.basePath}/item/:id`;
 
     this.router.get(
@@ -100,12 +100,9 @@ export class HttpTransport<
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const { id } = ctx.params;
           const response = await this.model.getItemResponse(id);
+          const hasNotPayload = this.send(ctx, response);
 
-          if (response.payload) {
-            ctx.status = 200;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(response);
-          } else {
+          if (hasNotPayload) {
             const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${id} ]`;
 
             ctx.throw(404, message);
@@ -113,7 +110,7 @@ export class HttpTransport<
         });
       },
     );
-  };
+  }
 
   protected create(): void {
     const URL = `${this.basePath}/create`;
@@ -130,12 +127,9 @@ export class HttpTransport<
           this.switchers.create,
           async (userId: string, wsid: string) => {
             const response = await this.model.createResponse(ctx.request.body, userId, wsid);
+            const hasNotPayload = this.send(ctx, response);
 
-            if (response.payload) {
-              ctx.status = 200;
-              ctx.type = "application/json";
-              ctx.body = JSON.stringify(response);
-            } else {
+            if (hasNotPayload) {
               throw new Error("The model wasn't created");
             }
           },
@@ -159,12 +153,9 @@ export class HttpTransport<
           this.switchers.update,
           async (userId: string, wsid: string) => {
             const response = await this.model.updateResponse(ctx.request.body, userId, wsid);
+            const hasNotPayload = this.send(ctx, response);
 
-            if (response.payload) {
-              ctx.status = 200;
-              ctx.type = "application/json";
-              ctx.body = JSON.stringify(response);
-            } else {
+            if (hasNotPayload) {
               throw new Error("The model wasn't updated");
             }
           },
@@ -190,12 +181,9 @@ export class HttpTransport<
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { id } = ctx.request.body;
             const response = await this.model.removeResponse(id, userId, wsid);
+            const hasNotPayload = this.send(ctx, response);
 
-            if (response.payload) {
-              ctx.status = 200;
-              ctx.type = "application/json";
-              ctx.body = JSON.stringify(response);
-            } else {
+            if (hasNotPayload) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
               const message = `[ ${this.constructor.name} ][ ${URL} ][ MODEL_NOT_FOUND_BY_ID: ${ctx.request.body.id} ]`;
 

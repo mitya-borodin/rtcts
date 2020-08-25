@@ -1,4 +1,11 @@
-import { ListResponse, Response, User, userEventEnum, userGroupEnum } from "@rtcts/isomorphic";
+import {
+  ListResponse,
+  Response,
+  User,
+  userEventEnum,
+  userGroupEnum,
+  ValidationResult,
+} from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
@@ -115,7 +122,14 @@ export class UserRepository<
 
       this.start();
 
-      await this.httpTransport.signIn(data);
+      const response: Response | void = await this.httpTransport.signIn(data);
+
+      if (!response) {
+        throw new Error(`response is empty`);
+      }
+
+      this.validationResult = new ValidationResult(response.validationResult);
+
       await this.init();
     } catch (error) {
       console.error(`SignIn (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`);
@@ -197,7 +211,13 @@ export class UserRepository<
           throw new Error(`response is empty`);
         }
 
+        this.validationResult = new ValidationResult(response.validationResult);
+
         const entity = response.payload;
+
+        if (!entity) {
+          return;
+        }
 
         if (!entity.isEntity()) {
           return;
@@ -245,7 +265,13 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       const entity = response.payload;
+
+      if (!entity) {
+        return;
+      }
 
       if (!entity.isEntity()) {
         return;
@@ -280,7 +306,13 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       const entity = response.payload;
+
+      if (!entity) {
+        return;
+      }
 
       if (!entity.isEntity()) {
         return;
@@ -312,6 +344,8 @@ export class UserRepository<
         throw new Error(`listResponse is empty`);
       }
 
+      this.validationResult = new ValidationResult(listResponse.validationResult);
+
       runInAction(`UpdateGroup (${this.constructor.name}) has been succeed`, () => {
         for (const user of listResponse.payload) {
           if (user.isEntity()) {
@@ -339,7 +373,13 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       const entity = response.payload;
+
+      if (!entity) {
+        return;
+      }
 
       if (!entity.isEntity()) {
         return;
@@ -385,7 +425,13 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
+      this.validationResult = new ValidationResult(response.validationResult);
+
       const entity = response.payload;
+
+      if (!entity) {
+        return;
+      }
 
       if (!entity.isEntity()) {
         return;
