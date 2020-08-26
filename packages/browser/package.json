@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1",
+  "version": "1.5.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -49,8 +49,8 @@
   },
   "module": "dist/browser.esm.js",
   "devDependencies": {
-    "@rtcts/isomorphic": "^1.5.0",
-    "@rtcts/utils": "^1.5.0",
+    "@rtcts/isomorphic": "^1.5.2",
+    "@rtcts/utils": "^1.5.2",
     "@types/eventemitter3": "^2.0.2",
     "@types/jest": "^26.0.10",
     "@types/node": "^14.6.0",

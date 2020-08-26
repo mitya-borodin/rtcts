@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.5.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -60,7 +60,7 @@
   ],
   "module": "dist/isomorphic.esm.js",
   "devDependencies": {
-    "@rtcts/utils": "^1.5.0",
+    "@rtcts/utils": "^1.5.2",
     "@types/jest": "^26.0.10",
     "@types/lodash.omit": "^4.5.6",
     "@types/lodash.pick": "^4.4.6",
