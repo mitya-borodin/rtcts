@@ -15,7 +15,7 @@ export class RepositoryHttpTransport<
   ENTITY extends Entity,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
-> extends BaseHttpTransport<WS, PUB_SUB> {
+> extends BaseHttpTransport<ENTITY, WS, PUB_SUB> {
   protected Entity: new (data: any) => ENTITY;
 
   public readonly ACL: RepositoryHttpTransportACL;
@@ -29,7 +29,7 @@ export class RepositoryHttpTransport<
     pubSub: PUB_SUB,
     root = "/api",
   ) {
-    super(name, ws, channelName, ACL, pubSub, root);
+    super(name, Entity, ws, channelName, ACL, pubSub, root);
 
     this.ACL = ACL;
     this.Entity = Entity;
@@ -49,19 +49,7 @@ export class RepositoryHttpTransport<
 
       const payload: any | void = await this.getHttpRequest(`/${this.name}/list`);
 
-      if (!payload) {
-        return;
-      }
-
-      const listResponse = new ListResponse(payload);
-
-      return new ListResponse<ENTITY>({
-        count: listResponse.count,
-        payload: listResponse.payload
-          .map((payload) => new this.Entity(payload))
-          .filter((entity) => entity.isEntity()),
-        validationResult: listResponse.validationResult,
-      });
+      return this.prepareListPayload(payload);
     } catch (error) {
       console.error(error);
     }
@@ -75,20 +63,7 @@ export class RepositoryHttpTransport<
 
       const payload: any | void = await this.getHttpRequest(`/${this.name}/item/${id}`);
 
-      if (!payload) {
-        return;
-      }
-
-      const response = new Response<ENTITY>(payload);
-
-      if (response.validationResult.hasError) {
-        return response;
-      }
-
-      return new Response<ENTITY>({
-        payload: new this.Entity(response.payload),
-        validationResult: response.validationResult,
-      });
+      return this.prepareItemPayload(payload);
     } catch (error) {
       console.error(error);
     }
@@ -102,20 +77,7 @@ export class RepositoryHttpTransport<
 
       const payload: any | void = await this.putHttpRequest(`/${this.name}/create`, input);
 
-      if (!payload) {
-        return;
-      }
-
-      const response = new Response<ENTITY>(payload);
-
-      if (response.validationResult.hasError) {
-        return response;
-      }
-
-      return new Response<ENTITY>({
-        payload: new this.Entity(response.payload),
-        validationResult: response.validationResult,
-      });
+      return this.prepareItemPayload(payload);
     } catch (error) {
       console.error(error);
     }
@@ -129,20 +91,7 @@ export class RepositoryHttpTransport<
 
       const payload: any | void = await this.postHttpRequest(`/${this.name}/update`, input);
 
-      if (!payload) {
-        return;
-      }
-
-      const response = new Response<ENTITY>(payload);
-
-      if (response.validationResult.hasError) {
-        return response;
-      }
-
-      return new Response<ENTITY>({
-        payload: new this.Entity(response.payload),
-        validationResult: response.validationResult,
-      });
+      return this.prepareItemPayload(payload);
     } catch (error) {
       console.error(error);
     }
@@ -156,20 +105,7 @@ export class RepositoryHttpTransport<
 
       const payload: any | void = await this.deleteHttpRequest(`/${this.name}/remove`, { id });
 
-      if (!payload) {
-        return;
-      }
-
-      const response = new Response<ENTITY>(payload);
-
-      if (response.validationResult.hasError) {
-        return response;
-      }
-
-      return new Response<ENTITY>({
-        payload: new this.Entity(response.payload),
-        validationResult: response.validationResult,
-      });
+      return this.prepareItemPayload(payload);
     } catch (error) {
       console.error(error);
     }

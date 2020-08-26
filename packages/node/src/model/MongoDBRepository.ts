@@ -157,7 +157,7 @@ export class MongoDBRepository<ENTITY extends Entity> {
     query: FilterQuery<QueryData>,
     offset = 0,
     limit = 20,
-    options?: FindOneOptions,
+    options?: FindOneOptions<ENTITY>,
   ): Promise<ENTITY[]> {
     try {
       const collection: Collection<any> | null = await this.getCollection();
@@ -185,7 +185,7 @@ export class MongoDBRepository<ENTITY extends Entity> {
   // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async findOne(
     query: FilterQuery<QueryData>,
-    options?: FindOneOptions,
+    options?: FindOneOptions<ENTITY>,
   ): Promise<ENTITY | null> {
     try {
       const collection: Collection<any> | null = await this.getCollection();
@@ -209,7 +209,7 @@ export class MongoDBRepository<ENTITY extends Entity> {
     return null;
   }
 
-  public async findById(id: string, options?: FindOneOptions): Promise<ENTITY | null> {
+  public async findById(id: string, options?: FindOneOptions<ENTITY>): Promise<ENTITY | null> {
     try {
       const item: ENTITY | null = await this.findOne(
         { _id: new ObjectId(id) },
@@ -255,7 +255,7 @@ export class MongoDBRepository<ENTITY extends Entity> {
   // https://docs.mongodb.com/manual/tutorial/query-documents/
   public async findOneAndRemove(
     query: FilterQuery<QueryData>,
-    options?: FindOneAndDeleteOption,
+    options?: FindOneAndDeleteOption<ENTITY>,
   ): Promise<ENTITY | null> {
     try {
       const collection: Collection<any> | null = await this.getCollection();
@@ -281,7 +281,7 @@ export class MongoDBRepository<ENTITY extends Entity> {
 
   public async findByIdAndRemove(
     id: string,
-    options?: FindOneAndDeleteOption,
+    options?: FindOneAndDeleteOption<ENTITY>,
   ): Promise<ENTITY | null> {
     try {
       return await this.findOneAndRemove({ _id: new ObjectId(id) }, this.getOptions(options));

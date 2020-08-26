@@ -1,4 +1,4 @@
-import { userEventEnum } from "@rtcts/isomorphic";
+import { Entity, userEventEnum, Response, ListResponse } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";
@@ -9,12 +9,14 @@ export interface BaseHttpTransportACL {
 }
 
 export class BaseHttpTransport<
+  ENTITY extends Entity,
   WS extends WSClient = WSClient,
   PUB_SUB extends EventEmitter = EventEmitter
 > {
   public currentUserGroup: string;
 
   protected name: string;
+  protected Entity: new (data: any) => ENTITY;
   protected ws: WS;
   protected channelName: string;
   public readonly ACL: BaseHttpTransportACL;
@@ -23,6 +25,7 @@ export class BaseHttpTransport<
 
   constructor(
     name: string,
+    Entity: new (data: any) => ENTITY,
     ws: WS,
     channelName: string,
     ACL: BaseHttpTransportACL,
@@ -37,6 +40,7 @@ export class BaseHttpTransport<
     this.rootPath = rootPath;
 
     this.currentUserGroup = "";
+    this.Entity = Entity;
 
     this.pubSub.on(userEventEnum.SET_USER_GROUP, (currentUserGroup: string) => {
       if (isString(currentUserGroup)) {
@@ -298,5 +302,42 @@ export class BaseHttpTransport<
     } catch (error) {
       console.error(error);
     }
+  }
+
+  protected prepareListPayload(listPayload: any): ListResponse<ENTITY> | void {
+    if (!listPayload) {
+      return;
+    }
+
+    const listResponse = new ListResponse(listPayload);
+
+    if (listResponse.validationResult.hasError) {
+      return listResponse;
+    }
+
+    return new ListResponse<ENTITY>({
+      count: listResponse.count,
+      payload: listResponse.payload
+        .map((payload) => new this.Entity(payload))
+        .filter((entity) => entity.isEntity()),
+      validationResult: listResponse.validationResult,
+    });
+  }
+
+  protected prepareItemPayload(payload: any): Response<ENTITY> | void {
+    if (!payload) {
+      return;
+    }
+
+    const response = new Response<ENTITY>(payload);
+
+    if (response.validationResult.hasError) {
+      return response;
+    }
+
+    return new Response<ENTITY>({
+      payload: new this.Entity(response.payload),
+      validationResult: response.validationResult,
+    });
   }
 }

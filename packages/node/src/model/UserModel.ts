@@ -46,7 +46,7 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
     });
   }
 
-  public async getItemResponse(id: string, options?: FindOneOptions): Promise<Response> {
+  public async getItemResponse(id: string, options?: FindOneOptions<ENTITY>): Promise<Response> {
     const payload: ENTITY | null = await this.repository.findById(id, options);
 
     return new Response({

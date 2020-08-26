@@ -22,7 +22,7 @@
     "prepare": "tsdx build"
   },
   "peerDependencies": {
-    "@rtcts/utils": "^1.4.0",
+    "@rtcts/utils": "^1.5.0",
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0"
   },
@@ -61,15 +61,15 @@
   "module": "dist/isomorphic.esm.js",
   "devDependencies": {
     "@rtcts/utils": "^1.5.0",
-    "@types/jest": "^26.0.0",
+    "@types/jest": "^26.0.10",
     "@types/lodash.omit": "^4.5.6",
     "@types/lodash.pick": "^4.4.6",
-    "@types/node": "^14.0.13",
+    "@types/node": "^14.6.0",
     "husky": "^4.2.5",
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
-    "tsdx": "^0.13.2",
-    "tslib": "^2.0.0",
-    "typescript": "^3.9.5"
+    "tsdx": "^0.13.3",
+    "tslib": "^2.0.1",
+    "typescript": "^3.9.7"
   }
 }

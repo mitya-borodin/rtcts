@@ -3,13 +3,13 @@ import { DataTransferObject } from "../Entity";
 import { Log, LogData } from "../log/Log";
 
 export interface ValidationData extends LogData {
-  readonly field: string | string[];
   readonly title?: string;
+  readonly field: string | string[];
 }
 
 export class Validation extends Log implements DataTransferObject {
-  readonly field: string | string[];
   readonly title?: string;
+  readonly field: string | string[];
 
   constructor(data: Partial<ValidationData>) {
     super(data);
@@ -56,8 +56,8 @@ export class Validation extends Log implements DataTransferObject {
   toObject(): ValidationData {
     return {
       ...super.toObject(),
-      field: this.field,
       title: this.title,
+      field: this.field,
     };
   }
 

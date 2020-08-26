@@ -22,10 +22,10 @@
     "prepare": "tsdx build"
   },
   "peerDependencies": {
-    "@rtcts/isomorphic": "^1.4.0",
-    "@rtcts/utils": "^1.4.0",
-    "eventemitter3": "^4.0.4",
-    "mobx": "^5.15.4"
+    "@rtcts/isomorphic": "^1.5.0",
+    "@rtcts/utils": "^1.5.0",
+    "eventemitter3": "^4.0.6",
+    "mobx": "^5.15.6"
   },
   "husky": {
     "hooks": {
@@ -52,13 +52,13 @@
     "@rtcts/isomorphic": "^1.5.0",
     "@rtcts/utils": "^1.5.0",
     "@types/eventemitter3": "^2.0.2",
-    "@types/jest": "^26.0.0",
-    "@types/node": "^14.0.13",
-    "eventemitter3": "^4.0.4",
+    "@types/jest": "^26.0.10",
+    "@types/node": "^14.6.0",
+    "eventemitter3": "^4.0.6",
     "husky": "^4.2.5",
-    "mobx": "^5.15.4",
-    "tsdx": "^0.13.2",
-    "tslib": "^2.0.0",
-    "typescript": "^3.9.5"
+    "mobx": "^5.15.6",
+    "tsdx": "^0.13.3",
+    "tslib": "^2.0.1",
+    "typescript": "^3.9.7"
   }
 }

@@ -5,7 +5,9 @@
     "bootstrap": "lerna bootstrap",
     "lint": "lerna run lint",
     "test": "lerna run test",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "ncu": "lerna exec 'ncu -u --semverLevel major'",
+    "ncu:check": "lerna exec 'ncu'"
   },
   "devDependencies": {
     "husky": "^4.2.5",
@@ -15,5 +17,8 @@
     "hooks": {
       "pre-commit": "yarn lint"
     }
+  },
+  "dependencies": {
+    "npm-check-updates": "^7.1.1"
   }
 }

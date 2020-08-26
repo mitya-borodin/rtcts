@@ -7,7 +7,7 @@ export class ListResponse<T = any> {
   readonly payload: T[];
   readonly validationResult: ValidationResult;
 
-  constructor(data?: Omit<ListResponse<T>, "toJSON">) {
+  constructor(data: Omit<ListResponse<T>, "toJSON">) {
     if (data) {
       this.count = 0;
       this.payload = [];
@@ -22,7 +22,7 @@ export class ListResponse<T = any> {
       if (isArray<T>(data.payload)) {
         this.payload = data.payload;
       } else {
-        throw new Error("ListResponse.payload is undefined");
+        throw new Error("ListResponse.payload should be an array");
       }
 
       if (data.validationResult instanceof ValidationResult) {
@@ -58,7 +58,7 @@ export class Response<T = any> {
   readonly payload: T | null;
   readonly validationResult: ValidationResult;
 
-  constructor(data?: Omit<Response<T>, "toJSON">) {
+  constructor(data: Omit<Response<T>, "toJSON">) {
     this.payload = null;
     this.validationResult = new ValidationResult([]);
 
@@ -75,7 +75,7 @@ export class Response<T = any> {
       } else if (isArray(data.validationResult)) {
         this.validationResult = new ValidationResult(data.validationResult);
       } else {
-        throw new Error(
+        throw new TypeError(
           "Response.validationResult should be instance of ValidationResult or array of ValidationData",
         );
       }

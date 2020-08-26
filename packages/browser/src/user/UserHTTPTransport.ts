@@ -37,16 +37,7 @@ export class UserHTTPTransport<
     try {
       const payload: any | void = await this.getHttpRequest(`/${this.name}/current`);
 
-      if (!payload) {
-        return;
-      }
-
-      const response = new Response<ENTITY>(payload);
-
-      return new Response<ENTITY>({
-        payload: new this.Entity(response.payload),
-        validationResult: response.validationResult,
-      });
+      return this.prepareItemPayload(payload);
     } catch (error) {
       console.error(error);
     }
@@ -56,11 +47,7 @@ export class UserHTTPTransport<
     try {
       const payload: any | void = await this.postHttpRequest(`/${this.name}/signIn`, data);
 
-      if (!payload) {
-        return;
-      }
-
-      return new Response(payload);
+      return this.prepareItemPayload(payload);
     } catch (error) {
       console.error(error);
     }
@@ -70,11 +57,7 @@ export class UserHTTPTransport<
     try {
       const payload: any | void = await this.postHttpRequest(`/${this.name}/signUp`, data);
 
-      if (!payload) {
-        return;
-      }
-
-      return new Response(payload);
+      return this.prepareItemPayload(payload);
     } catch (error) {
       console.error(error);
     }
@@ -93,20 +76,7 @@ export class UserHTTPTransport<
       if (this.ACL.updateLogin.includes(this.currentUserGroup)) {
         const payload: any | void = await this.postHttpRequest(`/${this.name}/updateLogin`, data);
 
-        if (!payload) {
-          return;
-        }
-
-        const response = new Response<ENTITY>(payload);
-
-        if (response.validationResult.hasError) {
-          return response;
-        }
-
-        return new Response<ENTITY>({
-          payload: new this.Entity(response.payload),
-          validationResult: response.validationResult,
-        });
+        return this.prepareItemPayload(payload);
       }
     } catch (error) {
       console.error(error);
@@ -121,20 +91,7 @@ export class UserHTTPTransport<
           data,
         );
 
-        if (!payload) {
-          return;
-        }
-
-        const response = new Response<ENTITY>(payload);
-
-        if (response.validationResult.hasError) {
-          return response;
-        }
-
-        return new Response<ENTITY>({
-          payload: new this.Entity(response.payload),
-          validationResult: response.validationResult,
-        });
+        return this.prepareItemPayload(payload);
       }
     } catch (error) {
       console.error(error);
@@ -149,19 +106,7 @@ export class UserHTTPTransport<
           group,
         });
 
-        if (!payload) {
-          return;
-        }
-
-        const listResponse = new ListResponse<ENTITY>(payload);
-
-        return new ListResponse<ENTITY>({
-          count: listResponse.count,
-          payload: listResponse.payload
-            .map((payload) => new this.Entity(payload))
-            .filter((entity) => entity.isEntity()),
-          validationResult: listResponse.validationResult,
-        });
+        return this.prepareListPayload(payload);
       }
     } catch (error) {
       console.error(error);
