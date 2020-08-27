@@ -74,8 +74,8 @@ export class ValidationResult implements DataTransferObject {
         }
       }
     } else if (data instanceof ValidationResult) {
-      for (const Validation of data.toValidation()) {
-        results.push(Validation);
+      for (const validation of data.toValidation()) {
+        results.push(validation);
       }
     } else if (data instanceof Validation) {
       results.push(data);
