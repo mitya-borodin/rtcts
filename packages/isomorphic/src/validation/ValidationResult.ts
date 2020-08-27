@@ -6,8 +6,7 @@ import { logTypeEnum } from "../log/logTypeEnum";
 import { Validation, ValidationData } from "./Validation";
 
 type ValidationResultData =
-  | Array<ValidationResult | Validation | Partial<ValidationData>>
-  | ValidationResult
+  | Array<Validation | Partial<ValidationData>>
   | Validation
   | Partial<ValidationData>;
 
@@ -61,11 +60,7 @@ export class ValidationResult implements DataTransferObject {
 
     if (isArray(data)) {
       for (const item of data) {
-        if (item instanceof ValidationResult) {
-          for (const validation of item.toValidation()) {
-            results.push(validation);
-          }
-        } else if (item instanceof Validation) {
+         if (item instanceof Validation) {
           results.push(item);
         } else if (isObject(item)) {
           results.push(new Validation(item));
@@ -250,6 +245,10 @@ export class ValidationResult implements DataTransferObject {
     }
 
     return false;
+  }
+
+  clone(): ValidationResult {
+    return new ValidationResult(this.toValidation())
   }
 
   toValidation(): Validation[] {

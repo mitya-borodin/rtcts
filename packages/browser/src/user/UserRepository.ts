@@ -1,11 +1,4 @@
-import {
-  ListResponse,
-  Response,
-  User,
-  userEventEnum,
-  userGroupEnum,
-  ValidationResult,
-} from "@rtcts/isomorphic";
+import { ListResponse, Response, User, userEventEnum, userGroupEnum } from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, runInAction } from "mobx";
@@ -128,7 +121,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       await this.init();
     } catch (error) {
@@ -211,7 +204,7 @@ export class UserRepository<
           throw new Error(`response is empty`);
         }
 
-        this.validationResult = new ValidationResult(response.validationResult);
+        this.validationResult = response.validationResult.clone();
 
         const entity = response.payload;
 
@@ -265,7 +258,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       const entity = response.payload;
 
@@ -306,7 +299,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       const entity = response.payload;
 
@@ -344,7 +337,7 @@ export class UserRepository<
         throw new Error(`listResponse is empty`);
       }
 
-      this.validationResult = new ValidationResult(listResponse.validationResult);
+      this.validationResult = listResponse.validationResult.clone();
 
       runInAction(`UpdateGroup (${this.constructor.name}) has been succeed`, () => {
         for (const user of listResponse.payload) {
@@ -373,7 +366,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       const entity = response.payload;
 
@@ -425,7 +418,7 @@ export class UserRepository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       const entity = response.payload;
 

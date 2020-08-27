@@ -90,7 +90,7 @@ export class SingleObjectRepository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
         if (!response.payload) {
@@ -134,7 +134,7 @@ export class SingleObjectRepository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       runInAction(`Update (${this.constructor.name}) has been succeed`, () => {
         if (!response.payload) {

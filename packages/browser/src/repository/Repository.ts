@@ -113,7 +113,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(listResponse.validationResult);
+      this.validationResult = listResponse.validationResult.clone();
 
       runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
         const collection: ENTITY[] = [];
@@ -162,7 +162,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       const entity = response.payload;
 
@@ -209,7 +209,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       const entity = response.payload;
 
@@ -257,7 +257,7 @@ export class Repository<
         throw new Error(`response is empty`);
       }
 
-      this.validationResult = new ValidationResult(response.validationResult);
+      this.validationResult = response.validationResult.clone();
 
       const entity = response.payload;
 

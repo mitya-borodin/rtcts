@@ -36,7 +36,10 @@ export class ValueObjectFormStore<VALUE_OBJECT extends ValueObject, DATA> extend
   @computed({ name: "ValueObjectFormStore.validationResult" })
   get validationResult(): ValidationResult {
     if (this.form instanceof this.Entity) {
-      return new ValidationResult([this.form.validation(), this.externalValidationResult]);
+      return new ValidationResult([
+        ...this.form.validation().toValidation(),
+        ...this.externalValidationResult.toValidation(),
+      ]);
     }
 
     return new ValidationResult([]);

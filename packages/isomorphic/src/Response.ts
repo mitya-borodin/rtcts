@@ -26,7 +26,7 @@ export class ListResponse<T = any> {
       }
 
       if (data.validationResult instanceof ValidationResult) {
-        this.validationResult = new ValidationResult(data.validationResult);
+        this.validationResult = data.validationResult.clone();
       } else if (isArray(data.validationResult)) {
         this.validationResult = new ValidationResult(data.validationResult);
       } else {
@@ -71,7 +71,7 @@ export class Response<T = any> {
       }
 
       if (data.validationResult instanceof ValidationResult) {
-        this.validationResult = new ValidationResult(data.validationResult);
+        this.validationResult = data.validationResult.clone();
       } else if (isArray(data.validationResult)) {
         this.validationResult = new ValidationResult(data.validationResult);
       } else {
