@@ -25,9 +25,7 @@ export class ListResponse<T = any> {
         throw new Error("ListResponse.payload should be an array");
       }
 
-      if (data.validationResult instanceof ValidationResult) {
-        this.validationResult = data.validationResult.clone();
-      } else if (isArray(data.validationResult)) {
+      if (data.validationResult instanceof ValidationResult || isArray(data.validationResult)) {
         this.validationResult = new ValidationResult(data.validationResult);
       } else {
         throw new Error(
@@ -70,9 +68,7 @@ export class Response<T = any> {
         throw new TypeError("Response.payload should not be undefined");
       }
 
-      if (data.validationResult instanceof ValidationResult) {
-        this.validationResult = data.validationResult.clone();
-      } else if (isArray(data.validationResult)) {
+      if (data.validationResult instanceof ValidationResult || isArray(data.validationResult)) {
         this.validationResult = new ValidationResult(data.validationResult);
       } else {
         throw new TypeError(
