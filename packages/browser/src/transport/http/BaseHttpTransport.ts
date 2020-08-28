@@ -335,6 +335,13 @@ export class BaseHttpTransport<
       return response;
     }
 
+    if (!response.payload) {
+      return new Response<ENTITY>({
+        payload: null,
+        validationResult: response.validationResult,
+      });
+    }
+
     return new Response<ENTITY>({
       payload: new this.Entity(response.payload),
       validationResult: response.validationResult,

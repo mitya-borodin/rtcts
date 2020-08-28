@@ -3,6 +3,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "module": "dist/isomorphic.esm.js",
   "files": [
     "dist",
     "src"
@@ -58,7 +59,6 @@
     "value object",
     "ws"
   ],
-  "module": "dist/isomorphic.esm.js",
   "devDependencies": {
     "@rtcts/utils": "^1.5.2",
     "@types/jest": "^26.0.10",
