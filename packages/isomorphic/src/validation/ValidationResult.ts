@@ -29,6 +29,8 @@ export class ValidationResult implements DataTransferObject {
   private readonly cache: Map<string, Validation> = new Map<string, Validation>();
 
   constructor(data: ValidationResultData) {
+    console.log(data);
+
     if (!data) {
       throw new Error("ValidationResult(data) data should be defined");
     }
