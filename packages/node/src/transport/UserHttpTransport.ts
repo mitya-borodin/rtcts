@@ -363,12 +363,6 @@ export class UserHttpTransport<
             const { ids, group } = ctx.request.body;
             const listResponse = await this.model.updateGroupResponse(ids, group, userId, wsid);
 
-            if (listResponse.payload.length === 0) {
-              const message = `UpdateGroup (${this.constructor.name})(${URL}) has been failed`;
-
-              ctx.throw(404, message);
-            }
-
             ctx.status = 200;
             ctx.type = "application/json";
             ctx.body = JSON.stringify(listResponse);
