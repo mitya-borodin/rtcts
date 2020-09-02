@@ -341,6 +341,22 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
         });
       }
 
+      const userByNewLogin: ENTITY | null = await this.repository.findOne({ login: data.login });
+
+      if (userByNewLogin !== null) {
+        return new Response({
+          payload: null,
+          validationResult: new ValidationResult([
+            new Validation({
+              type: logTypeEnum.error,
+              message: `User with login: ${data.login} already exist`,
+              field: "login",
+              title: `User ${data.login} already exist`,
+            }),
+          ]),
+        });
+      }
+
       const entity: ENTITY | null = await this.repository.findOne({ _id: new ObjectId(data.id) });
 
       if (entity === null) {
@@ -461,7 +477,8 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
     limit = 1000,
   ): Promise<ENTITY[]> {
     try {
-      const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
+      // ! If current user try to update group for himself, we should care about it and remove his from update list.
+      const query = { _id: { $in: ids.filter((id) => id !== uid).map((id) => new ObjectId(id)) } };
       const update = { $set: { group } };
 
       await this.repository.updateMany(query, update);
@@ -503,7 +520,7 @@ export class UserModel<ENTITY extends User, CONFIG extends Config = Config> exte
           return await super.update(
             {
               ...currentUser.toObject(),
-              ...omit(insert.getUnSecureData(), ["group"]),
+              ...omit(insert.getUnSecureData(), ["id", "login", "group"]),
             },
             uid,
             wsid,
