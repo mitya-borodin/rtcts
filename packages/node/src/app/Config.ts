@@ -31,7 +31,9 @@ export class Config {
       );
       console.log(chalk.cyan.bold("jwt.secret_key: "), chalk.cyan(`${process.env.JWT_SECRET_KEY}`));
       console.log(chalk.cyan.bold("db.name: "), chalk.cyan(`${process.env.DB}`));
-      console.log(chalk.cyan.bold("db.name: "), chalk.cyan(`${process.env.DB_URL}`));
+      console.log(chalk.cyan.bold("db.url: "), chalk.cyan(`${process.env.DB_URL}`));
+      console.log(chalk.cyan.bold("db.user: "), chalk.cyan(`${process.env.DB_USER}`));
+      console.log(chalk.cyan.bold("db.password: "), chalk.cyan(`${process.env.DB_PASSWORD}`));
       console.log(chalk.cyan.bold("server.host: "), chalk.cyan(`${process.env.SERVER_HOST}`));
       console.log(chalk.cyan.bold("server.port: "), chalk.cyan(`${process.env.SERVER_PORT}`));
       console.log(chalk.cyan.bold("ws.host: "), chalk.cyan(`${process.env.WS_HOST}`));
@@ -39,9 +41,15 @@ export class Config {
       console.log("");
     }
 
+    const name = process.env.DB || "test";
+    const url = process.env.DB_URL || "mongodb://localhost:27017";
+    const user = process.env.DB_USER;
+    const password = process.env.DB_PASSWORD;
+
     this.db = {
-      name: process.env.DB || "test",
-      url: process.env.DB_URL || "mongodb://localhost:27017",
+      name,
+      url,
+      ...(user && password ? { auth: { user, password } } : {}),
     };
 
     this.server = {
