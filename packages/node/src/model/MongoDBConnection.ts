@@ -50,6 +50,7 @@ export class MongoDBConnection extends EventEmitter {
         this.client = await MongoClient.connect(this.config.db.url, {
           useNewUrlParser: true,
           useUnifiedTopology: true,
+          ...(this.config.db.auth ? { auth: this.config.db.auth } : {}),
         });
 
         this.status = Status.OPEN;

@@ -8,6 +8,10 @@ export class Config {
   public readonly db: {
     readonly name: string;
     readonly url: string;
+    readonly auth?: {
+      readonly user: string;
+      readonly password: string;
+    };
   };
   public readonly server: {
     readonly host: string;
