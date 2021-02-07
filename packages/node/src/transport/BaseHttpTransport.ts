@@ -134,7 +134,7 @@ export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Chan
           user instanceof this.User &&
           // ! I should set UserData because I need to use concrete type
           user.isEntity() &&
-          (ACL.length === 0 || ACL.includes(user.group))
+          (ACL.length === 0 || (user.group && ACL.includes(user.group)))
         ) {
           return await worker(user.id, wsid);
         }
