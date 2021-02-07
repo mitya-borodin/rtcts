@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "name": "@rtcts/isomorphic",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://github.com/mitya-borodin/rtcts",
@@ -65,7 +65,7 @@
     ]
   },
   "devDependencies": {
-    "@rtcts/utils": "^1.6.0",
+    "@rtcts/utils": "^1.6.1",
     "@types/jest": "^26.0.20",
     "@types/lodash.omit": "^4.5.6",
     "@types/lodash.pick": "^4.4.6",

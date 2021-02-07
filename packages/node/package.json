@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "name": "@rtcts/node",
   "description": "Contains basic abstractions and implementations for creating a node application",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -75,8 +75,8 @@
     "ws": "^7.4.3"
   },
   "devDependencies": {
-    "@rtcts/isomorphic": "^1.6.0",
-    "@rtcts/utils": "^1.6.0",
+    "@rtcts/isomorphic": "^1.6.1",
+    "@rtcts/utils": "^1.6.1",
     "@types/bson": "^4.0.3",
     "@types/chai": "^4.2.14",
     "@types/co-body": "^5.1.0",

@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "name": "@rtcts/time-utils",
   "description": "Contains utility functions",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (https://borodin.site)",
@@ -57,7 +57,7 @@
     "moment": "^2.29.1"
   },
   "dependencies": {
-    "@rtcts/utils": "^1.6.0"
+    "@rtcts/utils": "^1.6.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.14.2",
