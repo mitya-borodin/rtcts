@@ -46,16 +46,13 @@
   },
   "lint-staged": {
     "*.(ts|js|json)": [
-      "pretty-quick --staged --pattern **/*.{ts,js,json} --verbose --bail",
-      "git add"
+      "pretty-quick --staged --pattern **/*.{ts,js,json} --verbose --bail"
     ],
     "src/**/*.(ts|js)": [
-      "npm run lint",
-      "git add"
+      "npm run lint"
     ],
     "test/**/*.(ts|js)": [
-      "npm run lint",
-      "git add"
+      "npm run lint"
     ]
   },
   "size-limit": [
