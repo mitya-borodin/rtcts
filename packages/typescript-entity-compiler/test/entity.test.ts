@@ -1,6 +1,6 @@
 import { compiler } from "../src";
 
-describe("Compilation for ", () => {
+describe("Compilation for", () => {
   it("a new type declaration", () => {
     expect(compiler()).toMatchSnapshot();
   });

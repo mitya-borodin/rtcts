@@ -5,3 +5,9 @@ exports[`Compilation for  a new type declaration 1`] = `undefined`;
 exports[`Compilation for  already compiled type declaration with additional code which was wrote by developers 1`] = `undefined`;
 
 exports[`Compilation for  already compiled type declaration without additional code of developer 1`] = `undefined`;
+
+exports[`Compilation for a new type declaration 1`] = `undefined`;
+
+exports[`Compilation for already compiled type declaration with additional code which was wrote by developers 1`] = `undefined`;
+
+exports[`Compilation for already compiled type declaration without additional code of developer 1`] = `undefined`;
