@@ -2,23 +2,16 @@
   "version": "1.0.0",
   "name": "rtcts",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna exec \"del node_modules dist build web_modules && npm i\"",
+    "fmt": "lerna run fmt",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "build": "lerna run build",
-    "ncu": "lerna exec 'ncu -u --semverLevel major'",
-    "ncu:check": "lerna exec 'ncu'"
+    "outdated": "lerna exec \"npm-check-updates --timeout 120000\"",
+    "upgrade": "lerna exec \"npm-check-updates --timeout 120000 -u --target minor\""
   },
   "devDependencies": {
-    "husky": "^4.2.5",
-    "lerna": "^3.22.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint"
-    }
-  },
-  "dependencies": {
-    "npm-check-updates": "^7.1.1"
+    "lerna": "^3.22.1",
+    "npm-check-updates": "^11.1.1"
   }
 }
