@@ -44,7 +44,7 @@
   },
   "lint-staged": {
     "*.(ts|js|json)": [
-      "pretty-quick --staged --pattern **/*.{ts,js,json} --verbose --bail"
+      "pretty-quick --staged --pattern **/*.{ts,js,json} --verbose"
     ],
     "src/**/*.(ts|js)": [
       "npm run lint"
