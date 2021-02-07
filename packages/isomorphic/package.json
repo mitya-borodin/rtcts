@@ -1,5 +1,5 @@
 {
-  "version": "1.5.8",
+  "version": "1.5.13",
   "name": "@rtcts/isomorphic",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://github.com/mitya-borodin/rtcts",
@@ -55,7 +55,7 @@
   },
   "lint-staged": {
     "*.(ts|js|json)": [
-      "pretty-quick --staged --pattern ** --verbose --bail"
+      "pretty-quick --staged --pattern **/*.{ts,js,json} --verbose --bail"
     ],
     "src/**/*.(ts|js)": [
       "npm run lint"
@@ -65,12 +65,12 @@
     ]
   },
   "devDependencies": {
-    "@rtcts/utils": "^1.5.2",
+    "@rtcts/utils": "^1.5.13",
     "@types/jest": "^26.0.20",
     "@types/lodash.omit": "^4.5.6",
     "@types/lodash.pick": "^4.4.6",
-    "@types/node": "^14.14.25",
     "@types/moment": "^2.13.0",
+    "@types/node": "^14.14.25",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
     "eslint": "^7.19.0",

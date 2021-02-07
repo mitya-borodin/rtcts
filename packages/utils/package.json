@@ -1,5 +1,5 @@
 {
-  "version": "1.5.2",
+  "version": "1.5.13",
   "name": "@rtcts/utils",
   "description": "Contains utility functions",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (https://borodin.site)",
@@ -44,7 +44,7 @@
   },
   "lint-staged": {
     "*.(ts|js|json)": [
-      "pretty-quick --staged --pattern ** --verbose --bail"
+      "pretty-quick --staged --pattern **/*.{ts,js,json} --verbose --bail"
     ],
     "src/**/*.(ts|js)": [
       "npm run lint"

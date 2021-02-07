@@ -1,5 +1,5 @@
 {
-  "version": "1.5.2",
+  "version": "1.5.13",
   "name": "@rtcts/time-utils",
   "description": "Contains utility functions",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (https://borodin.site)",
@@ -44,7 +44,7 @@
   },
   "lint-staged": {
     "*.(ts|js|json)": [
-      "pretty-quick --staged --pattern ** --verbose --bail"
+      "pretty-quick --staged --pattern **/*.{ts,js,json} --verbose --bail"
     ],
     "src/**/*.(ts|js)": [
       "npm run lint"
@@ -57,10 +57,9 @@
     "moment": "^2.29.1"
   },
   "dependencies": {
-    "@rtcts/utils": "^1.5.2"
+    "@rtcts/utils": "^1.5.13"
   },
   "devDependencies": {
-    "moment": "^2.29.1",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
     "eslint": "^7.19.0",
@@ -71,6 +70,7 @@
     "lint-staged": "^10.5.4",
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
+    "moment": "^2.29.1",
     "npm-check-updates": "^11.1.1",
     "prettier": "^2.2.1",
     "pretty-quick": "^3.1.0",
