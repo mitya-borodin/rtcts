@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { getErrorMessage } from "@rtcts/utils";
 import chalk from "chalk";
 import EventEmitter from "eventemitter3";
@@ -150,7 +151,7 @@ export class MongoDBConnection extends EventEmitter {
           this.db = this.client.db(this.config.db.name);
           this.db
             .executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" })
-            .then(() => resolve(this.db))
+            .then(() => this.db && resolve(this.db))
             .catch(reject);
         } else {
           this.once(Status.OPEN, () => {
@@ -158,7 +159,7 @@ export class MongoDBConnection extends EventEmitter {
               this.db = this.client.db(this.config.db.name);
               this.db
                 .executeDbAdminCommand({ setFeatureCompatibilityVersion: "4.2" })
-                .then(() => resolve(this.db))
+                .then(() => this.db && resolve(this.db))
                 .catch(reject);
             } else {
               throw new Error(`Connection object is not instanceof MongoClient`);

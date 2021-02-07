@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
 import { Entity, ValueObject } from "@rtcts/isomorphic";
 import { isObject } from "@rtcts/utils";

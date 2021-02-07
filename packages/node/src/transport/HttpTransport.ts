@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Entity, User } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";

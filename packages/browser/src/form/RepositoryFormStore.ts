@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Entity, ValidationResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";

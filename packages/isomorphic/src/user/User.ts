@@ -10,6 +10,7 @@ import { Validation } from "../validation/Validation";
 import { ValidationResult } from "../validation/ValidationResult";
 
 export interface UserData {
+  [index: string]: any;
   readonly id?: string;
   readonly login?: string;
   readonly group?: string;
@@ -21,6 +22,7 @@ const noSecureFields: string[] = ["login", "group"];
 const secureFields: string[] = ["salt", "hashedPassword"];
 
 export class User implements Entity {
+  [index: string]: any;
   readonly id?: string;
   readonly login?: string;
   readonly group?: string;
@@ -44,7 +46,7 @@ export class User implements Entity {
     }
   }
 
-  isEntity(): this is Required<Omit<UserData, "salt" | "hashedPassword">> {
+  isEntity(): this is Required<Omit<UserData, "salt" | "hashedPassword">> & { id: string } {
     if (!isString(this.id)) {
       throw new Error(`${this.constructor.name}.id should be String`);
     }

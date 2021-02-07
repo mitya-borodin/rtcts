@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Response, User, userGroupEnum, ValidationResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import Koa from "koa";

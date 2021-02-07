@@ -1,4 +1,5 @@
-import { Entity, userEventEnum, Response, ListResponse } from "@rtcts/isomorphic";
+/* eslint-disable no-unused-vars */
+import { Entity, ListResponse, Response, userEventEnum } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";

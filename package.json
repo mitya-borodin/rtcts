@@ -11,6 +11,7 @@
     "upgrade": "lerna exec \"npm-check-updates --timeout 120000 -u --target minor\""
   },
   "devDependencies": {
+    "del-cli": "^3.0.1",
     "lerna": "^3.22.1",
     "npm-check-updates": "^11.1.1"
   }

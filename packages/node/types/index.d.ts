@@ -1,5 +1,6 @@
-import type Koa from "koa";
+/* eslint-disable no-unused-vars */
 import { Files } from "formidable";
+import type Koa from "koa";
 
 declare module "koa" {
   interface Request extends Koa.BaseRequest {

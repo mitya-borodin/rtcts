@@ -8,35 +8,35 @@ jobs:
       - name: Begin CI...
         uses: actions/checkout@v2
 
-      - name: Use Node 12
+      - name: Use Node 14
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 14.x
 
       - name: Use cached node_modules
         uses: actions/cache@v1
         with:
           path: node_modules
-          key: nodeModules-${{ hashFiles('**/yarn.lock') }}
+          key: nodeModules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             nodeModules-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm install --frozen-lockfile
         env:
           CI: true
 
       - name: Bootstrap
-        run: yarn bootstrap
+        run: npm run bootstrap
         env:
           CI: true
 
       - name: Lint
-        run: yarn lint
+        run: npm run lint
         env:
           CI: true
 
       - name: Test
-        run: yarn test
+        run: npm test
         env:
           CI: true

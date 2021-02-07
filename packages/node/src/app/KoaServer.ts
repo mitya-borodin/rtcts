@@ -50,7 +50,7 @@ export class KoaServer {
               }
 
               this.haveBeenRun = true;
-              resolve();
+              resolve(undefined);
             },
           );
         });

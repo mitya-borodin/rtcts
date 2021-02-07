@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Entity, Response, Send, ValidationResult } from "@rtcts/isomorphic";
 import { Collection } from "mongodb";
 import { MongoDBRepository } from "./MongoDBRepository";

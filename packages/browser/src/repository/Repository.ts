@@ -1,4 +1,5 @@
-import { Entity, ListResponse, Response, wsEventEnum, ValidationResult } from "@rtcts/isomorphic";
+/* eslint-disable no-unused-vars */
+import { Entity, ListResponse, Response, ValidationResult, wsEventEnum } from "@rtcts/isomorphic";
 import { getErrorMessage, isArray, isObject } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
 import { action, computed, observable, ObservableMap, runInAction } from "mobx";

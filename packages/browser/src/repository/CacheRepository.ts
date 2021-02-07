@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Entity } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";

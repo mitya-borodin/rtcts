@@ -1,4 +1,5 @@
-import { Response, User, ValidationResult, Validation, logTypeEnum } from "@rtcts/isomorphic";
+/* eslint-disable no-unused-vars */
+import { logTypeEnum, Response, User, Validation, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import Koa from "koa";
 import koaLogger from "koa-logger";

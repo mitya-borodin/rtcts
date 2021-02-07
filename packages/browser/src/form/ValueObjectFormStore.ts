@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/require-await */
 import { ValidationResult, ValueObject } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";

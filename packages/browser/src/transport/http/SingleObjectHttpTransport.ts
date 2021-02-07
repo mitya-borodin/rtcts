@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Entity, Response } from "@rtcts/isomorphic";
 import EventEmitter from "eventemitter3";
 import { WSClient } from "../ws/WSClient";

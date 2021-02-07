@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Entity, User } from "@rtcts/isomorphic";
 import Koa from "koa";

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/require-await */
 import { Entity } from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";

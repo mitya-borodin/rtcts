@@ -1,13 +1,14 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   ListResponse,
+  logTypeEnum,
   Response,
   Send,
   User,
   userGroupEnum,
-  ValidationResult,
   Validation,
-  logTypeEnum,
+  ValidationResult,
 } from "@rtcts/isomorphic";
 import { checkPassword, isString } from "@rtcts/utils";
 import { ObjectId } from "bson";

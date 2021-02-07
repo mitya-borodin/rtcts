@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum wsEventEnum {
   OPEN = "OPEN",
   CLOSE = "CLOSE",

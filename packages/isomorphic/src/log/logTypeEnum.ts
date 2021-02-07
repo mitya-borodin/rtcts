@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum logTypeEnum {
   log = "log",
   info = "info",

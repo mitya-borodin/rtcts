@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ListResponse, Response, User } from "@rtcts/isomorphic";
 import EventEmitter from "eventemitter3";
 import {
