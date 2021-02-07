@@ -1,5 +1,5 @@
 {
-  "version": "1.5.13",
+  "version": "1.6.0",
   "name": "@rtcts/typescript-entity-compiler",
   "description": "Typescript compiler for entities",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
@@ -63,7 +63,7 @@
     ]
   },
   "dependencies": {
-    "@rtcts/isomorphic": "^1.5.13"
+    "@rtcts/isomorphic": "^1.6.0"
   },
   "devDependencies": {
     "@types/moment": "^2.13.0",
