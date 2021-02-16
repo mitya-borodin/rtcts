@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "name": "@rtcts/browser",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
   "homepage": "https://github.com/mitya-borodin/rtcts",
@@ -59,8 +59,8 @@
     "mobx": "^6.1.6"
   },
   "devDependencies": {
-    "@rtcts/isomorphic": "^1.6.1",
-    "@rtcts/utils": "^1.6.1",
+    "@rtcts/isomorphic": "^1.6.2",
+    "@rtcts/utils": "^1.6.2",
     "@types/eventemitter3": "^2.0.2",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.28",

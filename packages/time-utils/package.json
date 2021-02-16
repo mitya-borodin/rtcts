@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "name": "@rtcts/time-utils",
   "description": "Contains utility functions",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (https://borodin.site)",
@@ -57,7 +57,7 @@
     "moment": "^2.29.1"
   },
   "dependencies": {
-    "@rtcts/utils": "^1.6.1"
+    "@rtcts/utils": "^1.6.2"
   },
   "devDependencies": {
     "husky": "^5.0.9",
