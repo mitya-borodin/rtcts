@@ -351,7 +351,7 @@ export class UserRepository<
     }
   }
 
-  @action("UserRepository.remove")
+  @override
   public async remove(id: string): Promise<void> {
     try {
       this.start();
