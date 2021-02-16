@@ -51,6 +51,8 @@ export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Chan
     this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
       const wsid = ctx.headers[this.webSocketIdHeaderKey];
 
+      ctx.request.wsid = "";
+
       if (typeof wsid === "string") {
         ctx.request.wsid = wsid;
       }

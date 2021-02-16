@@ -1,12 +1,5 @@
 /* eslint-disable no-unused-vars */
-import {
-  Entity,
-  ListResponse,
-  logTypeEnum,
-  User,
-  Validation,
-  ValidationResult,
-} from "@rtcts/isomorphic";
+import { Entity, User } from "@rtcts/isomorphic";
 import Koa from "koa";
 import { getAuthenticateMiddleware } from "../app/auth";
 import { getRequestBodyJson } from "../app/getRequestBodyJson";
@@ -86,30 +79,25 @@ export class HttpTransport<
       getAuthenticateMiddleware(),
       async (ctx: Koa.Context): Promise<void> => {
         await this.executor(ctx, URL, this.ACL.getList, this.switchers.getList, async () => {
-          const { offset, limit } = ctx.query;
+          const offsetValue = ctx.query.offset;
+          const limitValue = ctx.query.limit;
 
-          if (typeof offset === "number" && typeof limit === "number") {
-            const listResponse = await this.model.getListResponse(offset, limit);
+          let offset = 0;
+          let limit = 20;
 
-            ctx.status = 200;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(listResponse);
-          } else {
-            ctx.status = 500;
-            ctx.type = "application/json";
-            ctx.body = JSON.stringify(
-              new ListResponse({
-                count: 0,
-                payload: [],
-                validationResult: new ValidationResult(
-                  new Validation({
-                    title: "Offset and limit wasn't received.",
-                    type: logTypeEnum.error,
-                  }),
-                ),
-              }),
-            );
+          if (typeof offsetValue === "string") {
+            offset = parseInt(offsetValue);
           }
+
+          if (typeof limitValue === "string") {
+            limit = parseInt(limitValue);
+          }
+
+          const listResponse = await this.model.getListResponse(offset, limit);
+
+          ctx.status = 200;
+          ctx.type = "application/json";
+          ctx.body = JSON.stringify(listResponse);
         });
       },
     );

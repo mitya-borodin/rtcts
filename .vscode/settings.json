@@ -58,7 +58,8 @@
 
   "conventionalCommits.scopes": [
     "settings",
-    "mobx"
+    "mobx",
+    "back"
   ],
 
   "javascript.preferences.importModuleSpecifier": "relative",
