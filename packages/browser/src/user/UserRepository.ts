@@ -2,7 +2,7 @@
 import { ListResponse, Response, User, userEventEnum, userGroupEnum } from "@rtcts/isomorphic";
 import { getErrorMessage, isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
-import { action, computed, observable, runInAction } from "mobx";
+import { action, computed, observable, override, runInAction } from "mobx";
 import { Repository } from "../repository/Repository";
 import { WSClient } from "../transport/ws/WSClient";
 import { UserHTTPTransport } from "./UserHTTPTransport";
@@ -64,7 +64,7 @@ export class UserRepository<
     return isString(this.id);
   }
 
-  @action("UserRepository.init")
+  @override
   public async init(): Promise<void> {
     if (this.isInit) {
       return;
