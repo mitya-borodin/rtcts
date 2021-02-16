@@ -87,10 +87,7 @@ export class UserRepository<
         }
 
         // * Завершаем процедуру инициализации
-        runInAction(
-          `Initialization (${this.constructor.name}) has been succeed`,
-          () => (this.isInit = true),
-        );
+        runInAction(() => (this.isInit = true));
       } else {
         this.pubSub.emit(userEventEnum.GO_TO_SIGN_IN);
       }
@@ -217,7 +214,7 @@ export class UserRepository<
           return;
         }
 
-        runInAction(`Create (${this.constructor.name}) has been succeed`, () => {
+        runInAction(() => {
           this.collection.set(entity.id, entity);
         });
       } else {
@@ -271,7 +268,7 @@ export class UserRepository<
         return;
       }
 
-      runInAction(`UpdateLogin (${this.constructor.name}) has been succeed`, () => {
+      runInAction(() => {
         this.collection.set(entity.id, entity);
       });
     } catch (error) {
@@ -312,9 +309,7 @@ export class UserRepository<
         return;
       }
 
-      runInAction(`UpdatePassword (${this.constructor.name}) has been succeed`, () =>
-        this.collection.set(entity.id, entity),
-      );
+      runInAction(() => this.collection.set(entity.id, entity));
     } catch (error) {
       console.error(
         `UpdatePassword (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,
@@ -340,7 +335,7 @@ export class UserRepository<
 
       this.validationResult = listResponse.validationResult.clone();
 
-      runInAction(`UpdateGroup (${this.constructor.name}) has been succeed`, () => {
+      runInAction(() => {
         for (const user of listResponse.payload) {
           if (user.isEntity()) {
             this.collection.set(user.id, user);
@@ -379,9 +374,7 @@ export class UserRepository<
         return;
       }
 
-      runInAction(`Remove (${this.constructor.name}) has been succeed`, () =>
-        this.collection.delete(entity.id),
-      );
+      runInAction(() => this.collection.delete(entity.id));
     } catch (error) {
       console.error(`Remove (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`);
     } finally {
@@ -431,32 +424,29 @@ export class UserRepository<
         return;
       }
 
-      await runInAction(
-        `fetchCurrentUser (${this.constructor.name}) has been succeed`,
-        async () => {
-          this.user = entity;
-          this.collection.set(entity.id, entity);
+      await runInAction(async () => {
+        this.user = entity;
+        this.collection.set(entity.id, entity);
 
-          const observableUser = this.collection.get(entity.id);
+        const observableUser = this.collection.get(entity.id);
 
-          if (observableUser instanceof this.Entity && observableUser.checkNoSecureFields()) {
-            this.pubSub.emit(userEventEnum.SET_USER, observableUser);
-            this.pubSub.emit(userEventEnum.SET_USER_GROUP, observableUser.group);
-          }
+        if (observableUser instanceof this.Entity && observableUser.checkNoSecureFields()) {
+          this.pubSub.emit(userEventEnum.SET_USER, observableUser);
+          this.pubSub.emit(userEventEnum.SET_USER_GROUP, observableUser.group);
+        }
 
-          this.ws.setUserID(entity.id);
+        this.ws.setUserID(entity.id);
 
-          if (!this.ws.isOpen) {
-            await this.ws.connect();
-          }
+        if (!this.ws.isOpen) {
+          await this.ws.connect();
+        }
 
-          if (!this.ws.isUserBindToConnection) {
-            await this.ws.bindUserToConnection();
-          }
+        if (!this.ws.isUserBindToConnection) {
+          await this.ws.bindUserToConnection();
+        }
 
-          this.pubSub.emit(userEventEnum.SIGN_IN);
-        },
-      );
+        this.pubSub.emit(userEventEnum.SIGN_IN);
+      });
     } catch (error) {
       console.error(
         `fetchCurrentUser (${this.constructor.name}) has been failed: ${getErrorMessage(error)}`,

@@ -49,8 +49,11 @@ export abstract class BaseHttpTransport<USER extends User, CHANNELS extends Chan
 
     this.router.use(koaLogger());
     this.router.use(async (ctx: Koa.Context, next: Koa.Next) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-      ctx.request.wsid = ctx.headers[this.webSocketIdHeaderKey];
+      const wsid = ctx.headers[this.webSocketIdHeaderKey];
+
+      if (typeof wsid === "string") {
+        ctx.request.wsid = wsid;
+      }
 
       await next();
     });

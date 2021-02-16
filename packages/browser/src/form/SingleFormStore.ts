@@ -2,7 +2,7 @@
 import { Entity, ValidationResult } from "@rtcts/isomorphic";
 import { getErrorMessage } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
-import { computed } from "mobx";
+import { override } from "mobx";
 import { SingleRepositoryPubSubEnum } from "../enums/SingleRepositoryPubSubEnum";
 import { SingleObjectRepository } from "../repository/SingleObjectRepository";
 import { SingleObjectHttpTransport } from "../transport/http/SingleObjectHttpTransport";
@@ -31,7 +31,7 @@ export class SingleFormStore<
     this.submitForm = this.submitForm.bind(this);
   }
 
-  @computed({ name: "SingleFormStore.externalValidationResult" })
+  @override
   get externalValidationResult(): ValidationResult {
     return this.repository.validationResult;
   }

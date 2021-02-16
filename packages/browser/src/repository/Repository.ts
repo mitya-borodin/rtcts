@@ -116,7 +116,7 @@ export class Repository<
 
       this.validationResult = listResponse.validationResult.clone();
 
-      runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
+      runInAction(() => {
         const collection: ENTITY[] = [];
 
         for (const item of listResponse.payload) {
@@ -175,7 +175,7 @@ export class Repository<
         return;
       }
 
-      runInAction(`Create (${this.constructor.name}) succeed`, () => {
+      runInAction(() => {
         this.collection.set(entity.id, entity);
       });
 
@@ -222,7 +222,7 @@ export class Repository<
         return;
       }
 
-      runInAction(`Update (${this.constructor.name}) succeed`, () => {
+      runInAction(() => {
         this.collection.set(entity.id, entity);
       });
 
@@ -270,7 +270,7 @@ export class Repository<
         return;
       }
 
-      runInAction(`Remove (${this.constructor.name}) succeed`, () => {
+      runInAction(() => {
         this.collection.delete(entity.id);
       });
 
@@ -397,15 +397,15 @@ export class Repository<
   }
 
   protected start(): void {
-    runInAction(`Start pending for (${this.constructor.name})`, () => (this.pending = true));
+    runInAction(() => (this.pending = true));
   }
 
   protected stop(): void {
-    runInAction(`Stop pending for (${this.constructor.name})`, () => (this.pending = false));
+    runInAction(() => (this.pending = false));
   }
 
   protected destroy(): void {
-    runInAction(`${this.constructor.name}.destroy`, () => {
+    runInAction(() => {
       this.isInit = false;
       this.pending = false;
       this.collection.clear();

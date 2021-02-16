@@ -93,7 +93,7 @@ export class SingleObjectRepository<
 
       this.validationResult = response.validationResult.clone();
 
-      runInAction(`Initialization (${this.constructor.name}) has been succeed`, () => {
+      runInAction(() => {
         if (!response.payload) {
           throw new Error(`response.payload is empty`);
         }
@@ -137,7 +137,7 @@ export class SingleObjectRepository<
 
       this.validationResult = response.validationResult.clone();
 
-      runInAction(`Update (${this.constructor.name}) has been succeed`, () => {
+      runInAction(() => {
         if (!response.payload) {
           throw new Error(`response.payload is empty`);
         }
@@ -198,15 +198,15 @@ export class SingleObjectRepository<
   }
 
   protected start(): void {
-    runInAction(`Start pending for (${this.constructor.name})`, () => (this.pending = true));
+    runInAction(() => (this.pending = true));
   }
 
   protected stop(): void {
-    runInAction(`Stop pending for (${this.constructor.name})`, () => (this.pending = false));
+    runInAction(() => (this.pending = false));
   }
 
   protected destroy(): void {
-    runInAction(`${this.constructor.name} was destroyed`, () => {
+    runInAction(() => {
       this.isInit = false;
       this.pending = false;
       this.entity = undefined;

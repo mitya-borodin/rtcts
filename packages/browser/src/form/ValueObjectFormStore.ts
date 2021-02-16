@@ -59,10 +59,7 @@ export class ValueObjectFormStore<VALUE_OBJECT extends ValueObject, DATA> extend
   }
 
   public async open(): Promise<void> {
-    runInAction(
-      `Open (${this.constructor.name}) has been open succeed`,
-      () => (this.form = new this.Entity({})),
-    );
+    runInAction(() => (this.form = new this.Entity({})));
   }
 
   public async change(change: DATA & { inputFiles?: File[] }): Promise<void> {
@@ -87,7 +84,7 @@ export class ValueObjectFormStore<VALUE_OBJECT extends ValueObject, DATA> extend
 
       const form = await this.changeForm(this.form, change);
 
-      runInAction(`${title} succeed`, () => (this.form = form));
+      runInAction(() => (this.form = form));
     } catch (error) {
       console.error(`${title} failed: ${getErrorMessage(error)}`);
     } finally {
@@ -121,7 +118,7 @@ export class ValueObjectFormStore<VALUE_OBJECT extends ValueObject, DATA> extend
   }
 
   public cancel(): void {
-    runInAction(`Cancel (${this.constructor.name}) has been succeed`, () => {
+    runInAction(() => {
       this.pending = false;
       this.inputFiles = [];
       this.form = undefined;
@@ -133,25 +130,19 @@ export class ValueObjectFormStore<VALUE_OBJECT extends ValueObject, DATA> extend
   }
 
   protected start(): void {
-    runInAction(`Start pending (${this.constructor.name})`, () => (this.pending = true));
+    runInAction(() => (this.pending = true));
   }
 
   protected stop(): void {
-    runInAction(`Stop pending (${this.constructor.name})`, () => (this.pending = false));
+    runInAction(() => (this.pending = false));
   }
 
   protected showValidation(): void {
-    runInAction(
-      `To show the result of validation (${this.constructor.name})`,
-      () => (this.showValidateResult = true),
-    );
+    runInAction(() => (this.showValidateResult = true));
   }
 
   protected hideValidation(): void {
-    runInAction(
-      `To hide the result of validation (${this.constructor.name})`,
-      () => (this.showValidateResult = false),
-    );
+    runInAction(() => (this.showValidateResult = false));
   }
 
   protected async changeForm(

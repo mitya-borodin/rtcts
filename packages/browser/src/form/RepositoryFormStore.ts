@@ -2,7 +2,7 @@
 import { Entity, ValidationResult } from "@rtcts/isomorphic";
 import { isString } from "@rtcts/utils";
 import EventEmitter from "eventemitter3";
-import { computed } from "mobx";
+import { override } from "mobx";
 import { Repository } from "../repository/Repository";
 import { RepositoryHttpTransport } from "../transport/http/RepositoryHttpTransport";
 import { WSClient } from "../transport/ws/WSClient";
@@ -39,7 +39,7 @@ export class RepositoryFormStore<
     this.repository.on(Repository.events.removeSubmit, this.cancel);
   }
 
-  @computed({ name: "RepositoryFormStore.externalValidationResult" })
+  @override
   get externalValidationResult(): ValidationResult {
     return this.repository.validationResult;
   }

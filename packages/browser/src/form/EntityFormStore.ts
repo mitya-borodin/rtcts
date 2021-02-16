@@ -24,7 +24,7 @@ export class EntityFormStore<ENTITY extends Entity, DATA> extends ValueObjectFor
       this.start();
       const form = await this.openForm(id);
 
-      runInAction(`${title} succeed`, () => (this.form = form));
+      runInAction(() => (this.form = form));
     } catch (error) {
       console.error(`${title} failed: ${getErrorMessage(error)}`);
     } finally {
