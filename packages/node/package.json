@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2",
+  "version": "1.6.5",
   "name": "@rtcts/node",
   "description": "Contains basic abstractions and implementations for creating a node application",
   "author": "Dmitriy Borodin <dmitriy@borodin.site> (http://borodin.site)",
